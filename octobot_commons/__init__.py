@@ -13,3 +13,6 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+
+PROJECT_NAME = "OctoBot-Commons"
+VERSION = "1.0.0"  # major.minor.revision
