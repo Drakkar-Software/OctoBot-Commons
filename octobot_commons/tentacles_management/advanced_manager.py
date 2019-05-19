@@ -20,11 +20,8 @@ from octobot_commons.logging.logging_util import get_logger
 
 try:
     from config import CONFIG_ADVANCED_CLASSES, CONFIG_ADVANCED_INSTANCES
-    from evaluator.Util.abstract_util import AbstractUtil
-    from evaluator.abstract_evaluator import AbstractEvaluator
-    from trading.trader.modes.abstract_trading_mode import AbstractTradingMode
 except ImportError:
-    get_logger("AdvancedManager").exception("Failed to import")
+    get_logger("AdvancedManager").exception("Failed to import config")
 
 
 class AdvancedManager:
@@ -86,6 +83,13 @@ class AdvancedManager:
 
     @staticmethod
     def create_class_list(config):
+        try:
+            from evaluator.Util.abstract_util import AbstractUtil
+            from trading.trader.modes.abstract_trading_mode import AbstractTradingMode
+            from evaluator.abstract_evaluator import AbstractEvaluator
+        except ImportError:
+            raise ImportError("Failed to load Abstracts classes")
+
         config[CONFIG_ADVANCED_CLASSES] = {}
         config[CONFIG_ADVANCED_INSTANCES] = {}
 
