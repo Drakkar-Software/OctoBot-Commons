@@ -1,4 +1,4 @@
-#  Drakkar-Software OctoBot-Commons
+#  Drakkar-Software OctoBot
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -14,7 +14,25 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.1.1"  # major.minor.revision
+from abc import *
 
-MARKET_SEPARATOR = "/"
+
+class Initializable:
+
+    def __init__(self):
+        self.is_initialized = False
+
+    # calls initialize_impl if not initialized
+    async def initialize(self, force=False):
+        if not self.is_initialized or force:
+            await self.initialize_impl()
+            self.is_initialized = True
+            return True
+        return False
+
+    @abstractmethod
+    async def initialize_impl(self):
+        raise NotImplementedError("initialize_impl not implemented")
+
+    def get_is_initialized(self):
+        return self.is_initialized

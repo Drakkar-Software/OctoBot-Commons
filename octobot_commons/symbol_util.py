@@ -1,4 +1,4 @@
-#  Drakkar-Software OctoBot-Commons
+#  Drakkar-Software OctoBot
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -14,7 +14,20 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.1.1"  # major.minor.revision
+from octobot_commons import MARKET_SEPARATOR
 
-MARKET_SEPARATOR = "/"
+
+# Return currency, market
+def split_symbol(symbol):
+    splitted = symbol.split(MARKET_SEPARATOR)
+    return splitted[0], splitted[1]
+
+
+# Return merged currency and market without /
+def merge_symbol(symbol):
+    return symbol.replace(MARKET_SEPARATOR, "")
+
+
+# Merge currency and market
+def merge_currencies(currency, market):
+    return f"{currency}/{market}"
