@@ -29,5 +29,14 @@ def merge_symbol(symbol):
 
 
 # Merge currency and market
-def merge_currencies(currency, market):
-    return f"{currency}/{market}"
+def merge_currencies(currency, market, separator=MARKET_SEPARATOR):
+    return f"{currency}{separator}{market}"
+
+
+# convert symbol
+def convert_symbol(symbol, symbol_separator,
+                   new_symbol_separator=MARKET_SEPARATOR,
+                   should_uppercase=False):
+    if should_uppercase:
+        return symbol.replace(symbol_separator, new_symbol_separator).upper()
+    return symbol.replace(symbol_separator, new_symbol_separator)
