@@ -36,7 +36,10 @@ def merge_currencies(currency, market, separator=MARKET_SEPARATOR):
 # convert symbol
 def convert_symbol(symbol, symbol_separator,
                    new_symbol_separator=MARKET_SEPARATOR,
-                   should_uppercase=False):
+                   should_uppercase=False,
+                   should_lowercase=False):
     if should_uppercase:
         return symbol.replace(symbol_separator, new_symbol_separator).upper()
+    if should_lowercase:
+        return symbol.replace(symbol_separator, new_symbol_separator).lower()
     return symbol.replace(symbol_separator, new_symbol_separator)
