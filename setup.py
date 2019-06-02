@@ -32,7 +32,6 @@ setup(
     name=PROJECT_NAME,
     version=VERSION,
     url='https://github.com/Drakkar-Software/OctoBot-Commons',
-    license='LGPL-3.0',
     author='Drakkar-Software',
     author_email='drakkar-software@protonmail.com',
     description='OctoBot project common modules',
@@ -46,6 +45,7 @@ setup(
     python_requires=REQUIRES_PYTHON,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
+        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
         'Operating System :: OS Independent',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: Microsoft :: Windows',
