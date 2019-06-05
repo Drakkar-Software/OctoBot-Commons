@@ -1,4 +1,4 @@
-#  Drakkar-Software OctoBot-Commons
+#  Drakkar-Software OctoBot
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -14,8 +14,6 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.1.6"  # major.minor.revision
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
+def round_into_str_with_max_digits(number, digits_count):
+    return "{:.{}f}".format(round(number, digits_count), digits_count)

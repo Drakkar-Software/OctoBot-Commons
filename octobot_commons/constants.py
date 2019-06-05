@@ -14,8 +14,5 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.1.6"  # major.minor.revision
-
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
+PORTFOLIO_AVAILABLE = "available"
+PORTFOLIO_TOTAL = "total"
