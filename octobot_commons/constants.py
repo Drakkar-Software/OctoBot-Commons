@@ -14,9 +14,16 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
+from octobot_commons.enums import TimeFrames
+
+# Strings
+CONFIG_WILDCARD = "*"
 PORTFOLIO_AVAILABLE = "available"
 PORTFOLIO_TOTAL = "total"
 
 # config
 CONFIG_ENABLED_OPTION = "enabled"
 CONFIG_TIME_FRAME = "time_frame"
+
+# Evaluators
+MIN_EVAL_TIME_FRAME = TimeFrames.FIVE_MINUTES
