@@ -16,3 +16,5 @@
 
 PORTFOLIO_AVAILABLE = "available"
 PORTFOLIO_TOTAL = "total"
+
+CONFIG_ENABLED_OPTION = "enabled"
