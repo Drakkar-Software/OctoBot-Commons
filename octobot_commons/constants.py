@@ -17,4 +17,6 @@
 PORTFOLIO_AVAILABLE = "available"
 PORTFOLIO_TOTAL = "total"
 
+# config
 CONFIG_ENABLED_OPTION = "enabled"
+CONFIG_TIME_FRAME = "time_frame"
