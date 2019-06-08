@@ -14,8 +14,8 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.1.11"  # major.minor.revision
+from octobot_commons.constants import DEFAULT_CONFIG_VALUES
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
+
+def has_invalid_default_config_value(*config_values):
+    return any(value in DEFAULT_CONFIG_VALUES for value in config_values)
