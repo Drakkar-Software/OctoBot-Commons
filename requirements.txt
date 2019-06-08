@@ -1,2 +1,4 @@
 # Telegram
 python-telegram-bot
+
+numpy
