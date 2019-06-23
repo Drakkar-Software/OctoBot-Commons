@@ -19,8 +19,11 @@ from octobot_commons import MARKET_SEPARATOR
 
 # Return currency, market
 def split_symbol(symbol):
-    splitted = symbol.split(MARKET_SEPARATOR)
-    return splitted[0], splitted[1]
+    try:
+        splitted = symbol.split(MARKET_SEPARATOR)
+        return splitted[0], splitted[1]
+    except IndexError:
+        return symbol
 
 
 # Return merged currency and market without /
