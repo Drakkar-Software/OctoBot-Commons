@@ -26,18 +26,18 @@ class PrettyPrinter:
     ORDER_TIME_FORMAT = '%m-%d %H:%M'
 
     @staticmethod
-    def open_order_pretty_printer(order, markdown=False):
+    def open_order_pretty_printer(exchange_name, order, markdown=False):
         _, _, c = PrettyPrinter.get_markets(markdown)
         currency, market = order.get_currency_and_market()
-        order_type_name = order.get_order_type().name
+        order_type_name = order.order_type.name
 
-        return f"{c}{order_type_name}{c}: {c}{PrettyPrinter.get_min_string_from_number(order.get_origin_quantity())} " \
-            f"{currency}{c} at {c}{PrettyPrinter.get_min_string_from_number(order.get_origin_price())} {market}{c} " \
-            f" {order.get_exchange().get_name()} " \
-            f"{convert_timestamp_to_datetime(order.get_creation_time(), time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
+        return f"{c}{order_type_name}{c}: {c}{PrettyPrinter.get_min_string_from_number(order.origin_quantity)} " \
+            f"{currency}{c} at {c}{PrettyPrinter.get_min_string_from_number(order.origin_price)} {market}{c} " \
+            f" {exchange_name} " \
+            f"{convert_timestamp_to_datetime(order.creation_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
 
     @staticmethod
-    def trade_pretty_printer(trade, markdown=False):
+    def trade_pretty_printer(exchange_name, trade, markdown=False):
         _, _, c = PrettyPrinter.get_markets(markdown)
         currency = trade.currency
         market = trade.market
@@ -45,7 +45,7 @@ class PrettyPrinter:
         
         return f"{c}{order_type_name}{c}: {c}{PrettyPrinter.get_min_string_from_number(trade.quantity)} {currency}{c}" \
             f" at {c}{PrettyPrinter.get_min_string_from_number(trade.price)} {market}{c} " \
-            f"{trade.exchange.get_name()} " \
+            f"{exchange_name} " \
             f"{convert_timestamp_to_datetime(trade.filled_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
 
     @staticmethod
