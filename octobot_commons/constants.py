@@ -27,9 +27,21 @@ CONFIG_TIME_FRAME = "time_frame"
 USER_FOLDER = "user"
 CONFIG_FILE = "config.json"
 DEFAULT_CONFIG_FILE = "config/default_config.json"
+SCHEMA = "schema"
+CONFIG_FOLDER = "config"
+CONFIG_FILE_EXT = ".json"
+CONFIG_FILE_SCHEMA = f"{CONFIG_FOLDER}/config_{SCHEMA}.json"
 
 # Evaluators
 MIN_EVAL_TIME_FRAME = TimeFrames.FIVE_MINUTES
+
+# tentacles
+TENTACLE_CONFIG_FOLDER = "config"
+TENTACLES_PATH = "tentacles"
+
+# Advanced
+CONFIG_ADVANCED_CLASSES = "advanced_classes"
+CONFIG_ADVANCED_INSTANCES = "advanced_instances"
 
 # default values in config files and interfaces
 DEFAULT_CONFIG_VALUES = {"your-api-key-here", "your-api-secret-here", "your-api-password-here", "NOKEY", "Empty"}

@@ -16,12 +16,8 @@
 
 from copy import copy
 
+from octobot_commons.constants import CONFIG_ADVANCED_INSTANCES, CONFIG_ADVANCED_CLASSES
 from octobot_commons.logging.logging_util import get_logger
-
-try:
-    from config import CONFIG_ADVANCED_CLASSES, CONFIG_ADVANCED_INSTANCES
-except ImportError:
-    get_logger("AdvancedManager").exception("Failed to import config")
 
 
 class AdvancedManager:

@@ -17,13 +17,9 @@
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 
-from octobot_commons.logging.logging_util import get_logger
+from octobot_commons.config import load_config
 
-try:
-    from config.config import load_config
-    from config import TENTACLES_PATH, TENTACLE_CONFIG_FOLDER, CONFIG_FILE_EXT, SCHEMA
-except ImportError:
-    get_logger("AbstractTentacle").exception("Failed to import")
+from octobot_commons.constants import SCHEMA, CONFIG_FILE_EXT, TENTACLE_CONFIG_FOLDER, TENTACLES_PATH
 
 
 class AbstractTentacle:

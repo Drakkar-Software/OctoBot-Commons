@@ -14,3 +14,6 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
+from .abstract_tentacle import *
+from .advanced_manager import *
+from .class_inspector import *
