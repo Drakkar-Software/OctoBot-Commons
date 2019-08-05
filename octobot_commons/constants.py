@@ -24,6 +24,9 @@ PORTFOLIO_TOTAL = "total"
 # config
 CONFIG_ENABLED_OPTION = "enabled"
 CONFIG_TIME_FRAME = "time_frame"
+USER_FOLDER = "user"
+CONFIG_FILE = "config.json"
+DEFAULT_CONFIG_FILE = "config/default_config.json"
 
 # Evaluators
 MIN_EVAL_TIME_FRAME = TimeFrames.FIVE_MINUTES
