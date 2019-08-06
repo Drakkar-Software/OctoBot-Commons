@@ -1,3 +1,4 @@
+jsonschema
 # Telegram
 python-telegram-bot
 

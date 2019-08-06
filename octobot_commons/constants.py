@@ -23,6 +23,7 @@ PORTFOLIO_TOTAL = "total"
 
 # config
 CONFIG_ENABLED_OPTION = "enabled"
+CONFIG_DEBUG_OPTION = "DEV-MODE"
 CONFIG_TIME_FRAME = "time_frame"
 USER_FOLDER = "user"
 CONFIG_FILE = "config.json"
@@ -44,6 +45,23 @@ TENTACLES_TRADING_PATH = "Trading"
 # Advanced
 CONFIG_ADVANCED_CLASSES = "advanced_classes"
 CONFIG_ADVANCED_INSTANCES = "advanced_instances"
+
+# terms of service
+CONFIG_ACCEPTED_TERMS = "accepted_terms"
+
+# metrics
+CONFIG_METRICS = "metrics"
+CONFIG_METRICS_BOT_ID = "metrics-bot-id"
+TIMER_BEFORE_METRICS_REGISTRATION_SECONDS = 600
+TIMER_BETWEEN_METRICS_UPTIME_UPDATE = 3600 * 4
+METRICS_URL = "https://octobotmetrics.herokuapp.com/"
+METRICS_ROUTE_GEN_BOT_ID = "gen-bot-id"
+METRICS_ROUTE = "metrics"
+METRICS_ROUTE_COMMUNITY = f"{METRICS_ROUTE}/community"
+METRICS_ROUTE_UPTIME = f"{METRICS_ROUTE}/uptime"
+METRICS_ROUTE_REGISTER = f"{METRICS_ROUTE}/register"
+COMMUNITY_TOPS_COUNT = 1000
+PLATFORM_DATA_SEPARATOR = ":"
 
 # default values in config files and interfaces
 DEFAULT_CONFIG_VALUES = {"your-api-key-here", "your-api-secret-here", "your-api-password-here", "NOKEY", "Empty"}

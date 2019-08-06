@@ -79,24 +79,28 @@ class AdvancedManager:
 
     @staticmethod
     def create_class_list(config):
-        try:
-            from evaluator.Util.abstract_util import AbstractUtil
-            from trading.trader.modes.abstract_trading_mode import AbstractTradingMode
-            from evaluator.abstract_evaluator import AbstractEvaluator
-        except ImportError:
-            raise ImportError("Failed to load Abstracts classes")
-
         config[CONFIG_ADVANCED_CLASSES] = {}
         config[CONFIG_ADVANCED_INSTANCES] = {}
 
-        # Evaluators
-        AdvancedManager._get_advanced(config, AbstractEvaluator)
+        try:
+            from octobot_evaluators.evaluator.abstract_util import AbstractUtil
+            from octobot_evaluators.evaluator.abstract_evaluator import AbstractEvaluator
 
-        # Util
-        AdvancedManager._get_advanced(config, AbstractUtil)
+            # Evaluators
+            AdvancedManager._get_advanced(config, AbstractEvaluator)
 
-        # Trading modes
-        AdvancedManager._get_advanced(config, AbstractTradingMode)
+            # Util
+            AdvancedManager._get_advanced(config, AbstractUtil)
+        except ImportError:
+            get_logger(AdvancedManager.__name__).warning("Failed to load Evaluator Abstracts classes")
+
+        try:
+            from octobot_trading.trader.modes.abstract_trading_mode import AbstractTradingMode
+
+            # Trading modes
+            AdvancedManager._get_advanced(config, AbstractTradingMode)
+        except ImportError:
+            get_logger(AdvancedManager.__name__).warning("Failed to load Trading Abstracts classes")
 
     @staticmethod
     def init_advanced_classes_if_necessary(config):
@@ -163,9 +167,8 @@ class AdvancedManager:
     def create_advanced_evaluator_types_list(evaluator_class, config):
         evaluator_advanced_eval_class_list = []
         for evaluator_subclass in evaluator_class.__subclasses__():
-            for eval_class in evaluator_subclass.__subclasses__():
-                for eval_class_type in AdvancedManager.get_classes(config, eval_class):
-                    evaluator_advanced_eval_class_list.append(eval_class_type)
+            for eval_class_type in AdvancedManager.get_classes(config, evaluator_subclass):
+                evaluator_advanced_eval_class_list.append(eval_class_type)
 
         if not AdvancedManager._check_duplicate(evaluator_advanced_eval_class_list):
             get_logger(AdvancedManager.__name__).warning("Duplicate evaluator name.")
