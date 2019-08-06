@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.17] - 2019-08-06
+## Added
+- Constants from OctoBot-Tentacles-Manager
+
 ## [1.1.16] - 2019-08-05
 ## Changed
 - Tentacles management imports to prepare OctoBot-Tentacles-Manager migration to commons

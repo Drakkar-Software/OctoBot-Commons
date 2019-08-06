@@ -38,6 +38,8 @@ MIN_EVAL_TIME_FRAME = TimeFrames.FIVE_MINUTES
 # tentacles
 TENTACLE_CONFIG_FOLDER = "config"
 TENTACLES_PATH = "tentacles"
+TENTACLES_EVALUATOR_PATH = "Evaluator"
+TENTACLES_TRADING_PATH = "Trading"
 
 # Advanced
 CONFIG_ADVANCED_CLASSES = "advanced_classes"
