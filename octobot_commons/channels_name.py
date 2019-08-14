@@ -13,11 +13,21 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+from enum import Enum
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.1.23"  # major.minor.revision
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
+class OctoBotEvaluatorsChannelsName(Enum):
+    MATRIX = "Matrix"
 
-OCTOBOT_KEY = b'uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0=' # TODO temp
+
+class OctoBotTradingChannelsName(Enum):
+    TICKER_CHANNEL = "Ticker"
+    RECENT_TRADES_CHANNEL = "RecentTrade"
+    ORDER_BOOK_CHANNEL = "OrderBook"
+    KLINE_CHANNEL = "Kline"
+    OHLCV_CHANNEL = "OHLCV"
+    TRADES_CHANNEL = "Trades"
+    ORDERS_CHANNEL = "Orders"
+    BALANCE_CHANNEL = "Balance"
+    BALANCE_PROFITABILITY_CHANNEL = "BalanceProfitability"
+    POSITIONS_CHANNEL = "Positions"
