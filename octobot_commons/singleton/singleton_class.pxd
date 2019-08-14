@@ -17,4 +17,4 @@
 
 
 cdef class Singleton:
-    cdef public dict _instances
+    pass
