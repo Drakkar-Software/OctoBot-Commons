@@ -79,9 +79,31 @@ class AdvancedManager:
 
     @staticmethod
     def create_class_list(config):
-        config[CONFIG_ADVANCED_CLASSES] = {}
-        config[CONFIG_ADVANCED_INSTANCES] = {}
+        AdvancedManager.create_evaluator_classes_list(config)
+        AdvancedManager.create_trading_classes_list(config)
 
+    @staticmethod
+    def __init_class_list_config(config):
+        if CONFIG_ADVANCED_CLASSES not in config:
+            config[CONFIG_ADVANCED_CLASSES] = {}
+
+        if CONFIG_ADVANCED_INSTANCES not in config:
+            config[CONFIG_ADVANCED_INSTANCES] = {}
+
+    @staticmethod
+    def create_trading_classes_list(config):
+        AdvancedManager.__init_class_list_config(config)
+        try:
+            from octobot_trading.trader.modes.abstract_trading_mode import AbstractTradingMode
+
+            # Trading modes
+            AdvancedManager._get_advanced(config, AbstractTradingMode)
+        except ImportError:
+            get_logger(AdvancedManager.__name__).warning("Failed to load Trading Abstracts classes")
+
+    @staticmethod
+    def create_evaluator_classes_list(config):
+        AdvancedManager.__init_class_list_config(config)
         try:
             from octobot_evaluators.evaluator.abstract_util import AbstractUtil
             from octobot_evaluators.evaluator.abstract_evaluator import AbstractEvaluator
@@ -93,14 +115,6 @@ class AdvancedManager:
             AdvancedManager._get_advanced(config, AbstractUtil)
         except ImportError:
             get_logger(AdvancedManager.__name__).warning("Failed to load Evaluator Abstracts classes")
-
-        try:
-            from octobot_trading.trader.modes.abstract_trading_mode import AbstractTradingMode
-
-            # Trading modes
-            AdvancedManager._get_advanced(config, AbstractTradingMode)
-        except ImportError:
-            get_logger(AdvancedManager.__name__).warning("Failed to load Trading Abstracts classes")
 
     @staticmethod
     def init_advanced_classes_if_necessary(config):
