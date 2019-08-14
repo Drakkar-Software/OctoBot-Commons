@@ -17,4 +17,4 @@
 
 
 cdef class Singleton:
-    cdef public object _instance
+    cdef public dict _instances
