@@ -14,12 +14,20 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 # from distutils.extension import Extension
+from Cython.Build import cythonize
+from Cython.Distutils import build_ext
 from setuptools import find_packages
-from setuptools import setup
+from setuptools import setup, Extension
 
 from octobot_commons import PROJECT_NAME, VERSION
 
 PACKAGES = find_packages(exclude=["tests"])
+
+packages_list = ["octobot_commons.singleton.singleton_class"]
+
+ext_modules = [
+    Extension(package, [f"{package.replace('.', '/')}.py"])
+    for package in packages_list]
 
 # long description from README file
 with open('README.md', encoding='utf-8') as f:
@@ -37,12 +45,16 @@ setup(
     author_email='drakkar-software@protonmail.com',
     description='OctoBot project common modules',
     packages=PACKAGES,
+    include_package_data=True,
     long_description=DESCRIPTION,
     install_requires=REQUIRED,
+    cmdclass={'build_ext': build_ext},
     tests_require=["pytest"],
     test_suite="tests",
     zip_safe=False,
     data_files=[],
+    setup_requires=['Cython'],
+    ext_modules=cythonize(ext_modules),
     python_requires=REQUIRES_PYTHON,
     classifiers=[
         'Development Status :: 5 - Production/Stable',

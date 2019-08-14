@@ -3,3 +3,4 @@ jsonschema
 python-telegram-bot
 
 numpy
+cython
