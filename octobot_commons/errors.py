@@ -14,10 +14,18 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.1.25"  # major.minor.revision
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
+class ConfigError(Exception):
+    pass
 
-OCTOBOT_KEY = b'uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0=' # TODO temp
+
+class ConfigEvaluatorError(Exception):
+    pass
+
+
+class ConfigTradingError(Exception):
+    pass
+
+
+class TentacleNotFound(Exception):
+    pass
