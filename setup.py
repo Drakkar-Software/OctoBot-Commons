@@ -23,7 +23,8 @@ from octobot_commons import PROJECT_NAME, VERSION
 
 PACKAGES = find_packages(exclude=["tests"])
 
-packages_list = ["octobot_commons.singleton.singleton_class"]
+packages_list = ["octobot_commons.singleton.singleton_class",
+                 "octobot_commons.tentacles_management.abstract_tentacle"]
 
 ext_modules = [
     Extension(package, [f"{package.replace('.', '/')}.py"])
