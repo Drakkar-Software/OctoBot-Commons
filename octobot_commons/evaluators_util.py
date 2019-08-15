@@ -14,10 +14,21 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.1.28"  # major.minor.revision
+import math
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
+from octobot_commons.constants import START_PENDING_EVAL_NOTE
 
-OCTOBOT_KEY = b'uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0=' # TODO temp
+UNSET_EVAL_TYPE = "unset_eval_type_param"
+
+
+def check_valid_eval_note(eval_note, eval_type=UNSET_EVAL_TYPE, expected_eval_type=None):
+    """
+    Will also test evaluation type if if eval_type is provided.
+    :param eval_note:
+    :param eval_type:
+    :param expected_eval_type: Default expected_eval_type is EVALUATOR_EVAL_DEFAULT_TYPE
+    :return:
+    """
+    if eval_type != UNSET_EVAL_TYPE and (eval_type != expected_eval_type or expected_eval_type is None):
+        return False
+    return eval_note and eval_note is not START_PENDING_EVAL_NOTE and not math.isnan(eval_note)
