@@ -154,7 +154,7 @@ def get_instance(config, class_type, *args) -> object:
     return None
 
 
-def create_default_types_list(clazz):
+def create_default_types_list(clazz) -> list:
     default_class_list = []
     for current_subclass in clazz.__subclasses__():
         subclasses = current_subclass.__subclasses__()
