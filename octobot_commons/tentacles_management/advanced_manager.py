@@ -21,13 +21,15 @@ from octobot_commons.logging.logging_util import get_logger
 
 
 class AdvancedManager:
-    """ is_abstract will test if the class in an abstract one or not
-    by checking if __metaclass__ attribute is inherited or not we will know if the class is an abstract one
-
-    Returns True if it is an abstract one else False. """
-
     @staticmethod
-    def is_abstract(class_type):
+    def is_abstract(class_type) -> bool:
+        """
+        is_abstract will test if the class in an abstract one or not
+        by checking if __metaclass__ attribute is inherited or not we will know if the class is an abstract one
+        :param class_type: class_type to inspect
+        :return: True if it is an abstract one else False
+        """
+
         # Get class parental description
         mro = class_type.mro()
 
@@ -41,20 +43,24 @@ class AdvancedManager:
         try:
             if class_type.__metaclass__ == parent_metaclass:
                 return False
-            else:
-                return True
+            return True
         except AttributeError:
             return False
 
-    """ get_advanced will get each subclasses of the parameter class_type
-    For each abstract subclasses it will call itself with the reference abstract_class not set
-    If the current child is not abstract it will be set as the reference only if abstract_class is None
-    If there is not subclasses to class_type it will add class_type into the config advanced list 
-    with its name as a key or the reference class name --> abstract_class
-    """
-
     @staticmethod
-    def _get_advanced(config, class_type, abstract_class=None):
+    def _get_advanced(config, class_type, abstract_class=None) -> None:
+        """
+        get_advanced will get each subclasses of the parameter class_type
+        For each abstract subclasses it will call itself with the reference abstract_class not set
+        If the current child is not abstract it will be set as the reference only if abstract_class is None
+        If there is not subclasses to class_type it will add class_type into the config advanced list
+        with its name as a key or the reference class name --> abstract_class
+        :param config: global config dict
+        :param class_type: class type to append
+        :param abstract_class: abstract class to get advanced
+        :return: None
+        """
+
         if class_type.__subclasses__():
             for child in class_type.__subclasses__():
                 if AdvancedManager.is_abstract(child):
@@ -68,22 +74,31 @@ class AdvancedManager:
                         AdvancedManager._get_advanced(config, child, abstract_class)
         else:
             if abstract_class is not None:
-                AdvancedManager._append_to_class_list(config, abstract_class, class_type)
+                AdvancedManager.__append_to_class(config, abstract_class, class_type)
             else:
-                AdvancedManager._append_to_class_list(config, class_type.get_name(), class_type)
-
-    """ create_class_list will create a list with the best class available
-    Advanced class are declared into advanced folders of each packages
-    For AbstractEvaluator and AbstractUtil classes, this will call the get_advanced method to initialize the config list
-    """
+                AdvancedManager.__append_to_class(config, class_type.get_name(), class_type)
 
     @staticmethod
-    def create_class_list(config):
-        AdvancedManager.create_evaluator_classes_list(config)
-        AdvancedManager.create_trading_classes_list(config)
+    def create_classes_list(config, abstract_class) -> None:
+        """
+        create_class_list will create a list with the best class available
+        Advanced class are declared into advanced folders of each packages
+        This will call the get_advanced method to initialize the config list
+        :param config: global config dict
+        :param abstract_class: abstract class to get advanced child
+        :return: None
+        """
+        AdvancedManager.__init_class_list_config(config)
+        AdvancedManager._get_advanced(config, abstract_class)
 
     @staticmethod
-    def __init_class_list_config(config):
+    def __init_class_list_config(config) -> None:
+        """
+        Init advanced dicts in config if not exists
+        :param config: global config dict
+        :return: None
+        """
+
         if CONFIG_ADVANCED_CLASSES not in config:
             config[CONFIG_ADVANCED_CLASSES] = {}
 
@@ -91,62 +106,38 @@ class AdvancedManager:
             config[CONFIG_ADVANCED_INSTANCES] = {}
 
     @staticmethod
-    def create_trading_classes_list(config):
-        AdvancedManager.__init_class_list_config(config)
-        try:
-            from octobot_trading.trader.modes.abstract_trading_mode import AbstractTradingMode
-
-            # Trading modes
-            AdvancedManager._get_advanced(config, AbstractTradingMode)
-        except ImportError:
-            get_logger(AdvancedManager.__name__).warning("Failed to load Trading Abstracts classes")
-
-    @staticmethod
-    def create_evaluator_classes_list(config):
-        AdvancedManager.__init_class_list_config(config)
-        try:
-            from octobot_evaluators.evaluator.abstract_util import AbstractUtil
-            from octobot_evaluators.evaluator.abstract_evaluator import AbstractEvaluator
-
-            # Evaluators
-            AdvancedManager._get_advanced(config, AbstractEvaluator)
-
-            # Util
-            AdvancedManager._get_advanced(config, AbstractUtil)
-        except ImportError:
-            get_logger(AdvancedManager.__name__).warning("Failed to load Evaluator Abstracts classes")
-
-    @staticmethod
-    def init_advanced_classes_if_necessary(config):
-        if CONFIG_ADVANCED_CLASSES not in config:
-            AdvancedManager.create_class_list(config)
-
-    @staticmethod
-    def _get_advanced_classes_list(config):
+    def __get_advanced_classes(config) -> dict:
         return config[CONFIG_ADVANCED_CLASSES]
 
     @staticmethod
-    def _get_advanced_instances_list(config):
+    def __get_advanced_instances(config) -> dict:
         return config[CONFIG_ADVANCED_INSTANCES]
 
     @staticmethod
-    def _append_to_class_list(config, class_name, class_type):
-        if class_name not in AdvancedManager._get_advanced_classes_list(config):
-            AdvancedManager._get_advanced_classes_list(config)[class_name] = [class_type]
-        else:
-            AdvancedManager._get_advanced_classes_list(config)[class_name].append(class_type)
+    def __append_to_class(config, class_name, class_type) -> None:
+        """
+        Append class type to advanced class list
+        :param config: global config dict
+        :param class_name: class name to add
+        :param class_type: class type to add
+        :return: None
+        """
+        try:
+            AdvancedManager.__get_advanced_classes(config)[class_name].append(class_type)
+        except KeyError:
+            AdvancedManager.__get_advanced_classes(config)[class_name] = [class_type]
 
     @staticmethod
-    def get_classes(config, class_type, get_all_classes=False):
+    def get_classes(config, class_type, get_all_classes=False) -> list:
         classes = []
-        if class_type.get_name() in AdvancedManager._get_advanced_classes_list(config):
-            classes = copy(AdvancedManager._get_advanced_classes_list(config)[class_type.get_name()])
+        if class_type.get_name() in AdvancedManager.__get_advanced_classes(config):
+            classes = copy(AdvancedManager.__get_advanced_classes(config)[class_type.get_name()])
         if not classes or (get_all_classes and class_type not in classes):
             classes.append(class_type)
         return classes
 
     @staticmethod
-    def get_class(config, class_type):
+    def get_class(config, class_type) -> object:
         classes = AdvancedManager.get_classes(config, class_type)
         if classes and len(classes) > 1:
             get_logger(AdvancedManager.__name__).warning(f"More than one instance of {class_type} available, "
@@ -154,13 +145,13 @@ class AdvancedManager:
         return classes[0]
 
     @staticmethod
-    def get_util_instance(config, class_type, *args):
+    def get_instance(config, class_type, *args) -> object:
         advanced_class_type = AdvancedManager.get_class(config, class_type)
-        if class_type in AdvancedManager._get_advanced_instances_list(config):
-            return AdvancedManager._get_advanced_instances_list(config)[class_type]
+        if class_type in AdvancedManager.__get_advanced_instances(config):
+            return AdvancedManager.__get_advanced_instances(config)[class_type]
         elif advanced_class_type:
             instance = advanced_class_type(*args)
-            AdvancedManager._get_advanced_instances_list(config)[class_type] = instance
+            AdvancedManager.__get_advanced_instances(config)[class_type] = instance
             return instance
         return None
 
@@ -178,26 +169,27 @@ class AdvancedManager:
         return default_class_list
 
     @staticmethod
-    def create_advanced_evaluator_types_list(evaluator_class, config):
-        evaluator_advanced_eval_class_list = []
-        for evaluator_subclass in evaluator_class.__subclasses__():
-            for eval_class_type in AdvancedManager.get_classes(config, evaluator_subclass):
-                evaluator_advanced_eval_class_list.append(eval_class_type)
+    def create_advanced_types_list(clazz, config) -> list:
+        advanced_class_list = [
+            class_type
+            for subclass in clazz.__subclasses__()
+            for class_type in AdvancedManager.get_classes(config, subclass)
+        ]
 
-        if not AdvancedManager._check_duplicate(evaluator_advanced_eval_class_list):
-            get_logger(AdvancedManager.__name__).warning("Duplicate evaluator name.")
+        if not AdvancedManager.__check_duplicate(advanced_class_list):
+            get_logger(AdvancedManager.__name__).warning("Duplicate class name.")
 
-        return evaluator_advanced_eval_class_list
-
-    @staticmethod
-    def get_all_classes(evaluator_class, config):
-        evaluator_all_classes_list = []
-        for evaluator_subclass in evaluator_class.__subclasses__():
-            for eval_class in evaluator_subclass.__subclasses__():
-                for eval_class_type in AdvancedManager.get_classes(config, eval_class, True):
-                    evaluator_all_classes_list.append(eval_class_type)
-        return evaluator_all_classes_list
+        return advanced_class_list
 
     @staticmethod
-    def _check_duplicate(list_to_check):
+    def get_all_classes(clazz, config) -> list:
+        return [
+            class_type
+            for subclass in clazz.__subclasses__()
+            for type_class in subclass.__subclasses__()
+            for class_type in AdvancedManager.get_classes(config, type_class, True)
+        ]
+
+    @staticmethod
+    def __check_duplicate(list_to_check) -> bool:
         return len(set(list_to_check)) == len(list_to_check)
