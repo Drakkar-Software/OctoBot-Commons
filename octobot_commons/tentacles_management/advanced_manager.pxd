@@ -15,44 +15,18 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
+cdef void __init_class_list_config(dict config)
+cdef dict __get_advanced_classes(dict config)
+cdef dict __get_advanced_instances(dict config)
+cdef void __append_to_class(dict config, str class_name, object class_type)
+cdef bint __check_duplicate(list list_to_check)
+cdef void __get_advanced(dict config, object class_type, object abstract_class=*)
 
-cdef class AdvancedManager:
+cpdef bint is_abstract(object class_type)
+cpdef void create_classes_list(dict config, object abstract_class)
+cpdef list get_classes(dict config, object class_type, bint get_all_classes=*)
+cpdef object get_class(dict config, object class_type)
+cpdef create_default_types_list(object clazz)
+cpdef list create_advanced_types_list(object clazz, dict config)
+cpdef list get_all_classes(object clazz, dict config)
 
-    @staticmethod
-    cdef bint is_abstract(object class_type)
-
-    @staticmethod
-    cdef void _get_advanced(dict config, object class_type, object abstract_class=*)
-
-    @staticmethod
-    cdef void create_classes_list(dict config, object abstract_class)
-
-    @staticmethod
-    cdef void __init_class_list_config(dict config)
-
-    @staticmethod
-    cdef dict __get_advanced_classes(dict config)
-
-    @staticmethod
-    cdef dict __get_advanced_instances(dict config)
-
-    @staticmethod
-    cdef void __append_to_class(dict config, str class_name, object class_type)
-
-    @staticmethod
-    cdef list get_classes(dict config, object class_type, bint get_all_classes=*)
-
-    @staticmethod
-    cdef object get_class(dict config, object class_type)
-
-    @staticmethod
-    cdef create_default_types_list(object clazz)
-
-    @staticmethod
-    cdef list create_advanced_types_list(object clazz, dict config)
-
-    @staticmethod
-    cdef list get_all_classes(object clazz, dict config)
-
-    @staticmethod
-    cdef bint __check_duplicate(list list_to_check)
