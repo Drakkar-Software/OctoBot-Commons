@@ -13,11 +13,15 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+from octobot_commons.config import load_config
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.1.32"  # major.minor.revision
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
+def reload_tentacle_config(config: dict,
+                           config_key: str,
+                           tentacle_config_path: str,
+                           raised_exception: Exception = None):
+    config[config_key] = load_config(tentacle_config_path, False)
+    if config[config_key] is None:
+        raise raised_exception
 
-OCTOBOT_KEY = b'uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0=' # TODO temp
+    return config
