@@ -32,3 +32,4 @@ class OctoBotTradingChannelsName(Enum):
     BALANCE_PROFITABILITY_CHANNEL = "BalanceProfitability"
     POSITIONS_CHANNEL = "Positions"
     MODE_CHANNEL = "Mode"
+    TIME_CHANNEL = "Time"

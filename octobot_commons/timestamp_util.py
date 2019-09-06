@@ -42,6 +42,8 @@ def is_valid_timestamp(timestamp):
             return False
         except OverflowError:
             return False
+        except TypeError:
+            return False
     return True
 
 
