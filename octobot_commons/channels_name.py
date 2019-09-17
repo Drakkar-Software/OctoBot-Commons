@@ -20,6 +20,10 @@ class OctoBotEvaluatorsChannelsName(Enum):
     MATRIX = "Matrix"
 
 
+class OctoBotBacktestingChannelsName(Enum):
+    TIME_CHANNEL = "Time"
+
+
 class OctoBotTradingChannelsName(Enum):
     TICKER_CHANNEL = "Ticker"
     RECENT_TRADES_CHANNEL = "RecentTrade"
@@ -32,4 +36,3 @@ class OctoBotTradingChannelsName(Enum):
     BALANCE_PROFITABILITY_CHANNEL = "BalanceProfitability"
     POSITIONS_CHANNEL = "Positions"
     MODE_CHANNEL = "Mode"
-    TIME_CHANNEL = "Time"
