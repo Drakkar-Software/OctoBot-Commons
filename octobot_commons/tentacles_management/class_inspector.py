@@ -17,7 +17,7 @@
 import inspect
 
 
-def _default_parent_inspection(element, parent):
+def default_parent_inspection(element, parent):
     return parent in element.__bases__
 
 
@@ -29,8 +29,9 @@ def trading_mode_parent_inspection(element, parent):
     return hasattr(element, "get_parent_trading_mode_classes") and element.get_parent_trading_mode_classes(parent)
 
 
-def get_class_from_string(class_string, parent, module, parent_inspection=_default_parent_inspection,
-                          error_when_not_found=False):
+def get_class_from_string(class_string: str, parent, module,
+                          parent_inspection=default_parent_inspection,
+                          error_when_not_found: bool = False):
     if any(m[0] == class_string and
            hasattr(m[1], '__bases__') and
            parent_inspection(m[1], parent)
