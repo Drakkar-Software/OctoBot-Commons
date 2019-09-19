@@ -21,6 +21,10 @@ def default_parent_inspection(element, parent):
     return parent in element.__bases__
 
 
+def default_parents_inspection(element, parent):
+    return parent in element.mro()
+
+
 def evaluator_parent_inspection(element, parent):
     return hasattr(element, "get_parent_evaluator_classes") and element.get_parent_evaluator_classes(parent)
 

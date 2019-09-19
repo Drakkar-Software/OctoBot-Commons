@@ -16,6 +16,7 @@
 #  License along with this library.
 
 cpdef bint default_parent_inspection(object element, object parent)
+cpdef bint default_parents_inspection(object element, object parent)
 cpdef bint evaluator_parent_inspection(object element, object parent)
 cpdef bint trading_mode_parent_inspection(object element, object parent)
 cpdef object get_deep_class_from_string(str class_string, object module)
