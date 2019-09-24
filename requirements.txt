@@ -1,6 +1,6 @@
-jsonschema
-# Telegram
-python-telegram-bot
-
-numpy
+setuptools>=18.0
 cython
+numpy
+jsonschema
+
+python-telegram-bot
