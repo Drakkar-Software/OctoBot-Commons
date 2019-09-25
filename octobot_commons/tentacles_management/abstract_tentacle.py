@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from copy import deepcopy
 
 from octobot_commons.config import load_config
@@ -38,7 +38,6 @@ class AbstractTentacle:
         return cls.__name__
 
     @classmethod
-    @abstractmethod
     def get_config_tentacle_type(cls) -> str:
         """
         :return: The tentacle config type
@@ -46,7 +45,6 @@ class AbstractTentacle:
         raise NotImplementedError("get_config_tentacle_type")
 
     @classmethod
-    @abstractmethod
     def get_tentacle_folder(cls) -> str:
         """
         :return: The tentacle folder

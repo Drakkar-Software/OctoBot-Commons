@@ -33,6 +33,13 @@ def trading_mode_parent_inspection(element, parent):
     return hasattr(element, "get_parent_trading_mode_classes") and element.get_parent_trading_mode_classes(parent)
 
 
+def get_class_from_parent_subclasses(class_string, parent):
+    for c in parent.__subclasses__():
+        if c.__name__ == class_string:
+            return c
+    return None
+
+
 def get_class_from_string(class_string: str, parent, module,
                           parent_inspection=default_parent_inspection,
                           error_when_not_found: bool = False):
