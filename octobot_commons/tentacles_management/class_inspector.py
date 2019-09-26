@@ -34,9 +34,23 @@ def trading_mode_parent_inspection(element, parent):
 
 
 def get_class_from_parent_subclasses(class_string, parent):
-    for c in parent.__subclasses__():
-        if c.__name__ == class_string:
-            return c
+    for found in parent.__subclasses__():
+        if found.__name__ == class_string:
+            return found
+    return None
+
+
+def get_deep_class_from_parent_subclasses(class_string, parent):
+    found = get_class_from_parent_subclasses(class_string, parent)
+    if found is not None:
+        return found
+
+    for parent_class in parent.__subclasses__():
+        found = get_deep_class_from_parent_subclasses(class_string, parent_class)
+
+        if found is not None:
+            return found
+
     return None
 
 
