@@ -29,4 +29,6 @@ cpdef object get_class(dict config, object class_type)
 cpdef list create_default_types_list(object clazz)
 cpdef list create_advanced_types_list(object clazz, dict config)
 cpdef list get_all_classes(object clazz, dict config)
+cpdef object search_class_name_in_class_list(str class_name, list parent_class_list)
+cpdef list get_all_classes_from_parent(object parent_class)
 

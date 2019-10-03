@@ -67,6 +67,10 @@ class TimeFrameManager:
         tf_list = time_frames
         if time_frames and isinstance(next(iter(time_frames)), TimeFrames):
             tf_list = [t.value for t in time_frames]
+
+        if not tf_list:  # if exchange has no time frame list, returns minimal time frame
+            return TimeFrameManager.TimeFramesRank[0]
+
         min_index = 0
         if min_time_frame:
             min_index = TimeFrameManager.TimeFramesRank.index(min_time_frame)

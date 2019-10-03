@@ -139,7 +139,7 @@ def get_class(config, class_type) -> object:
     classes = get_classes(config, class_type)
     if classes and len(classes) > 1:
         get_logger(__name__).warning(f"More than one instance of {class_type} available, "
-                                                     f"using {classes[0]}.")
+                                     f"using {classes[0]}.")
     return classes[0]
 
 
@@ -187,6 +187,20 @@ def get_all_classes(clazz, config) -> list:
         for type_class in subclass.__subclasses__()
         for class_type in get_classes(config, type_class, True)
     ]
+
+
+def get_all_classes_from_parent(parent_class) -> list:
+    return [subclass if not subclass.__subclasses__() else get_all_classes_from_parent(subclass)
+            for subclass in parent_class.__subclasses__()]
+
+
+def search_class_name_in_class_list(class_name, parent_class_list) -> object:
+    for subclass in parent_class_list:
+        if isinstance(subclass, list):
+            return search_class_name_in_class_list(class_name, subclass)
+        elif subclass.get_name() == class_name:
+            return subclass
+    return None
 
 
 def __check_duplicate(list_to_check) -> bool:
