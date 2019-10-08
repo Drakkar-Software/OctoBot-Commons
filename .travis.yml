@@ -5,15 +5,27 @@ os: linux
 language: python
 cache: pip
 python: 3.7-dev
+services:
+  - docker
+
+env:
+  global:
+  - GH_REPO=Drakkar-Software/OctoBot-Commons
+  - REPO_NAME=OctoBot-Commons
+  - DEPLOY_BRANCH=master
+  - PACKAGE_FOLDER=octobot_commons
+  - secure: E9V4jp6ENQDK/gOJejnCuzoXctFVKzM7vD2mTdpdoChv+hITk1vWD/Y1B9ZAFsSC08PggnFBrpAUXWEX4J5dEIobFSlDpzozMFbmdo1H1uwz0r5Wje5FD7ihQhLpMLRMscv8jrjzHq5RGVaqN5d477ljtURdrCb3WZpyK+dBdnSJIjKbiu6QF2cvBBfP1PSDLwVmEL3+cYd7Xi8dX/QAibWcuFaSKF4fFVehVHgLVXz0U/1mobhCkIpYnZaI54DnlN7ww90od90qfGcNbRei8cyPfpgL5kq+JviWLkgS43Q5mQ8kcKHqNIriLaHUwR5WZl2s9bgTYv2MFM7cJzY5kxIzyuJE1TgZjxCEoZI3VHdsUTWsZ27Ax+HPrTtPJwJmRtIqoY7+xZNlirGETjIZj67hd509/7ng3Zuw2YSX3scbywEJj7G3BW3eGgoO3Z3dJDdHEL30iLF8RIKGlOQYWPUPND4a9vmMnb2Se0FYyo9X8/OkypVi56Gy5NIndLWWHw6fxL+PtGkvx6I8N6K16ZTCR9gnfVRq5CVimEclk0wPiUkcdd3oS9Q6fktbKUq2FK62HTM9sEaRO/Wm3pUroiB7phWLYf6SKJ/IwplRePolNTSu0H7SEj7VaCXSa3Vs/nWgcWznh6/fMtiEmYAGDlEQ+dFXmU+eyvvEyihqaUA=
+  - secure: spsn+EW/9O0HioOYHaYtuFg4gE778fjEYbawSfoc4ICvuJinus8nN59pDOZHyLAfwKsnkoDQXj86dCnbQ2Og/uSeM5KHFtpMGFHMV7VsgdfsFmiZ9gss0Uy7/H7vwt9crJE8KuEvjPjFRcQYjkk8FPnejdfwoHYNvWKriyZAvpQg/IV1PdgNry3E+PrZLns/q4yRziYG8FWPSozamL4zOAWeyG7iuRiPL1Cl/Xuh2XJQ+/AZZi7IYseIXLQd8uLDJZ6jobQepHXkYqJ/bU1Wnf9hkoDLYRuzBboHpafOjD7wNYbs9Hc1ERppmXhj5vF/c9jWCYz67vQ2nwJDQzEJa7W1CW7fWz0yjXRsuOr4Rxg/q0trsMlvHsRMvMZ9UCF9Ksjpy/To6aFxBmb/SmyZfDHMfQpJe+n+wHfInDhaRWXww5fGLGX/1jfQxagLjNfuS7zEUTIaKx/v/kxDmUIJtQeuYxA3M6jw/diXWlezPySg05skXTqUcnvaVaydc5z7+kLQk1qSNv753c95KioX6Z01lQduZKlMIRktP1zVu79rhzprLc5YnA6/7wIv7kNZo1cXrulwEmuwzRMakZps4QM/VsgS8vSScvMglewJyPfSp2E2XRBGkn176CgW59N4/C4upoQjyhkXShLBWZ9z8a4futJvAp+t//Rs/XSXZS8=
 
 matrix:
   include:
-    - name: "Linux - Python 3 nightly"
-      os: linux
-      python: nightly
-      language: python
-      script:
-        - python3 setup.py install
+  - name: Linux - Python 3 nightly - Cython compilation
+    stage: build
+    os: linux
+    python: nightly
+    language: python
+    script:
+      - python3 setup.py build_ext --inplace
 
 deploy:
   - provider: pypi
@@ -23,9 +35,18 @@ deploy:
       secure: PSieH+Z9+7rQ3TuJq0+Z28NkPB7hhnyJYeTBXAP1TbKH29J2pShpRbUG5SPYQVJVs0hvlZVNjLl/Do45S7EdRdq8Bx8uo9MgYR6+DEDqa3RSzjVYMn/v+akDwAbPoAQdPbc4Cbdupipm4vqZ0GjqLQwtuyUZCLua/ldIfoWMORHrXIAH+7QCDv3YdTlVcR1o/hP+Vb/qdj15Fy9EZDyZhLxkUl9u4nWCN4FXrK/p5akg4iTSFRkU3TMFlhkYAq8zvmP/lWjNlpAAbEPsNAqNNkn9UABAQK/LFlu3P9iGwQRkflhs8Bylogku4AMEHp3uC52dhU4xFdsBdAb2qyeHqYhwO3R7dMEUvcLjByEEDVKpSPEamF1mJSHLVe615q+UsqDQRmQU1p1wYh+oB3SnWbXa4GhMq/vUm/14sdPoJeAX/9M6JsBVxYVnLcAH2SXMVsZUREqUdCEyyFUfGYWpYC90dl+fp9SjpzCP6gTWubNu/iO3A0Jvqu1+jh/9RJ0jzDKti3YZD/IMMspZwOY7SNc3ubQqbv7ogiqgyNpObmw2xwR73zYppgdUrwq3VBsGC9D08+2ZrRl/jvo6++OdiejRfnuELNqOuh/zVGVFR3T4aM54ErXwzzBg9CENnwyoBbPFIwsPqv/ymuZZTrH3p/QgL4pgbmjfqkwl0mGNmBs=
     skip_existing: true
     skip_cleanup: true
-    distributions: "sdist"
+    distributions: sdist
     on:
-      repo: Drakkar-Software/OctoBot-Commons
-      branch: master
+      repo: "$GH_REPO"
+      branch: "$DEPLOY_BRANCH"
       tags: true
-      condition: $TRAVIS_OS_NAME = 'linux'
+      condition: "$TRAVIS_OS_NAME = 'linux'"
+  - provider: script
+    script:
+    - docker run -it drakkarsoftware/octobot-pypi-deploy:i686 $GH_REPO $REPO_NAME "cp37-cp37m" "cp37"
+    - docker run -it drakkarsoftware/octobot-pypi-deploy:x86_x64 $GH_REPO $REPO_NAME "cp37-cp37m" "cp37"
+    on:
+      repo: "$GH_REPO"
+      branch: "$DEPLOY_BRANCH"
+      tags: true
+      condition: "$TRAVIS_OS_NAME = 'linux'"
