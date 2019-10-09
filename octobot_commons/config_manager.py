@@ -98,7 +98,7 @@ def dump_json(json_data):
 
 def check_config(config_file):
     try:
-        valid, e = validate_config_file(load_config(config_file=config_file, error=True))
+        valid, e = validate_config_file(load_config(config_file=config_file))
         if not valid:
             raise e
     except Exception as e:

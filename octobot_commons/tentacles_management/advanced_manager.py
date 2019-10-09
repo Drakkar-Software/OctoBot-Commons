@@ -126,11 +126,11 @@ def __append_to_class(config, class_name, class_type) -> None:
         __get_advanced_classes(config)[class_name] = [class_type]
 
 
-def get_classes(config, class_type, get_all_classes=False) -> list:
+def get_classes(config, class_type, should_get_all_classes=False) -> list:
     classes = []
     if class_type.get_name() in __get_advanced_classes(config):
         classes = copy(__get_advanced_classes(config)[class_type.get_name()])
-    if not classes or (get_all_classes and class_type not in classes):
+    if not classes or (should_get_all_classes and class_type not in classes):
         classes.append(class_type)
     return classes
 

@@ -24,7 +24,7 @@ cdef void __get_advanced(dict config, object class_type, object abstract_class=*
 
 cpdef bint is_abstract(object class_type)
 cpdef void create_classes_list(dict config, object abstract_class)
-cpdef list get_classes(dict config, object class_type, bint get_all_classes=*)
+cpdef list get_classes(dict config, object class_type, bint should_get_all_classes=*)
 cpdef object get_class(dict config, object class_type)
 cpdef list create_default_types_list(object clazz)
 cpdef list create_advanced_types_list(object clazz, dict config)
