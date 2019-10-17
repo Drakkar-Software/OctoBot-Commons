@@ -18,8 +18,7 @@ env:
   - secure: spsn+EW/9O0HioOYHaYtuFg4gE778fjEYbawSfoc4ICvuJinus8nN59pDOZHyLAfwKsnkoDQXj86dCnbQ2Og/uSeM5KHFtpMGFHMV7VsgdfsFmiZ9gss0Uy7/H7vwt9crJE8KuEvjPjFRcQYjkk8FPnejdfwoHYNvWKriyZAvpQg/IV1PdgNry3E+PrZLns/q4yRziYG8FWPSozamL4zOAWeyG7iuRiPL1Cl/Xuh2XJQ+/AZZi7IYseIXLQd8uLDJZ6jobQepHXkYqJ/bU1Wnf9hkoDLYRuzBboHpafOjD7wNYbs9Hc1ERppmXhj5vF/c9jWCYz67vQ2nwJDQzEJa7W1CW7fWz0yjXRsuOr4Rxg/q0trsMlvHsRMvMZ9UCF9Ksjpy/To6aFxBmb/SmyZfDHMfQpJe+n+wHfInDhaRWXww5fGLGX/1jfQxagLjNfuS7zEUTIaKx/v/kxDmUIJtQeuYxA3M6jw/diXWlezPySg05skXTqUcnvaVaydc5z7+kLQk1qSNv753c95KioX6Z01lQduZKlMIRktP1zVu79rhzprLc5YnA6/7wIv7kNZo1cXrulwEmuwzRMakZps4QM/VsgS8vSScvMglewJyPfSp2E2XRBGkn176CgW59N4/C4upoQjyhkXShLBWZ9z8a4futJvAp+t//Rs/XSXZS8=
 
 install:
-  - python3 -m pip install -r dev_requirements.txt
-  - python3 -m pip install -r requirements.txt
+  - python3 -m pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
 
 matrix:
   include:
@@ -54,7 +53,7 @@ deploy:
       tags: true
       condition: "$TRAVIS_OS_NAME = 'linux'"
   - provider: script
-    script: docker run -it -e PYPI_USERNAME=$PYPI_USERNAME -e PYPI_PASSWORD=$PYPI_PASSWORD -v $(pwd):/project drakkarsoftware/octobot-pypi-deploy:x86_x64 "x86_64" "cp37-cp37m" "cp37"
+    script: docker run -it -e PYPI_USERNAME=$PYPI_USERNAME -e PYPI_PASSWORD=$PYPI_PASSWORD -v $(pwd):/project drakkarsoftware/octobot-pypi-deploy:x86_64 "x86_64" "cp37-cp37m" "cp37"
     skip_cleanup: true
     on:
       repo: "$GH_REPO"

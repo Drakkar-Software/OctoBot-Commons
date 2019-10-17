@@ -62,3 +62,15 @@ class PriceIndexes(Enum):
     IND_PRICE_LOW = 3
     IND_PRICE_CLOSE = 4
     IND_PRICE_VOL = 5
+
+
+class PlatformsName(Enum):
+    WINDOWS = "nt"
+    LINUX = "posix"
+    MAC = "mac"
+
+
+class OctoBotTypes(Enum):
+    BINARY = "binary"
+    PYTHON = "python"
+    DOCKER = "docker"
