@@ -1,5 +1,5 @@
 # Setup requirements
-cython==0.29.13
+cython==0.29.14
 
 # Commons requirements
 jsonschema==3.1.1
