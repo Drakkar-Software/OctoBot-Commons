@@ -13,28 +13,30 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from asyncio import Event
+import asyncio
+from asyncio import Event, Task
 
 
 class EventTreeNode(object):
-    __slots__ = ['node_value', 'node_event', 'node_type', 'node_path', 'children']
+    __slots__ = ['node_value', 'node_event', 'node_type', 'node_path', 'node_task', 'children']
 
     def __init__(self, node_value, node_type, node_path):
         self.node_value = node_value
         self.node_type = node_type
         self.node_path = node_path
         self.node_event = Event()
+        self.node_task = None
         self.children = {}
 
 
 class EventTree(object):
-    __slots__ = ['tree']
+    __slots__ = ['root']
 
     def __init__(self):
         """
         Init the root node
         """
-        self.tree = EventTreeNode(None, None, [])
+        self.root = EventTreeNode(None, None, [])
 
     def set_node(self, value, node_type, node):
         """
@@ -77,7 +79,7 @@ class EventTree(object):
         :param path: the path (as a list of string) to the node
         :return: EventTreeNode at path
         """
-        current_node = self.tree
+        current_node = self.root
         for key in path:
             current_node = current_node.children[key]
         return current_node
@@ -88,14 +90,22 @@ class EventTree(object):
         :param path: path (as a list of string) to the selected node
         :return: the created node path
         """
-        current_dict = self.tree
+        current_node = self.root
         for key in path:
             try:
-                current_dict = current_dict.children[key]
+                current_node = current_node.children[key]
             except KeyError:
-                current_dict.children[key] = EventTreeNode(None, None, current_dict.node_path + [key])
-                current_dict = current_dict.children[key]
-        return current_dict
+                # create a new node as the current node child
+                current_node.children[key] = EventTreeNode(None, None, current_node.node_path + [key])
+
+                # update parent node event to gather its children event
+                # TODO think about the total replacement when adding a new node
+                current_node.node_task = asyncio.create_task(self.__set_node_event_from_children(current_node))
+
+                # change to the new node
+                current_node = current_node.children[key]
+
+        return current_node
 
     def __set_node(self, node, value=None, node_type=None):
         """
@@ -111,8 +121,25 @@ class EventTree(object):
         if node_type is not None:
             node.node_type = node_type
 
-        # update the node event and its parents
-        self.__set_node_parent_event(node, node.node_event)
+        # reset the node event
+        node.node_event.set()
+        node.node_event.clear()
 
-    def __set_node_parent_event(self, node, node_event):
-        pass
+    async def __set_node_event_from_children(self, node: EventTreeNode):
+        """
+        Should be run in a Task
+        :param node: the node instance related to the task
+        :return: void
+        """
+        try:
+            while True:
+                # reset the event
+                node.node_event.clear()
+
+                # wait until each children has trigger its event
+                await asyncio.gather(*[n.node_event.wait() for n in node.children.values()])
+
+                # notify
+                node.node_event.set()
+        except asyncio.CancelledError:
+            pass
