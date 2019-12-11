@@ -21,7 +21,6 @@ cdef class EventTreeNode:
     cdef public object node_event
     cdef public object node_type
     cdef public object node_task
-    cdef public list node_path
     cdef public dict children
 
 cdef class EventTree:

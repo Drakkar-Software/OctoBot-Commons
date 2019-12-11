@@ -39,11 +39,11 @@ from octobot_commons import PROJECT_NAME, VERSION
 
 PACKAGES = find_packages(exclude=["tests"])
 
-packages_list = {"octobot_commons.event_tree",
+packages_list = ["octobot_commons.event_tree",
                  "octobot_commons.singleton.singleton_class",
                  "octobot_commons.tentacles_management.abstract_tentacle",
                  "octobot_commons.tentacles_management.advanced_manager",
-                 "octobot_commons.tentacles_management.class_inspector"}
+                 "octobot_commons.tentacles_management.class_inspector"]
 
 ext_modules = [
     Extension(package, [f"{package.replace('.', '/')}.py"])
