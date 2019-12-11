@@ -54,16 +54,22 @@ class EventTree(object):
         Creates the node if it doesn't exists
         :param value: the node 'node_value' attribute to set
         :param node_type: the node 'node_type' attribute to set
-        :param path: the node path (as a list of string)
+        :param path: the node path (as a list of string).
+        For example:
+        - If you created a first node with the path ["my-parent-node"]
+        - You can create a child node of my-parent-node by using ["my-parent-node", "my-new-child-node"] as `path`
         :return: void
         """
-        self.__set_node(self.get_node(path), value, node_type)
+        self.__set_node(self.get_or_create_node(path), value, node_type)
 
-    def get_node(self, path):
+    def get_or_create_node(self, path):
         """
         Get the node at the specified path
         Creates the node if it doesn't exists
-        :param path: the node path (as a list of string)
+        :param path: the node path (as a list of string).
+        For example:
+        - If you created a first node with the path ["my-parent-node"]
+        - You can create a child node of my-parent-node by using ["my-parent-node", "my-new-child-node"] as `path`
         :return: the node instance
         """
         try:
