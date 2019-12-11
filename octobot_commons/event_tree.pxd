@@ -28,7 +28,7 @@ cdef class EventTree:
 
     cpdef void set_node(self, object value, object node_type, EventTreeNode node)
     cpdef void set_node_at_path(self, object value, object node_type, list path)
-    cpdef EventTreeNode get_node(self, list path)
+    cpdef EventTreeNode get_or_create_node(self, list path)
 
     cdef EventTreeNode __get_node(self, list path)
     cdef EventTreeNode __create_node_path(self, list path)
