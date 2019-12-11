@@ -14,16 +14,15 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import asyncio
-from asyncio import Event, Task
+from asyncio import Event, ALL_COMPLETED
 
 
 class EventTreeNode(object):
-    __slots__ = ['node_value', 'node_event', 'node_type', 'node_path', 'node_task', 'children']
+    __slots__ = ['node_value', 'node_event', 'node_type', 'node_task', 'children']
 
-    def __init__(self, node_value, node_type, node_path):
+    def __init__(self, node_value, node_type):
         self.node_value = node_value
         self.node_type = node_type
-        self.node_path = node_path
         self.node_event = Event()
         self.node_task = None
         self.children = {}
@@ -36,7 +35,7 @@ class EventTree(object):
         """
         Init the root node
         """
-        self.root = EventTreeNode(None, None, [])
+        self.root = EventTreeNode(None, None)
 
     def set_node(self, value, node_type, node):
         """
@@ -96,7 +95,7 @@ class EventTree(object):
                 current_node = current_node.children[key]
             except KeyError:
                 # create a new node as the current node child
-                current_node.children[key] = EventTreeNode(None, None, current_node.node_path + [key])
+                current_node.children[key] = EventTreeNode(None, None)
 
                 # update parent node event to gather its children event
                 # TODO think about the total replacement when adding a new node
@@ -123,7 +122,9 @@ class EventTree(object):
 
         # reset the node event
         node.node_event.set()
-        node.node_event.clear()
+
+        # schedule the event reset for the next loop iteration
+        asyncio.get_event_loop().call_soon(node.node_event.clear)
 
     async def __set_node_event_from_children(self, node: EventTreeNode):
         """
@@ -137,7 +138,7 @@ class EventTree(object):
                 node.node_event.clear()
 
                 # wait until each children has trigger its event
-                await asyncio.gather(*[n.node_event.wait() for n in node.children.values()])
+                await asyncio.wait([n.node_event.wait() for n in node.children.values()], return_when=ALL_COMPLETED)
 
                 # notify
                 node.node_event.set()
