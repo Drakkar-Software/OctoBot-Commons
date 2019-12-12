@@ -45,6 +45,23 @@ async def test_event_tree_get_existing_node():
 
 
 @pytest.mark.asyncio
+async def test_event_tree_get_new_relative_node():
+    event_tree = EventTree()
+    created_node = event_tree.get_or_create_node(["test"])
+    relative_created_node = event_tree.get_or_create_node(["test-relative"], starting_node=created_node)
+    get_node_result = event_tree.get_or_create_node(["test", "test-relative"])
+    assert relative_created_node is get_node_result
+
+
+@pytest.mark.asyncio
+async def test_event_tree_get_relative_node():
+    event_tree = EventTree()
+    created_node = event_tree.get_or_create_node(["test"])
+    relative_created_node = event_tree.get_or_create_node(["test", "test-relative"])
+    get_node_result = event_tree.get_or_create_node(["test-relative"], starting_node=created_node)
+    assert relative_created_node is get_node_result
+
+@pytest.mark.asyncio
 async def test_event_tree_set_node():
     event_tree = EventTree()
     created_node = event_tree.get_or_create_node(["test"])
