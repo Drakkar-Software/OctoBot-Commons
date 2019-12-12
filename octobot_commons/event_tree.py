@@ -62,7 +62,7 @@ class EventTree(object):
         """
         self.__set_node(self.get_or_create_node(path), value, node_type)
 
-    def get_or_create_node(self, path):
+    def get_or_create_node(self, path, starting_node=None):
         """
         Get the node at the specified path
         Creates the node if it doesn't exists
@@ -70,32 +70,35 @@ class EventTree(object):
         For example:
         - If you created a first node with the path ["my-parent-node"]
         - You can create a child node of my-parent-node by using ["my-parent-node", "my-new-child-node"] as `path`
+        :param starting_node: the node to start the relative path
         :return: the node instance
         """
         try:
-            return self.__get_node(path)
+            return self.__get_node(path, starting_node=starting_node)
         except KeyError:
-            return self.__create_node_path(path)
+            return self.__create_node_path(path, starting_node=starting_node)
 
-    def __get_node(self, path):
+    def __get_node(self, path, starting_node=None):
         """
         Return the node corresponding to the path
         Can raise a KeyError if the path does not exists
         :param path: the path (as a list of string) to the node
+        :param starting_node: the node to start the path, root if None
         :return: EventTreeNode at path
         """
-        current_node = self.root
+        current_node = self.root if starting_node is None else starting_node
         for key in path:
             current_node = current_node.children[key]
         return current_node
 
-    def __create_node_path(self, path):
+    def __create_node_path(self, path, starting_node=None):
         """
         Expensive method that creates the path to the selected node
         :param path: path (as a list of string) to the selected node
+        :param starting_node: the node to start the path, root if None
         :return: the created node path
         """
-        current_node = self.root
+        current_node = self.root if starting_node is None else starting_node
         for key in path:
             try:
                 current_node = current_node.children[key]
