@@ -62,6 +62,21 @@ class EventTree(object):
         """
         self.__set_node(self.get_or_create_node(path), value, node_type)
 
+    def get_node(self, path, starting_node=None):
+        """
+        Get the node at the specified path
+        :param path: the node path (as a list of string).
+        For example:
+        - If you created a first node with the path ["my-parent-node"]
+        - You can create a child node of my-parent-node by using ["my-parent-node", "my-new-child-node"] as `path`
+        :param starting_node: the node to start the relative path
+        :return: the node instance
+        """
+        try:
+            return self.__get_node(path, starting_node=starting_node)
+        except KeyError:
+            return None
+
     def get_or_create_node(self, path, starting_node=None):
         """
         Get the node at the specified path

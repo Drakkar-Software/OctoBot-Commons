@@ -45,6 +45,12 @@ async def test_event_tree_get_existing_node():
 
 
 @pytest.mark.asyncio
+async def test_event_tree_get_not_existing_node():
+    event_tree = EventTree()
+    assert event_tree.get_node(["test"]) is None
+
+
+@pytest.mark.asyncio
 async def test_event_tree_get_new_relative_node():
     event_tree = EventTree()
     created_node = event_tree.get_or_create_node(["test"])
