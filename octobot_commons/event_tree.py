@@ -28,6 +28,10 @@ class EventTreeNode(object):
         self.children = {}
 
 
+class NodeExistsError(Exception):
+    pass
+
+
 class EventTree(object):
     __slots__ = ['root']
 
@@ -70,12 +74,12 @@ class EventTree(object):
         - If you created a first node with the path ["my-parent-node"]
         - You can create a child node of my-parent-node by using ["my-parent-node", "my-new-child-node"] as `path`
         :param starting_node: the node to start the relative path
-        :return: the node instance
+        :return: the node instance or raise a NodeExistsError if the node doesn't exists
         """
         try:
             return self.__get_node(path, starting_node=starting_node)
         except KeyError:
-            return None
+            raise NodeExistsError
 
     def get_or_create_node(self, path, starting_node=None):
         """

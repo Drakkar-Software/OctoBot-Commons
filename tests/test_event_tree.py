@@ -18,7 +18,7 @@ from unittest.mock import patch
 
 import pytest
 
-from octobot_commons.event_tree import EventTree
+from octobot_commons.event_tree import EventTree, NodeExistsError
 
 
 async def async_event_tree_set_node(tree, value, node_type, node):
@@ -47,7 +47,8 @@ async def test_event_tree_get_existing_node():
 @pytest.mark.asyncio
 async def test_event_tree_get_not_existing_node():
     event_tree = EventTree()
-    assert event_tree.get_node(["test"]) is None
+    with pytest.raises(NodeExistsError):
+        assert event_tree.get_node(["test"]) is None
 
 
 @pytest.mark.asyncio

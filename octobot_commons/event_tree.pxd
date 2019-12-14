@@ -23,6 +23,9 @@ cdef class EventTreeNode:
     cdef public object node_task
     cdef public dict children
 
+cdef class NodeExistsError(Exception):
+    pass
+
 cdef class EventTree:
     cdef public EventTreeNode root
 
