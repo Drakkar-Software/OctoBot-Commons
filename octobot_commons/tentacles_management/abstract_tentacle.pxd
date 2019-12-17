@@ -27,16 +27,18 @@ cdef class AbstractTentacle:
 
     cpdef list get_all_subclasses(cls)
 
-    cpdef str get_config_folder(cls, str config_tentacle_type=*)
-
-    cpdef str get_config_file_name(cls, str config_tentacle_type=*)
-
-    cpdef str get_config_file_schema_name(cls, str config_tentacle_type=*)
-
-    cpdef str get_config_file_error_message(cls, str error)
-
-    cpdef str get_specific_config(cls, bint raise_exception=*, bint raw_file=*)
-
-    cpdef str get_specific_config_schema(cls, bint raise_exception=*)
+#     cpdef str get_config_folder(cls, str config_tentacle_type=*)
+#
+#     cpdef str get_config_file_name(cls, str config_tentacle_type=*)
+#
+#     cpdef str get_config_file_schema_name(cls, str config_tentacle_type=*)
+#
+#     cpdef str get_config_file_error_message(cls, str error)
+#
+#     cpdef dict get_specific_config(cls, bint raise_exception=*)
+#
+#     cpdef str get_specific_raw_config(cls, bint raise_exception=*)
+#
+#     cpdef str get_specific_config_schema(cls, bint raise_exception=*)
 
     cpdef str get_description(cls)

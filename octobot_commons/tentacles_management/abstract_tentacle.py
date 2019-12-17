@@ -83,12 +83,19 @@ class AbstractTentacle:
                f". (error: {error})"
 
     @classmethod
-    def get_specific_config(cls, raise_exception=True, raw_file=False) -> str:
+    def get_specific_config(cls, raise_exception=True) -> dict:
         try:
-            if raw_file:
-                with open(cls.get_config_file_name()) as file:
-                    return file.read()
-            return load_config(cls.get_config_file_name())
+            return load_config(config_file=cls.get_config_file_name())
+        except Exception as e:
+            if raise_exception:
+                raise e
+        return {}
+
+    @classmethod
+    def get_specific_raw_config(cls, raise_exception=True) -> str:
+        try:
+            with open(cls.get_config_file_name()) as file:
+                return file.read()
         except Exception as e:
             if raise_exception:
                 raise e

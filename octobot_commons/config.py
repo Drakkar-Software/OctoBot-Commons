@@ -26,7 +26,7 @@ def get_user_config():
     return os.path.join(USER_FOLDER, CONFIG_FILE)
 
 
-def load_config(config_file=get_user_config(), error=True, fill_missing_fields=False):
+def load_config(config_file=get_user_config(), error=True, fill_missing_fields=False) -> dict:
     logger = logging.getLogger("CONFIG LOADER")
     basic_error = "Error when load config file {0}".format(config_file)
     try:

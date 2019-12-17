@@ -2,6 +2,8 @@ PYTHON=python3
 COMPILER=gcc
 LINKER=gcc
 
+CLEAN_EXT=*.o *.c *.so
+EXTENSION_FOLDER=octobot_commons
 CFLAGS=-O9
 
 help:
@@ -17,7 +19,9 @@ build: clean
 
 .PHONY: clean
 clean:
-	rm -rf *~ **/*.so **/*.c **/*.o **/*.html build
+	rm -rf build
+	for i in $(CLEAN_EXT); do find $(EXTENSION_FOLDER) -name "$$i" -delete; done
+
 
 # Suffix rules
 .PRECIOUS: %.c
