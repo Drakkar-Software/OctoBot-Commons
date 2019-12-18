@@ -13,11 +13,27 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import os
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.2.0"  # major.minor.revision
+from octobot_commons.config import load_config
+from octobot_commons.constants import CONFIG_TIME_FRAME, CONFIG_FILE
+from octobot_commons.enums import TimeFrames
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
+TEST_CONFIG_FOLDER = "tests/static"
 
-OCTOBOT_KEY = b'uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0='  # TODO temp
+
+def get_test_config():
+    return os.path.join(TEST_CONFIG_FOLDER, CONFIG_FILE)
+
+
+def init_config_time_frame_for_tests(config):
+    result = []
+    for time_frame in config[CONFIG_TIME_FRAME]:
+        result.append(TimeFrames(time_frame))
+    config[CONFIG_TIME_FRAME] = result
+
+
+def load_test_config():
+    config = load_config(get_test_config())
+    init_config_time_frame_for_tests(config)
+    return config

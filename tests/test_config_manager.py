@@ -13,11 +13,15 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+from octobot_commons.config_manager import is_in_dev_mode
+from octobot_commons.constants import CONFIG_DEBUG_OPTION
+from octobot_commons.tests.test_config import load_test_config
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.2.0"  # major.minor.revision
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
-
-OCTOBOT_KEY = b'uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0='  # TODO temp
+def test_is_in_dev_mode():
+    config = load_test_config()
+    assert not is_in_dev_mode(config)
+    config[CONFIG_DEBUG_OPTION] = False
+    assert not is_in_dev_mode(config)
+    config[CONFIG_DEBUG_OPTION] = True
+    assert is_in_dev_mode(config)

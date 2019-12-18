@@ -22,29 +22,6 @@ install:
 
 matrix:
   include:
-  - name: "Linux - Python 3.7-dev - Cython compilation"
-    stage: build
-    os: linux
-    python: 3.7
-    language: python
-    script:
-      - python3 setup.py build_ext --inplace
-
-  - name: "OSX - Python 3.7-dev - Cython compilation"
-    stage: build
-    os: osx
-    osx_image: xcode11    # Python 3.7.2 running on macOS 10.14.3
-    language: shell       # 'language: python' is an error on Travis CI macOS
-    # python: 3.7         # 'python:' is ignored on Travis CI macOS
-    before_install: python3 --version ; pip3 --version ; sw_vers
-    before_cache:
-      - rm -f "$HOME/Library/Caches/pip/log/debug.log"
-    cache:
-      directories:
-        - "$HOME/Library/Caches/pip"
-    script:
-      - python3 setup.py build_ext --inplace
-
   - name: "Linux - Python 3.7-dev - Python sources"
     stage: test
     os: linux
@@ -61,6 +38,24 @@ matrix:
     python: 3.7-dev
     language: python
     script:
+      - python3 setup.py install
+      - rm -rf $PACKAGE_FOLDER
+      - pytest tests
+
+  - name: "OSX - Python 3.7-dev - Installed"
+    stage: test
+    os: osx
+    osx_image: xcode11    # Python 3.7.2 running on macOS 10.14.3
+    language: shell       # 'language: python' is an error on Travis CI macOS
+    # python: 3.7         # 'python:' is ignored on Travis CI macOS
+    before_install: python3 --version ; pip3 --version ; sw_vers
+    before_cache:
+      - rm -f "$HOME/Library/Caches/pip/log/debug.log"
+    cache:
+      directories:
+        - "$HOME/Library/Caches/pip"
+    script:
+      - python3 setup.py build_ext --inplace
       - python3 setup.py install
       - rm -rf $PACKAGE_FOLDER
       - pytest tests

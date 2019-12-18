@@ -13,26 +13,18 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-
 import math
 import numpy as np
 
-from octobot_commons.constants import START_PENDING_EVAL_NOTE
+from octobot_commons.constants import START_PENDING_EVAL_NOTE, INIT_EVAL_NOTE
+from octobot_commons.evaluators_util import check_valid_eval_note
 
-UNSET_EVAL_TYPE = "unset_eval_type_param"
 
+def test_check_valid_eval_note():
+    assert not check_valid_eval_note(START_PENDING_EVAL_NOTE)
+    assert not check_valid_eval_note(math.nan)
+    assert not check_valid_eval_note(np.nan)
 
-def check_valid_eval_note(eval_note, eval_type=UNSET_EVAL_TYPE, expected_eval_type=None):
-    """
-    Will also test evaluation type if if eval_type is provided.
-    :param eval_note:
-    :param eval_type:
-    :param expected_eval_type: Default expected_eval_type is EVALUATOR_EVAL_DEFAULT_TYPE
-    :return:
-    """
-    if eval_type != UNSET_EVAL_TYPE and (eval_type != expected_eval_type or expected_eval_type is None):
-        return False
-    return eval_note is not None \
-           and eval_note is not START_PENDING_EVAL_NOTE \
-           and not math.isnan(eval_note) \
-           and not np.isnan(eval_note)
+    assert check_valid_eval_note(INIT_EVAL_NOTE)
+    # UNSET_EVAL_TYPE
+

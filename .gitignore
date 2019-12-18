@@ -103,10 +103,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-\.idea/
-
 *.c
 
-cython_debug/
-
-wheelhouse/
+.idea
+user
+cython_debug
+wheelhouse

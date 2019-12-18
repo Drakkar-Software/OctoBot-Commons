@@ -13,11 +13,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+from octobot_commons.dict_util import get_value_or_default
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.2.0"  # major.minor.revision
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
-
-OCTOBOT_KEY = b'uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0='  # TODO temp
+def test_get_value_or_default():
+    assert get_value_or_default({"test": 1}, "test") == 1
+    assert get_value_or_default({"test": 1}, "test2", "a") == "a"

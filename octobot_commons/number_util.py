@@ -15,5 +15,9 @@
 #  License along with this library.
 
 
-def round_into_str_with_max_digits(number, digits_count):
+def round_into_str_with_max_digits(number: float, digits_count: int) -> str:
     return "{:.{}f}".format(round(number, digits_count), digits_count)
+
+
+def round_into_float_with_max_digits(number: float, digits_count: int) -> float:
+    return float(round_into_str_with_max_digits(number=number, digits_count=digits_count))

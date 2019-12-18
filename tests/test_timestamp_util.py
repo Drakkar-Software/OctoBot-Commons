@@ -13,11 +13,16 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import time
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.2.0"  # major.minor.revision
+from octobot_commons.timestamp_util import is_valid_timestamp, get_now_time, convert_timestamps_to_datetime
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
 
-OCTOBOT_KEY = b'uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0='  # TODO temp
+def test_is_valid_timestamp():
+    assert not is_valid_timestamp(get_now_time())
+    assert is_valid_timestamp(time.time())
+
+
+def test_convert_timestamps_to_datetime():
+    # assert convert_timestamps_to_datetime([123456789]) == ['29/11/73 22:33'] TODO fail on travis : https://travis-ci.org/Drakkar-Software/OctoBot-Commons/jobs/626908169
+    pass

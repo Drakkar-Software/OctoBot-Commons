@@ -13,11 +13,17 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import numpy as np
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.2.0"  # major.minor.revision
+from octobot_commons.data_util import drop_nan, mean
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
 
-OCTOBOT_KEY = b'uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0='  # TODO temp
+def test_drop_nan():
+    assert np.array_equal(drop_nan(np.array([1, np.nan, 2, 3, np.nan])), np.array([1, 2, 3]))
+    assert np.array_equal(drop_nan(np.array([np.nan, np.nan, np.nan])), np.array([]))
+
+
+def test_mean():
+    assert mean([1, 2, 3, 4, 5, 6, 7]) == 4.0
+    assert mean([0.684, 1, 2, 3, 4, 5.5, 6, 7.5]) == 3.7105
+    assert mean([]) == 0

@@ -19,7 +19,7 @@ import logging
 import os
 from shutil import copyfile
 
-from octobot_commons.constants import USER_FOLDER, CONFIG_FILE, DEFAULT_CONFIG_FILE
+from octobot_commons.constants import USER_FOLDER, CONFIG_FILE, DEFAULT_CONFIG_FILE_PATH
 
 
 def get_user_config():
@@ -56,7 +56,7 @@ def load_config(config_file=get_user_config(), error=True, fill_missing_fields=F
     return None
 
 
-def init_config(config_file=get_user_config(), from_config_file=DEFAULT_CONFIG_FILE):
+def init_config(config_file=get_user_config(), from_config_file=DEFAULT_CONFIG_FILE_PATH):
     try:
         if not os.path.exists(USER_FOLDER):
             os.makedirs(USER_FOLDER)
