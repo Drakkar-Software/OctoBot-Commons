@@ -1,4 +1,5 @@
-PYTHON=python3
+PYTHON=python
+PYTHON_VENV=venv/bin/python
 COMPILER=gcc
 LINKER=gcc
 
@@ -6,10 +7,16 @@ CLEAN_EXT=*.o *.c *.so
 EXTENSION_FOLDER=octobot_commons
 CFLAGS=-O9
 
+PYTHON=$(PYTHON_VENV)
+
+# export PYTHONPATH=$PYTHONPATH:.
+
 help:
-	@echo "OctoBot Components Cython Makefile.  Available tasks:"
-	@echo "build  -> build the Cython extension module."
+	@echo "OctoBot-Commons Cython Makefile.  Available tasks:"
+	@echo "build -> build the Cython extension module."
 	@echo "clean -> clean the Cython extension module."
+	@echo "debug -> debug the Cython extension module."
+	@echo "run -> run the Cython extension module."
 
 all: build
 
@@ -22,6 +29,13 @@ clean:
 	rm -rf build
 	for i in $(CLEAN_EXT); do find $(EXTENSION_FOLDER) -name "$$i" -delete; done
 
+.PHONY: debug
+debug:
+	gdb -ex r --args $(PYTHON) demo.py
+
+.PHONY: run
+run: build
+	$(PYTHON) demo.py
 
 # Suffix rules
 .PRECIOUS: %.c
