@@ -21,7 +21,7 @@ from copy import copy
 import jsonschema
 
 from octobot_commons.config import load_config, get_user_config
-from octobot_commons.config_util import decrypt, encrypt
+from octobot_commons.config_util import decrypt, encrypt, has_invalid_default_config_value
 from octobot_commons.constants import CONFIG_FILE_SCHEMA, DEFAULT_CONFIG_VALUES, CONFIG_ACCEPTED_TERMS, \
     CONFIG_ENABLED_OPTION, CONFIG_DEBUG_OPTION, TENTACLE_DEFAULT_FOLDER, CONFIG_METRICS, TEMP_RESTORE_CONFIG_FILE
 from octobot_commons.logging.logging_util import get_logger
@@ -299,10 +299,6 @@ def factory_reset_tentacle_config(klass):
     config_file_name = config_file.split(config_folder)[1]
     factory_config = f"{config_folder}/{TENTACLE_DEFAULT_FOLDER}/{config_file_name}"
     shutil.copy(factory_config, config_file)
-
-
-def has_invalid_default_config_value(*config_values):
-    return any(value in DEFAULT_CONFIG_VALUES for value in config_values)
 
 
 def get_metrics_enabled(config):
