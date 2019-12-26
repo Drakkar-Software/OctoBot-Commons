@@ -31,4 +31,5 @@ cpdef list create_advanced_types_list(object clazz, dict config)
 cpdef list get_all_classes(object clazz, dict config)
 cpdef object search_class_name_in_class_list(str class_name, list parent_class_list)
 cpdef list get_all_classes_from_parent(object parent_class)
+cpdef object get_only_deepest_child_class(object clazz)
 
