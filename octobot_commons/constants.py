@@ -43,6 +43,13 @@ SCHEMA = "schema"
 CONFIG_FILE_EXT = ".json"
 CONFIG_FILE_SCHEMA = f"{CONFIG_FOLDER}/config_{SCHEMA}.json"
 
+# Config currencies
+CONFIG_CRYPTO_CURRENCIES = "crypto-currencies"
+CONFIG_CRYPTO_CURRENCY = "crypto-currency"
+CONFIG_CRYPTO_PAIRS = "pairs"
+CONFIG_CRYPTO_QUOTE = "quote"
+CONFIG_CRYPTO_ADD = "add"
+
 # OS
 PLATFORM_DATA_SEPARATOR = ":"
 
@@ -99,3 +106,6 @@ DEFAULT_CONFIG_VALUES = {"your-api-key-here", "your-api-secret-here", "your-api-
 
 # Async settings
 DEFAULT_FUTURE_TIMEOUT = 120
+
+# External resources
+EXTERNAL_RESOURCE_URL = "https://raw.githubusercontent.com/Drakkar-Software/OctoBot/assets/external_resources.json"

@@ -16,14 +16,17 @@
 import json
 import os
 import shutil
-from copy import copy
+from copy import copy, deepcopy
+from functools import reduce
 
 import jsonschema
 
 from octobot_commons.config import load_config, get_user_config
 from octobot_commons.config_util import decrypt, encrypt, has_invalid_default_config_value
 from octobot_commons.constants import CONFIG_FILE_SCHEMA, DEFAULT_CONFIG_VALUES, CONFIG_ACCEPTED_TERMS, \
-    CONFIG_ENABLED_OPTION, CONFIG_DEBUG_OPTION, TENTACLE_DEFAULT_FOLDER, CONFIG_METRICS, TEMP_RESTORE_CONFIG_FILE
+    CONFIG_ENABLED_OPTION, CONFIG_DEBUG_OPTION, TENTACLE_DEFAULT_FOLDER, CONFIG_METRICS, TEMP_RESTORE_CONFIG_FILE, \
+    CONFIG_EVALUATOR_FILE_PATH, CONFIG_EVALUATOR_FILE, CONFIG_TRADING_FILE_PATH, CONFIG_TRADING_FILE, \
+    CONFIG_CRYPTO_CURRENCIES
 from octobot_commons.logging.logging_util import get_logger
 
 DELETE_ELEMENT_VALUE = ""
@@ -110,17 +113,20 @@ def is_in_dev_mode(config):
     return CONFIG_DEBUG_OPTION in config and config[CONFIG_DEBUG_OPTION]
 
 
-# @staticmethod
-# def update_evaluator_config(to_update_data, current_config, deactivate_others):
-#     _update_activation_config(to_update_data, current_config,
-#                                             CONFIG_EVALUATOR_FILE_PATH, CONFIG_EVALUATOR_FILE,
-#                                             deactivate_others)
-#
-# @staticmethod
-# def update_trading_config(to_update_data, current_config):
-#     _update_activation_config(to_update_data, current_config,
-#                                             CONFIG_TRADING_FILE_PATH, CONFIG_TRADING_FILE,
-#                                             False)
+def update_evaluator_config(to_update_data, current_config, deactivate_others):
+    _update_activation_config(to_update_data,
+                              current_config,
+                              CONFIG_EVALUATOR_FILE_PATH,
+                              CONFIG_EVALUATOR_FILE,
+                              deactivate_others)
+
+
+def update_trading_config(to_update_data, current_config):
+    _update_activation_config(to_update_data,
+                              current_config,
+                              CONFIG_TRADING_FILE_PATH,
+                              CONFIG_TRADING_FILE,
+                              False)
 
 def remove_loaded_only_element(config):
     # # remove service instances
@@ -144,43 +150,44 @@ def remove_loaded_only_element(config):
     pass  # TODO
 
 
-# @staticmethod
-# def filter_to_update_data(to_update_data, current_config):
-#     if backtesting_enabled(current_config):
-#         for key in set(to_update_data.keys()):
-#             # remove changes to currency config when in backtesting
-#             if CONFIG_CRYPTO_CURRENCIES in key:
-#                 to_update_data.pop(key)
+def filter_to_update_data(to_update_data, current_config, in_backtesting):
+    if in_backtesting:
+        for key in set(to_update_data.keys()):
+            # remove changes to currency config when in backtesting
+            if CONFIG_CRYPTO_CURRENCIES in key:
+                to_update_data.pop(key)
 
-# @staticmethod
-# def update_global_config(to_update_data, current_config, update_input=False, delete=False):
-#     new_current_config = copy(current_config)
-#
-#     filter_to_update_data(to_update_data, current_config)
-#
-#     remove_loaded_only_element(new_current_config)
-#
-#     # now can make a deep copy
-#     new_current_config = deepcopy(new_current_config)
-#
-#     if delete:
-#         removed_configs = [parse_and_update(data_key, DELETE_ELEMENT_VALUE)
-#                            for data_key in to_update_data]
-#         reduce(clear_dictionaries_by_keys, [new_current_config] + removed_configs)
-#         if update_input:
-#             reduce(clear_dictionaries_by_keys, [current_config] + removed_configs)
-#     else:
-#         updated_configs = [
-#             parse_and_update(data_key, data_value)
-#             for data_key, data_value in to_update_data.items()
-#         ]
-#         # merge configs
-#         reduce(merge_dictionaries_by_appending_keys, [new_current_config] + updated_configs)
-#         if update_input:
-#             reduce(merge_dictionaries_by_appending_keys, [current_config] + updated_configs)
-#
-#     # save config
-#     save_config(get_user_config(), new_current_config, TEMP_RESTORE_CONFIG_FILE)
+
+def update_global_config(to_update_data, current_config, in_backtesting,
+                         config_separator, update_input=False, delete=False):
+    new_current_config = copy(current_config)
+
+    filter_to_update_data(to_update_data, current_config, in_backtesting)
+
+    remove_loaded_only_element(new_current_config)
+
+    # now can make a deep copy
+    new_current_config = deepcopy(new_current_config)
+
+    if delete:
+        removed_configs = [parse_and_update(data_key, DELETE_ELEMENT_VALUE, config_separator)
+                           for data_key in to_update_data]
+        reduce(clear_dictionaries_by_keys, [new_current_config] + removed_configs)
+        if update_input:
+            reduce(clear_dictionaries_by_keys, [current_config] + removed_configs)
+    else:
+        updated_configs = [
+            parse_and_update(data_key, data_value, config_separator)
+            for data_key, data_value in to_update_data.items()
+        ]
+        # merge configs
+        reduce(merge_dictionaries_by_appending_keys, [new_current_config] + updated_configs)
+        if update_input:
+            reduce(merge_dictionaries_by_appending_keys, [current_config] + updated_configs)
+
+    # save config
+    save_config(get_user_config(), new_current_config, TEMP_RESTORE_CONFIG_FILE)
+
 
 def simple_save_config_update(updated_config):
     to_save_config = copy(updated_config)
@@ -189,24 +196,23 @@ def simple_save_config_update(updated_config):
     return True
 
 
-# @staticmethod
-# def parse_and_update(key, new_data):
-#     parsed_data_array = key.split(UPDATED_CONFIG_SEPARATOR)
-#     new_config = {}
-#     current_dict = new_config
-#
-#     for i, _ in enumerate(parsed_data_array):
-#         if i > 0:
-#             if i == len(parsed_data_array) - 1:
-#                 current_dict[parsed_data_array[i]] = new_data
-#             else:
-#                 current_dict[parsed_data_array[i]] = {}
-#         else:
-#             new_config[parsed_data_array[i]] = {}
-#
-#         current_dict = current_dict[parsed_data_array[i]]
-#
-#     return new_config
+def parse_and_update(key, new_data, config_separator):
+    parsed_data_array = key.split(config_separator)
+    new_config = {}
+    current_dict = new_config
+
+    for i, _ in enumerate(parsed_data_array):
+        if i > 0:
+            if i == len(parsed_data_array) - 1:
+                current_dict[parsed_data_array[i]] = new_data
+            else:
+                current_dict[parsed_data_array[i]] = {}
+        else:
+            new_config[parsed_data_array[i]] = {}
+
+        current_dict = current_dict[parsed_data_array[i]]
+
+    return new_config
 
 def are_of_compatible_type(val1, val2):
     return (
@@ -254,35 +260,35 @@ def clear_dictionaries_by_keys(dict_dest, dict_src):
     return dict_dest
 
 
-# @staticmethod
-# def _update_activation_config(to_update_data, current_config, config_file_path, config_file, deactivate_others):
-#     from tentacles_management.class_inspector import get_class_from_string, evaluator_parent_inspection
-#     something_changed = False
-#     for element_name, activated in to_update_data.items():
-#         if element_name in current_config:
-#             active = activated if isinstance(activated, bool) else activated.lower() == "true"
-#             current_activation = current_config[element_name]
-#             if current_activation != active:
-#                 get_logger().info(f"{config_file} updated: {element_name} "
-#                                   f"{'activated' if active else 'deactivated'}")
-#                 current_config[element_name] = active
-#                 something_changed = True
-#     if deactivate_others:
-#         import evaluator.Strategies as strategies
-#         for element_name, activated in current_config.items():
-#             if element_name not in to_update_data:
-#                 if current_config[element_name]:
-#                     # do not deactivate strategies
-#                     config_class = get_class_from_string(element_name, strategies.StrategiesEvaluator,
-#                                                          strategies, evaluator_parent_inspection)
-#                     if config_class is None:
-#                         get_logger().info(f"{config_file} updated: {element_name} "
-#                                           f"{'deactivated'}")
-#                         current_config[element_name] = False
-#                         something_changed = True
-#     if something_changed:
-#         with open(config_file_path, "w+") as config_file_w:
-#             config_file_w.write(dump_json(current_config))
+def _update_activation_config(to_update_data, current_config, config_file_path, config_file, deactivate_others):
+    from octobot_commons.tentacles_management.class_inspector import get_class_from_string, evaluator_parent_inspection
+    something_changed = False
+    for element_name, activated in to_update_data.items():
+        if element_name in current_config:
+            active = activated if isinstance(activated, bool) else activated.lower() == "true"
+            current_activation = current_config[element_name]
+            if current_activation != active:
+                get_logger().info(f"{config_file} updated: {element_name} "
+                                  f"{'activated' if active else 'deactivated'}")
+                current_config[element_name] = active
+                something_changed = True
+    if deactivate_others:
+        import evaluator.Strategies as strategies
+        for element_name, activated in current_config.items():
+            if element_name not in to_update_data:
+                if current_config[element_name]:
+                    # do not deactivate strategies
+                    config_class = get_class_from_string(element_name, strategies.StrategiesEvaluator,
+                                                         strategies, evaluator_parent_inspection)
+                    if config_class is None:
+                        get_logger().info(f"{config_file} updated: {element_name} "
+                                          f"{'deactivated'}")
+                        current_config[element_name] = False
+                        something_changed = True
+    if something_changed:
+        with open(config_file_path, "w+") as config_file_w:
+            config_file_w.write(dump_json(current_config))
+
 
 def update_tentacle_config(klass, config_update):
     current_config = klass.get_specific_config()
