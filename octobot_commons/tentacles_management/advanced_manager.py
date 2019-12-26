@@ -205,3 +205,13 @@ def search_class_name_in_class_list(class_name, parent_class_list) -> object:
 
 def __check_duplicate(list_to_check) -> bool:
     return len(set(list_to_check)) == len(list_to_check)
+
+
+def get_single_deepest_child_class(clazz) -> object:
+    children_classes = clazz.__subclasses__()
+    if len(children_classes) == 0:
+        return clazz
+    if len(children_classes) > 1:
+        get_logger(__name__).error(f"More than one child class of {clazz}, expecting one, "
+                                   f"using {children_classes[0]}")
+    return get_single_deepest_child_class(children_classes[0])
