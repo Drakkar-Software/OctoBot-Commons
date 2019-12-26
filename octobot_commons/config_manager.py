@@ -20,6 +20,7 @@ from copy import copy, deepcopy
 from functools import reduce
 
 import jsonschema
+from octobot_trading.constants import CONFIG_EXCHANGES, CONFIG_EXCHANGE_ENCRYPTED_VALUES
 
 from octobot_commons.config import load_config, get_user_config
 from octobot_commons.config_util import decrypt, encrypt, has_invalid_default_config_value
@@ -38,7 +39,7 @@ def save_config(config_file, config, temp_restore_config_file, json_data=None):
         # prepare a restoration config file
         prepare_restore_file(temp_restore_config_file, config_file)
 
-        new_content = json_data  # TODO jsonify_config(config) if json_data is None else json_data
+        new_content = jsonify_config(config) if json_data is None else json_data
 
         # edit the config file
         with open(config_file, "w") as cg_file:
@@ -77,6 +78,18 @@ def prepare_restore_file(restore_file, current_config_file):
 
 def remove_restore_file(restore_file):
     os.remove(restore_file)
+
+
+def jsonify_config(config):
+    # check exchange keys encryption
+    for exchange, exchange_config in config[CONFIG_EXCHANGES].items():
+        try:
+            for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES:
+                _handle_encrypted_value(key, exchange_config)
+        except Exception:
+            config[CONFIG_EXCHANGES][exchange] = {key: "" for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES}
+
+    return dump_json(config)
 
 
 def _handle_encrypted_value(value_key, config_element, verbose=False):
@@ -129,6 +142,7 @@ def update_trading_config(to_update_data, current_config):
                               False)
 
 def remove_loaded_only_element(config):
+    # OctoBot 0.3.X
     # # remove service instances
     # for service in config[CONFIG_CATEGORY_SERVICES]:
     #     config[CONFIG_CATEGORY_SERVICES][service].pop(CONFIG_SERVICE_INSTANCE, None)
@@ -147,7 +161,10 @@ def remove_loaded_only_element(config):
     #     if CONFIG_BACKTESTING in config:
     #         config[CONFIG_BACKTESTING].pop(CONFIG_ENABLED_OPTION, None)
     #         config[CONFIG_BACKTESTING].pop(CONFIG_ANALYSIS_ENABLED_OPTION, None)
-    pass  # TODO
+
+    # OctoBot 0.4.X
+    # for now nothing to remove (nothing added in runtime)
+    pass
 
 
 def filter_to_update_data(to_update_data, current_config, in_backtesting):
