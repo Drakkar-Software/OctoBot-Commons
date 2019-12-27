@@ -16,6 +16,7 @@
 
 from octobot_commons import DICT_BULLET_TOKEN_STR
 from octobot_commons.constants import PORTFOLIO_TOTAL, PORTFOLIO_AVAILABLE
+from octobot_commons.enums import MarkdownFormat
 from octobot_commons.timestamp_util import convert_timestamp_to_datetime
 from octobot_commons.number_util import round_into_str_with_max_digits
 from telegram.utils.helpers import escape_markdown
@@ -27,7 +28,7 @@ class PrettyPrinter:
 
     @staticmethod
     def open_order_pretty_printer(exchange_name, order, markdown=False):
-        _, _, c = PrettyPrinter.get_markets(markdown)
+        _, _, c = PrettyPrinter.get_markers(markdown)
         currency, market = order.get_currency_and_market()
         order_type_name = order.order_type.name
 
@@ -38,7 +39,7 @@ class PrettyPrinter:
 
     @staticmethod
     def trade_pretty_printer(exchange_name, trade, markdown=False):
-        _, _, c = PrettyPrinter.get_markets(markdown)
+        _, _, c = PrettyPrinter.get_markers(markdown)
         currency = trade.currency
         market = trade.market
         order_type_name = trade.order_type.name
@@ -82,7 +83,7 @@ class PrettyPrinter:
 
     @staticmethod
     def pretty_print_dict(dict_content, default="0", markdown=False):
-        _, _, c = PrettyPrinter.get_markets(markdown)
+        _, _, c = PrettyPrinter.get_markers(markdown)
         if dict_content:
             result_str = DICT_BULLET_TOKEN_STR
             return f"{result_str}{c}" \
@@ -109,7 +110,7 @@ class PrettyPrinter:
 
     # return markers for italic, bold and code
     @staticmethod
-    def get_markets(markdown=False):
+    def get_markers(markdown=False):
         if markdown:
-            return "_", "*", "`"
+            return MarkdownFormat.ITALIC.value, MarkdownFormat.BOLD.value, MarkdownFormat.CODE.value
         return "", "", ""
