@@ -190,8 +190,13 @@ def get_all_classes(clazz, config) -> list:
 
 
 def get_all_classes_from_parent(parent_class) -> list:
-    return [subclass if not subclass.__subclasses__() else get_all_classes_from_parent(subclass)
-            for subclass in parent_class.__subclasses__()]
+    classes = []
+    for subclass in parent_class.__subclasses__():
+        if subclass.__subclasses__():
+            classes += get_all_classes_from_parent(subclass)
+        else:
+            classes.append(subclass)
+    return classes
 
 
 def search_class_name_in_class_list(class_name, parent_class_list) -> object:
