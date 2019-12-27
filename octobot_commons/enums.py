@@ -83,3 +83,17 @@ class OctoBotTypes(Enum):
     BINARY = "binary"
     PYTHON = "python"
     DOCKER = "docker"
+
+
+class MarkdownFormat(Enum):
+    ITALIC = "_"
+    BOLD = "**"
+    CODE = "`"
+    IGNORE = ""
+    NONE = ""
+
+
+class NotificationCategory(Enum):
+    GLOBAL_INFO = "global-info"
+    PRICE_ALERTS = "price-alerts"
+    TRADES = "trades"
