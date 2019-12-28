@@ -72,3 +72,7 @@ def get_deep_class_from_string(class_string, module):
         if m[0] == class_string:
             return getattr(module, class_string)
     return None
+
+
+def is_abstract_using_inspection_and_class_naming(clazz):
+    return inspect.isabstract(clazz) or "abstract" in clazz.__name__.lower()
