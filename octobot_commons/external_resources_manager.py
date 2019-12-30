@@ -30,7 +30,7 @@ def _handle_exception(exception, resource_key, catch_exception, default_response
         raise exception
 
 
-def get_external_resource(resource_key, catch_exception=False, default_response=""):
+def get_external_resource(resource_key, catch_exception=False, default_response="") -> object:
     try:
         external_resources = json.loads(requests.get(EXTERNAL_RESOURCE_URL).text)
         return external_resources[resource_key]
@@ -38,7 +38,8 @@ def get_external_resource(resource_key, catch_exception=False, default_response=
         return _handle_exception(e, resource_key, catch_exception, default_response)
 
 
-async def async_get_external_resource(resource_key, aiohttp_session, catch_exception=False, default_response=""):
+async def async_get_external_resource(resource_key, aiohttp_session,
+                                      catch_exception=False, default_response="") -> object:
     try:
         async with aiohttp_session.get(EXTERNAL_RESOURCE_URL) as resp:
             external_resources = json.loads(resp.text())
