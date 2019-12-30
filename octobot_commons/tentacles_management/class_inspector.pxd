@@ -23,3 +23,5 @@ cpdef bint trading_mode_parent_inspection(object element, object parent)
 cpdef object get_deep_class_from_string(str class_string, object module)
 cpdef object get_class_from_parent_subclasses(str class_string, object parent)
 cpdef object get_deep_class_from_parent_subclasses(str class_string, object parent)
+
+cpdef bool is_abstract_using_inspection_and_class_naming(object clazz)
