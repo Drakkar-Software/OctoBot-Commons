@@ -38,7 +38,3 @@ def run_coroutine_in_asyncio_loop(coroutine, async_loop):
         LOGGER.error(f'{coroutine} coroutine raised an exception: {e}')
         LOGGER.exception(e)
         raise e
-
-
-async def get_gather_wrapper(tasks):
-    await asyncio.gather(*tasks)
