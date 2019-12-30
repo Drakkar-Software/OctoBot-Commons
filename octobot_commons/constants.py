@@ -50,10 +50,6 @@ CONFIG_CRYPTO_PAIRS = "pairs"
 CONFIG_CRYPTO_QUOTE = "quote"
 CONFIG_CRYPTO_ADD = "add"
 
-# Config notifications
-CONFIG_CATEGORY_NOTIFICATION = "notification"
-CONFIG_NOTIFICATION_TYPE = "notification-type"
-
 # OS
 PLATFORM_DATA_SEPARATOR = ":"
 
