@@ -78,7 +78,7 @@ class OctoBotTypes(Enum):
 
 class MarkdownFormat(Enum):
     ITALIC = "_"
-    BOLD = "**"
+    BOLD = "*"
     CODE = "`"
     IGNORE = ""
     NONE = ""
