@@ -20,7 +20,6 @@ from copy import copy, deepcopy
 from functools import reduce
 
 import jsonschema
-from octobot_trading.constants import CONFIG_EXCHANGES, CONFIG_EXCHANGE_ENCRYPTED_VALUES
 
 from octobot_commons.config import load_config, get_user_config
 from octobot_commons.config_util import decrypt, encrypt, has_invalid_default_config_value
@@ -81,15 +80,20 @@ def remove_restore_file(restore_file):
 
 
 def jsonify_config(config):
-    # check exchange keys encryption
-    for exchange, exchange_config in config[CONFIG_EXCHANGES].items():
-        try:
-            for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES:
-                _handle_encrypted_value(key, exchange_config)
-        except Exception:
-            config[CONFIG_EXCHANGES][exchange] = {key: "" for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES}
+    try:
+        from octobot_trading.constants import CONFIG_EXCHANGES, CONFIG_EXCHANGE_ENCRYPTED_VALUES
+        # check exchange keys encryption
+        for exchange, exchange_config in config[CONFIG_EXCHANGES].items():
+            try:
+                for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES:
+                    _handle_encrypted_value(key, exchange_config)
+            except Exception:
+                config[CONFIG_EXCHANGES][exchange] = {key: "" for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES}
 
-    return dump_json(config)
+        return dump_json(config)
+    except ImportError:
+        get_logger().error(f"OctoBot_Commons/config_manager.py/jsonify_config requires "
+                           f"OctoBot-Trading package installed")
 
 
 def _handle_encrypted_value(value_key, config_element, verbose=False):
