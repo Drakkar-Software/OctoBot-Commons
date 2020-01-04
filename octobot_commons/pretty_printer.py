@@ -50,11 +50,12 @@ class PrettyPrinter:
             f"{convert_timestamp_to_datetime(trade.filled_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
 
     @staticmethod
-    def cryptocurrency_alert(crypto_currency, symbol, result, final_eval):
-        alert = f"OctoBot ALERT : #{crypto_currency}\n Symbol : #{symbol.replace('/', '')}\n " \
-            f"Result : {str(result).split('.')[1]}\n Evaluation : {final_eval}"
-        alert_markdown = f"*OctoBot ALERT* : `{crypto_currency}`\n Symbol : `{symbol.replace('/', '')}`\n " \
-            f"Result : `{str(result).split('.')[1]}`\n Evaluation : `{escape_markdown(str(final_eval))}`"
+    def cryptocurrency_alert(result, final_eval):
+        _, _, c = PrettyPrinter.get_markers(True)
+        alert = f"Result : {str(result).split('.')[1]}\n" \
+                f"Evaluation : {final_eval}"
+        alert_markdown = f"Result : {c}{str(result).split('.')[1]}{c}\n" \
+                         f"Evaluation : {c}{escape_markdown(str(final_eval))}{c}"
         return alert, alert_markdown
 
     @staticmethod

@@ -80,5 +80,5 @@ class MarkdownFormat(Enum):
     ITALIC = "_"
     BOLD = "*"
     CODE = "`"
-    IGNORE = ""
-    NONE = ""
+    IGNORE = 1
+    NONE = 0
