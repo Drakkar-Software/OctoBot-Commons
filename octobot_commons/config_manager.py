@@ -167,8 +167,16 @@ def remove_loaded_only_element(config):
     #         config[CONFIG_BACKTESTING].pop(CONFIG_ANALYSIS_ENABLED_OPTION, None)
 
     # OctoBot 0.4.X
-    # for now nothing to remove (nothing added in runtime)
-    pass
+    try:
+        from octobot_evaluators.constants import CONFIG_EVALUATOR
+        from octobot_trading.constants import CONFIG_TRADING_TENTACLES
+
+        config.pop(CONFIG_EVALUATOR, None)
+        config.pop(CONFIG_TRADING_TENTACLES, None)
+    except ImportError as e:
+        get_logger().error(f"Impossible to save config: requires OctoBot-Trading and "
+                           f"OctoBot-Evaluators packages installed")
+        raise e
 
 
 def filter_to_update_data(to_update_data, current_config, in_backtesting):
