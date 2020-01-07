@@ -34,7 +34,7 @@ class PrettyPrinter:
 
         return f"{c}{order_type_name}{c}: {c}{PrettyPrinter.get_min_string_from_number(order.origin_quantity)} " \
             f"{currency}{c} at {c}{PrettyPrinter.get_min_string_from_number(order.origin_price)} {market}{c} " \
-            f"{exchange_name} " \
+            f"{exchange_name.capitalize()} " \
             f"{convert_timestamp_to_datetime(order.creation_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
 
     @staticmethod
@@ -46,7 +46,7 @@ class PrettyPrinter:
         
         return f"{c}{order_type_name}{c}: {c}{PrettyPrinter.get_min_string_from_number(trade.quantity)} {currency}{c}" \
             f" at {c}{PrettyPrinter.get_min_string_from_number(trade.price)} {market}{c} " \
-            f"{exchange_name} " \
+            f"{exchange_name.capitalize()} " \
             f"{convert_timestamp_to_datetime(trade.filled_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
 
     @staticmethod
