@@ -4,7 +4,7 @@ sudo: enabled
 os: linux
 language: python
 cache: pip
-python: 3.7-dev
+python: 3.8-dev
 services:
   - docker
 
@@ -22,20 +22,20 @@ install:
 
 matrix:
   include:
-  - name: "Linux - Python 3.7-dev - Python sources"
+  - name: "Linux - Python 3.8-dev - Python sources"
     stage: test
     os: linux
-    python: 3.7-dev
+    python: 3.8-dev
     language: python
     script:
       - pytest --cov=. --cov-config=.coveragerc --durations=0 -rw tests
     after_success:
       - if [ $TRAVIS_PULL_REQUEST == "false" ]; then coveralls; fi
 
-  - name: "Linux - Python 3.7-dev - Installed"
+  - name: "Linux - Python 3.8-dev - Installed"
     stage: test
     os: linux
-    python: 3.7-dev
+    python: 3.8-dev
     language: python
     script:
       - python3 setup.py install
