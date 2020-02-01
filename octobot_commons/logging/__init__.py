@@ -30,6 +30,8 @@ logs_database = {
     BACKTESTING_NEW_ERRORS_COUNT: 0
 }
 
+error_notifier_callbacks = []
+
 LOGS_MAX_COUNT = 1000
 
 
@@ -45,6 +47,8 @@ def add_log(level, source, message):
     if level >= ERROR:
         logs_database[LOG_NEW_ERRORS_COUNT] += 1
         logs_database[BACKTESTING_NEW_ERRORS_COUNT] += 1
+    for callback in error_notifier_callbacks:
+        callback()
 
 
 def get_errors_count(counter=LOG_NEW_ERRORS_COUNT):
@@ -53,3 +57,7 @@ def get_errors_count(counter=LOG_NEW_ERRORS_COUNT):
 
 def reset_errors_count(counter=LOG_NEW_ERRORS_COUNT):
     logs_database[counter] = 0
+
+
+def register_error_notifier(callback):
+    error_notifier_callbacks.append(callback)
