@@ -30,9 +30,8 @@ class PrettyPrinter:
     def open_order_pretty_printer(exchange_name, order, markdown=False):
         _, _, c = PrettyPrinter.get_markers(markdown)
         currency, market = order.get_currency_and_market()
-        order_type_name = order.order_type.name
 
-        return f"{c}{order_type_name}{c}: {c}{PrettyPrinter.get_min_string_from_number(order.origin_quantity)} " \
+        return f"{c}{order.order_type.name}{c}: {c}{PrettyPrinter.get_min_string_from_number(order.origin_quantity)} " \
             f"{currency}{c} at {c}{PrettyPrinter.get_min_string_from_number(order.origin_price)} {market}{c} " \
             f"{exchange_name.capitalize()} " \
             f"{convert_timestamp_to_datetime(order.creation_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
@@ -40,14 +39,12 @@ class PrettyPrinter:
     @staticmethod
     def trade_pretty_printer(exchange_name, trade, markdown=False):
         _, _, c = PrettyPrinter.get_markers(markdown)
-        currency = trade.currency
-        market = trade.market
-        order_type_name = trade.order_type.name
         
-        return f"{c}{order_type_name}{c}: {c}{PrettyPrinter.get_min_string_from_number(trade.quantity)} {currency}{c}" \
-            f" at {c}{PrettyPrinter.get_min_string_from_number(trade.price)} {market}{c} " \
-            f"{exchange_name.capitalize()} " \
-            f"{convert_timestamp_to_datetime(trade.filled_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
+        return f"{c}{trade.trade_type.name}{c}: {c}" \
+               f"{PrettyPrinter.get_min_string_from_number(trade.executed_quantity)} {trade.currency}{c} at {c}" \
+               f"{PrettyPrinter.get_min_string_from_number(trade.executed_price)} {trade.market}{c} " \
+               f"{exchange_name.capitalize()} " \
+               f"{convert_timestamp_to_datetime(trade.executed_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
 
     @staticmethod
     def cryptocurrency_alert(result, final_eval):
