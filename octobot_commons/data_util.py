@@ -30,3 +30,16 @@ def drop_nan(data):
 
 def mean(number_list):
     return sum(number_list) / len(number_list) if number_list else 0
+
+
+def shift_value_array(array, shift_count=-1, size=1000, fill_value=np.nan, dtype=np.float64):
+    new_array = np.full(size, fill_value=fill_value, dtype=dtype)
+    if shift_count > 0:
+        new_array[:shift_count] = fill_value
+        new_array[shift_count:] = array[:-shift_count]
+    elif shift_count < 0:
+        new_array[shift_count:] = fill_value
+        new_array[:shift_count] = array[-shift_count:]
+    else:
+        new_array[:] = array
+    return new_array
