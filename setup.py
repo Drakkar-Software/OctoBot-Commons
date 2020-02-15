@@ -19,6 +19,8 @@ import os
 from setuptools import dist
 dist.Distribution().fetch_build_eggs(['Cython>=0.29.14', 'numpy>=1.17.3'])
 
+import numpy as np
+
 try:
     from Cython.Distutils import build_ext
     from Cython.Build import cythonize
@@ -48,7 +50,7 @@ packages_list = ["octobot_commons.event_tree",
                  "octobot_commons.tentacles_management.class_inspector"]
 
 ext_modules = [
-    Extension(package, [f"{package.replace('.', '/')}.py"])
+    Extension(package, [f"{package.replace('.', '/')}.py"], include_dirs=[np.get_include()])
     for package in packages_list]
 
 # long description from README file
@@ -70,6 +72,7 @@ setup(
     packages=PACKAGES,
     include_package_data=True,
     long_description=DESCRIPTION,
+    include_dirs=[np.get_include()],
     cmdclass={'build_ext': build_ext},
     tests_require=["pytest"],
     test_suite="tests",
