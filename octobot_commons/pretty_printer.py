@@ -53,13 +53,20 @@ class PrettyPrinter:
 
     @staticmethod
     def trade_pretty_printer(exchange_name, trade, markdown=False):
-        _, _, c = PrettyPrinter.get_markers(markdown)
-        
-        return f"{c}{trade.trade_type.name.replace('_', ' ')}{c}: {c}" \
-               f"{PrettyPrinter.get_min_string_from_number(trade.executed_quantity)} {trade.currency}{c} at {c}" \
-               f"{PrettyPrinter.get_min_string_from_number(trade.executed_price)} {trade.market}{c} " \
-               f"{exchange_name.capitalize()} " \
-               f"{convert_timestamp_to_datetime(trade.executed_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
+        try:
+            from octobot_trading.enums import ExchangeConstantsOrderColumns, TraderOrderType, TradeOrderSide
+            _, _, c = PrettyPrinter.get_markers(markdown)
+            trade_type = trade.trade_type
+            if trade_type == TraderOrderType.UNKNOWN:
+                trade_type = trade.side
+
+            return f"{c}{trade_type.name.replace('_', ' ')}{c}: {c}" \
+                   f"{PrettyPrinter.get_min_string_from_number(trade.executed_quantity)} {trade.currency}{c} at {c}" \
+                   f"{PrettyPrinter.get_min_string_from_number(trade.executed_price)} {trade.market}{c} " \
+                   f"{exchange_name.capitalize()} " \
+                   f"{convert_timestamp_to_datetime(trade.executed_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
+        except ImportError:
+            PrettyPrinter.LOGGER.error("open_order_pretty_printer requires OctoBot-Trading package installed")
 
     @staticmethod
     def cryptocurrency_alert(result, final_eval):
