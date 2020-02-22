@@ -35,6 +35,5 @@ def run_coroutine_in_asyncio_loop(coroutine, async_loop):
         future.cancel()
         raise e
     except Exception as e:
-        LOGGER.error(f'{coroutine} coroutine raised an exception: {e}')
-        LOGGER.exception(e)
+        LOGGER.exception(e, True, f'{coroutine} coroutine raised an exception: {e}')
         raise e
