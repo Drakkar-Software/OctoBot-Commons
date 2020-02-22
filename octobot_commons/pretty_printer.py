@@ -16,31 +16,46 @@
 
 from octobot_commons import DICT_BULLET_TOKEN_STR
 from octobot_commons.constants import PORTFOLIO_TOTAL, PORTFOLIO_AVAILABLE
+from octobot_commons.dict_util import get_value_or_default
 from octobot_commons.enums import MarkdownFormat
+from octobot_commons.logging.logging_util import get_logger
+from octobot_commons.symbol_util import split_symbol
 from octobot_commons.timestamp_util import convert_timestamp_to_datetime
 from octobot_commons.number_util import round_into_str_with_max_digits
-from telegram.utils.helpers import escape_markdown
 
 
 class PrettyPrinter:
 
     ORDER_TIME_FORMAT = '%m-%d %H:%M'
+    LOGGER = get_logger("PrettyPrinter")
 
     @staticmethod
-    def open_order_pretty_printer(exchange_name, order, markdown=False):
-        _, _, c = PrettyPrinter.get_markers(markdown)
-        currency, market = order.get_currency_and_market()
+    def open_order_pretty_printer(exchange_name, dict_order, markdown=False):
+        try:
+            from octobot_trading.enums import ExchangeConstantsOrderColumns, TraderOrderType, TradeOrderSide
+            from octobot_trading.api.orders import parse_order_type
+            _, _, c = PrettyPrinter.get_markers(markdown)
+            currency, market = \
+                split_symbol(str(get_value_or_default(dict_order, ExchangeConstantsOrderColumns.SYMBOL.value, "")))
+            order_type = parse_order_type(dict_order)
+            if order_type == TraderOrderType.UNKNOWN:
+                order_type = TradeOrderSide(get_value_or_default(dict_order, ExchangeConstantsOrderColumns.SIDE.value))
+            quantity = get_value_or_default(dict_order, ExchangeConstantsOrderColumns.AMOUNT.value, 0.0)
+            price = get_value_or_default(dict_order, ExchangeConstantsOrderColumns.PRICE.value, 0.0)
+            creation_time = get_value_or_default(dict_order, ExchangeConstantsOrderColumns.TIMESTAMP.value, 0)
 
-        return f"{c}{order.order_type.name}{c}: {c}{PrettyPrinter.get_min_string_from_number(order.origin_quantity)} " \
-            f"{currency}{c} at {c}{PrettyPrinter.get_min_string_from_number(order.origin_price)} {market}{c} " \
-            f"{exchange_name.capitalize()} " \
-            f"{convert_timestamp_to_datetime(order.creation_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
+            return f"{c}{order_type.name.replace('_', ' ')}{c}: {c}" \
+                   f"{PrettyPrinter.get_min_string_from_number(quantity)} {currency}{c} at {c}" \
+                   f"{PrettyPrinter.get_min_string_from_number(price)} {market}{c} {exchange_name.capitalize()} " \
+                   f"{convert_timestamp_to_datetime(creation_time, time_format=PrettyPrinter.ORDER_TIME_FORMAT)}"
+        except ImportError:
+            PrettyPrinter.LOGGER.error("open_order_pretty_printer requires OctoBot-Trading package installed")
 
     @staticmethod
     def trade_pretty_printer(exchange_name, trade, markdown=False):
         _, _, c = PrettyPrinter.get_markers(markdown)
         
-        return f"{c}{trade.trade_type.name}{c}: {c}" \
+        return f"{c}{trade.trade_type.name.replace('_', ' ')}{c}: {c}" \
                f"{PrettyPrinter.get_min_string_from_number(trade.executed_quantity)} {trade.currency}{c} at {c}" \
                f"{PrettyPrinter.get_min_string_from_number(trade.executed_price)} {trade.market}{c} " \
                f"{exchange_name.capitalize()} " \
@@ -48,12 +63,17 @@ class PrettyPrinter:
 
     @staticmethod
     def cryptocurrency_alert(result, final_eval):
-        _, _, c = PrettyPrinter.get_markers(True)
-        alert = f"Result : {str(result).split('.')[1]}\n" \
-                f"Evaluation : {final_eval}"
-        alert_markdown = f"Result : {c}{str(result).split('.')[1]}{c}\n" \
-                         f"Evaluation : {c}{escape_markdown(str(final_eval))}{c}"
-        return alert, alert_markdown
+        try:
+            from telegram.utils.helpers import escape_markdown
+            _, _, c = PrettyPrinter.get_markers(True)
+            display_result = str(result).split('.')[1].replace('_', ' ')
+            alert = f"Result : {display_result}\n" \
+                    f"Evaluation : {final_eval}"
+            alert_markdown = f"Result : {c}{display_result}{c}\n" \
+                             f"Evaluation : {c}{escape_markdown(str(final_eval))}{c}"
+            return alert, alert_markdown
+        except ImportError:
+            PrettyPrinter.LOGGER.error("cryptocurrency_alert requires Telegram package installed")
 
     @staticmethod
     def global_portfolio_pretty_print(global_portfolio, separator="\n", markdown=False):
