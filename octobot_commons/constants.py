@@ -27,6 +27,7 @@ DAYS_TO_SECONDS = HOURS_TO_SECONDS * 24
 # Strings
 CONFIG_WILDCARD = "*"
 PORTFOLIO_AVAILABLE = "available"
+MARGIN_PORTFOLIO = "margin"
 PORTFOLIO_TOTAL = "total"
 
 # config
