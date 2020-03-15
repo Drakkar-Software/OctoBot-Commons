@@ -49,3 +49,11 @@ def is_valid_timestamp(timestamp):
 
 def get_now_time(time_format='%Y-%m-%d %H:%M:%S'):
     return datetime.fromtimestamp(time.time()).strftime(time_format)
+
+
+def datetime_to_timestamp(date_time_str: str, date_time_format: str) -> float:
+    return time.mktime(create_datetime_from_string(date_time_str, date_time_format).timetuple())
+
+
+def create_datetime_from_string(date_time_str: str, date_time_format: str) -> datetime:
+    return datetime.strptime(date_time_str, date_time_format)
