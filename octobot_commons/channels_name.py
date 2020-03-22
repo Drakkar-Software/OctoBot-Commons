@@ -26,11 +26,14 @@ class OctoBotBacktestingChannelsName(Enum):
 
 class OctoBotTradingChannelsName(Enum):
     TICKER_CHANNEL = "Ticker"
+    MINI_TICKER_CHANNEL = "MiniTicker"
     RECENT_TRADES_CHANNEL = "RecentTrade"
     ORDER_BOOK_CHANNEL = "OrderBook"
+    ORDER_BOOK_TICKER_CHANNEL = "OrderBookTicker"
     KLINE_CHANNEL = "Kline"
     OHLCV_CHANNEL = "OHLCV"
     TRADES_CHANNEL = "Trades"
+    LIQUIDATIONS_CHANNEL = "Liquidations"
     ORDERS_CHANNEL = "Orders"
     BALANCE_CHANNEL = "Balance"
     BALANCE_PROFITABILITY_CHANNEL = "BalanceProfitability"
