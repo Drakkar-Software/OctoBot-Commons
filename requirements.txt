@@ -1,9 +1,9 @@
 # Setup requirements
-cython==0.29.14
-numpy==1.17.3
+cython==0.29.16
+numpy==1.18.2
 
 # Commons requirements
-jsonschema==3.1.1
+jsonschema==3.2.0
 
 # Others
-python-telegram-bot==12.2.0
+python-telegram-bot==12.4.2
