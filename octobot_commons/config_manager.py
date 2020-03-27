@@ -23,9 +23,8 @@ import jsonschema
 
 from octobot_commons.config import load_config, get_user_config
 from octobot_commons.config_util import decrypt, encrypt, has_invalid_default_config_value
-from octobot_commons.constants import CONFIG_FILE_SCHEMA, DEFAULT_CONFIG_VALUES, CONFIG_ACCEPTED_TERMS, \
-    CONFIG_ENABLED_OPTION, CONFIG_DEBUG_OPTION, TENTACLE_DEFAULT_FOLDER, CONFIG_METRICS, TEMP_RESTORE_CONFIG_FILE, \
-    CONFIG_EVALUATOR_FILE_PATH, CONFIG_EVALUATOR_FILE, CONFIG_TRADING_FILE_PATH, CONFIG_TRADING_FILE, \
+from octobot_commons.constants import CONFIG_FILE_SCHEMA, CONFIG_ACCEPTED_TERMS, \
+    CONFIG_ENABLED_OPTION, CONFIG_DEBUG_OPTION, CONFIG_METRICS, TEMP_RESTORE_CONFIG_FILE, \
     CONFIG_CRYPTO_CURRENCIES
 from octobot_commons.logging.logging_util import get_logger
 
@@ -130,21 +129,6 @@ def is_in_dev_mode(config):
     return CONFIG_DEBUG_OPTION in config and config[CONFIG_DEBUG_OPTION]
 
 
-def update_evaluator_config(to_update_data, current_config, deactivate_others):
-    _update_activation_config(to_update_data,
-                              current_config,
-                              CONFIG_EVALUATOR_FILE_PATH,
-                              CONFIG_EVALUATOR_FILE,
-                              deactivate_others)
-
-
-def update_trading_config(to_update_data, current_config):
-    _update_activation_config(to_update_data,
-                              current_config,
-                              CONFIG_TRADING_FILE_PATH,
-                              CONFIG_TRADING_FILE,
-                              False)
-
 def remove_loaded_only_element(config):
     # OctoBot 0.3.X
     # # remove service instances
@@ -167,16 +151,7 @@ def remove_loaded_only_element(config):
     #         config[CONFIG_BACKTESTING].pop(CONFIG_ANALYSIS_ENABLED_OPTION, None)
 
     # OctoBot 0.4.X
-    try:
-        from octobot_evaluators.constants import CONFIG_EVALUATOR
-        from octobot_trading.constants import CONFIG_TRADING_TENTACLES
-
-        config.pop(CONFIG_EVALUATOR, None)
-        config.pop(CONFIG_TRADING_TENTACLES, None)
-    except ImportError as e:
-        get_logger().error(f"Impossible to save config: requires OctoBot-Trading and "
-                           f"OctoBot-Evaluators packages installed")
-        raise e
+    pass
 
 
 def filter_to_update_data(to_update_data, current_config, in_backtesting):
@@ -287,53 +262,6 @@ def clear_dictionaries_by_keys(dict_dest, dict_src):
                 get_logger().error(f"Conflict when deleting dict element with key : {key}")
 
     return dict_dest
-
-
-def _update_activation_config(to_update_data, current_config, config_file_path, config_file, deactivate_others):
-    from octobot_commons.tentacles_management.class_inspector import get_class_from_string, evaluator_parent_inspection
-    something_changed = False
-    for element_name, activated in to_update_data.items():
-        if element_name in current_config:
-            active = activated if isinstance(activated, bool) else activated.lower() == "true"
-            current_activation = current_config[element_name]
-            if current_activation != active:
-                get_logger().info(f"{config_file} updated: {element_name} "
-                                  f"{'activated' if active else 'deactivated'}")
-                current_config[element_name] = active
-                something_changed = True
-    if deactivate_others:
-        import evaluator.Strategies as strategies
-        for element_name, activated in current_config.items():
-            if element_name not in to_update_data:
-                if current_config[element_name]:
-                    # do not deactivate strategies
-                    config_class = get_class_from_string(element_name, strategies.StrategiesEvaluator,
-                                                         strategies, evaluator_parent_inspection)
-                    if config_class is None:
-                        get_logger().info(f"{config_file} updated: {element_name} "
-                                          f"{'deactivated'}")
-                        current_config[element_name] = False
-                        something_changed = True
-    if something_changed:
-        with open(config_file_path, "w+") as config_file_w:
-            config_file_w.write(dump_json(current_config))
-
-
-def update_tentacle_config(klass, config_update):
-    current_config = klass.get_specific_config()
-    # only update values in config update not to erase values in root config (might not be editable)
-    for key, val in config_update.items():
-        current_config[key] = val
-    with open(klass.get_config_file_name(), "w+") as config_file_w:
-        config_file_w.write(dump_json(current_config))
-
-
-def factory_reset_tentacle_config(klass):
-    config_file = klass.get_config_file_name()
-    config_folder = klass.get_config_folder()
-    config_file_name = config_file.split(config_folder)[1]
-    factory_config = f"{config_folder}/{TENTACLE_DEFAULT_FOLDER}/{config_file_name}"
-    shutil.copy(factory_config, config_file)
 
 
 def get_metrics_enabled(config):
