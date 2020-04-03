@@ -1,7 +1,7 @@
 notifications:
   email: false
-sudo: enabled
 os: linux
+dist: xenial
 language: python
 cache: pip
 python: 3.8-dev
@@ -18,7 +18,7 @@ env:
 install:
   - python3 -m pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
 
-matrix:
+jobs:
   include:
   - name: "Linux - Python 3.8-dev - Python sources"
     stage: test
@@ -60,11 +60,11 @@ matrix:
 
 deploy:
   - provider: pypi
-    user: __token__
+    username: __token__
     password:
       secure: mN1PMavqZ8+NXnxMbCiEYfFP07EMhX6BXXK4XtXtu21c1s3GW4C7ePQ/as0EUZRFyAzP6nRdFlAIYKrbmbC0WHn8Rr9WQEHK3gurpEYbLRERv3q9hfS36bN+2DmvqHcUG8/EOywf9Ut/hunc8ikvt3+DpR37+JGAzI1Ln3sFXWWYtyL8atkdiVsozsuzFFA/TDScD5ICwYqiNWhve1bnLfM5uooXF/ehwk339KYsiyaUJw8roAToAW7k8o4vxuz8G2DImoKl5rv4kLzI4svoH1S035dS0U0cx0oloE1rxP+nQTUisX02QuRknfojfwZ5xRqmTydi1wo80NBJS/HS7WXJSFFn6v9jZ1KvphJBkdNxQt/fCaWjU09h7Lu1CyWc5VQ0kNZ2ia5RifQz8IhUz/j0qd39tQEQGq3UE9NHV6m4jdYg7Weef6HNnGU5ys+YWWHVgO6G5qVO40Vvqif6pVSZcWK2/IAQS57Pnov0ZjoXEcTxzOvXTEJwmy51QQ9wHL0BjZy0HPcPQkuTWoLCvHYXYBPcBX/dJlRkTrauKKVs/cY4bVZNAkqHll7CH4TwYLRn2PD93+N7FjyUuz9Fp8eQs7zTizZ+plh2dHGhoULKX66Vnc3wRVQU8AR7e5ZZr45/4D2RlzYIkUCaUGTO7IjU34HF5vuwnrE7eV3aj2E=
     skip_existing: true
-    skip_cleanup: true
+    cleanup: true
     distributions: sdist
     on:
       repo: "$GH_REPO"
@@ -73,7 +73,7 @@ deploy:
       condition: "$TRAVIS_OS_NAME = 'linux'"
   - provider: script
     script: docker run -it -e PYPI_USERNAME=$PYPI_USERNAME -e PYPI_PASSWORD=$PYPI_PASSWORD -v $(pwd):/project drakkarsoftware/octobot-pypi-deploy:i686 "i686" "cp37-cp37m" "cp37"
-    skip_cleanup: true
+    cleanup: true
     on:
       repo: "$GH_REPO"
       branch: "$DEPLOY_BRANCH"
@@ -81,7 +81,7 @@ deploy:
       condition: "$TRAVIS_OS_NAME = 'linux'"
   - provider: script
     script: docker run -it -e PYPI_USERNAME=$PYPI_USERNAME -e PYPI_PASSWORD=$PYPI_PASSWORD -v $(pwd):/project drakkarsoftware/octobot-pypi-deploy:x86_64 "x86_64" "cp37-cp37m" "cp37"
-    skip_cleanup: true
+    cleanup: true
     on:
       repo: "$GH_REPO"
       branch: "$DEPLOY_BRANCH"
@@ -89,7 +89,7 @@ deploy:
       condition: "$TRAVIS_OS_NAME = 'linux'"
   - provider: script
     script: python3 setup.py bdist_wheel && python3 -m twine upload dist/* -u $PYPI_USERNAME -p $PYPI_PASSWORD --skip-existing
-    skip_cleanup: true
+    cleanup: true
     on:
       repo: "$GH_REPO"
       branch: "$DEPLOY_BRANCH"
