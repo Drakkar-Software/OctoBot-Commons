@@ -43,6 +43,7 @@ DEFAULT_CONFIG_FILE_PATH = f"{CONFIG_FOLDER}/{DEFAULT_CONFIG_FILE}"
 SCHEMA = "schema"
 CONFIG_FILE_EXT = ".json"
 CONFIG_FILE_SCHEMA = f"{CONFIG_FOLDER}/config_{SCHEMA}.json"
+CONFIG_REFRESH_RATE = "refresh_rate_seconds"
 
 # Config currencies
 CONFIG_CRYPTO_CURRENCIES = "crypto-currencies"
