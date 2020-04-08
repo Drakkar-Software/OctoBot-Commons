@@ -45,7 +45,6 @@ packages_list = ["octobot_commons.event_tree",
                  "octobot_commons.evaluators_util",
                  "octobot_commons.data_util",
                  "octobot_commons.singleton.singleton_class",
-                 "octobot_commons.tentacles_management.abstract_tentacle",
                  "octobot_commons.tentacles_management.advanced_manager",
                  "octobot_commons.tentacles_management.class_inspector"]
 
