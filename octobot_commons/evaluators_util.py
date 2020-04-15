@@ -33,6 +33,6 @@ def check_valid_eval_note(eval_note, eval_type=UNSET_EVAL_TYPE, expected_eval_ty
     if eval_type != UNSET_EVAL_TYPE and (eval_type != expected_eval_type or expected_eval_type is None):
         return False
     return eval_note is not None \
-           and eval_note is not START_PENDING_EVAL_NOTE \
-           and not math.isnan(eval_note) \
-           and not np.isnan(eval_note)
+        and eval_note is not START_PENDING_EVAL_NOTE \
+        and not math.isnan(eval_note) \
+        and not np.isnan(eval_note)
