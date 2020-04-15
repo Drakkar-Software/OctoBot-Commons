@@ -19,9 +19,13 @@
 cdef class EventTreeNode:
     cdef public object node_value
     cdef public object node_event
+    cdef public object node_clear_event
     cdef public object node_type
     cdef public object node_task
     cdef public dict children
+
+    cpdef void set(self)
+    cpdef void clear(self)
 
 cdef class NodeExistsError(Exception):
     pass
