@@ -50,7 +50,7 @@ class EventTree(object):
         :param node: the node to update
         :return: void
         """
-        self.__set_node(node, value, node_type)
+        self._set_node(node, value, node_type)
 
     def set_node_at_path(self, value, node_type, path):
         """
@@ -64,7 +64,7 @@ class EventTree(object):
         - You can create a child node of my-parent-node by using ["my-parent-node", "my-new-child-node"] as `path`
         :return: void
         """
-        self.__set_node(self.get_or_create_node(path), value, node_type)
+        self._set_node(self.get_or_create_node(path), value, node_type)
 
     def get_node(self, path, starting_node=None):
         """
@@ -77,7 +77,7 @@ class EventTree(object):
         :return: the node instance or raise a NodeExistsError if the node doesn't exists
         """
         try:
-            return self.__get_node(path, starting_node=starting_node)
+            return self._get_node(path, starting_node=starting_node)
         except KeyError:
             raise NodeExistsError
 
@@ -93,11 +93,11 @@ class EventTree(object):
         :return: the node instance
         """
         try:
-            return self.__get_node(path, starting_node=starting_node)
+            return self._get_node(path, starting_node=starting_node)
         except KeyError:
-            return self.__create_node_path(path, starting_node=starting_node)
+            return self._create_node_path(path, starting_node=starting_node)
 
-    def __get_node(self, path, starting_node=None):
+    def _get_node(self, path, starting_node=None):
         """
         Return the node corresponding to the path
         Can raise a KeyError if the path does not exists
@@ -110,7 +110,7 @@ class EventTree(object):
             current_node = current_node.children[key]
         return current_node
 
-    def __create_node_path(self, path, starting_node=None):
+    def _create_node_path(self, path, starting_node=None):
         """
         Expensive method that creates the path to the selected node
         :param path: path (as a list of string) to the selected node
@@ -127,14 +127,14 @@ class EventTree(object):
 
                 # update parent node event to gather its children event
                 # TODO think about the total replacement when adding a new node
-                current_node.node_task = asyncio.create_task(self.__set_node_event_from_children(current_node))
+                current_node.node_task = asyncio.create_task(self._set_node_event_from_children(current_node))
 
                 # change to the new node
                 current_node = current_node.children[key]
 
         return current_node
 
-    def __set_node(self, node, value=None, node_type=None):
+    def _set_node(self, node, value=None, node_type=None):
         """
         Sets the node attributes
         :param node: the node instance to update
@@ -154,7 +154,7 @@ class EventTree(object):
         # schedule the event reset for the next loop iteration
         asyncio.get_event_loop().call_soon(node.node_event.clear)
 
-    async def __set_node_event_from_children(self, node: EventTreeNode):
+    async def _set_node_event_from_children(self, node: EventTreeNode):
         """
         Should be run in a Task
         :param node: the node instance related to the task
