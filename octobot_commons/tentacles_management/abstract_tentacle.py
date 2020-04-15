@@ -20,8 +20,6 @@ from copy import deepcopy
 class AbstractTentacle:
     __metaclass__ = ABCMeta
 
-    DESCRIPTION = "No description set."
-
     def __init__(self):
         self.logger = None
 
