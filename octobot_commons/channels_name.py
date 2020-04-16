@@ -18,6 +18,7 @@ from enum import Enum
 
 class OctoBotEvaluatorsChannelsName(Enum):
     MATRIX = "Matrix"
+    EVALUATORS = "Evaluators"
 
 
 class OctoBotBacktestingChannelsName(Enum):
