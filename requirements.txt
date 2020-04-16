@@ -6,4 +6,4 @@ numpy==1.18.2
 jsonschema==3.2.0
 
 # Others
-python-telegram-bot==12.4.2
+python-telegram-bot==12.6.1
