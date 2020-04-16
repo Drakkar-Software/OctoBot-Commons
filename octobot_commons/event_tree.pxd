@@ -18,6 +18,7 @@
 
 cdef class EventTreeNode:
     cdef public object node_value
+    cdef public object node_value_time
     cdef public object node_event
     cdef public object node_clear_event
     cdef public object node_type
@@ -33,11 +34,11 @@ cdef class NodeExistsError(Exception):
 cdef class EventTree:
     cdef public EventTreeNode root
 
-    cpdef void set_node(self, object value, object node_type, EventTreeNode node)
-    cpdef void set_node_at_path(self, object value, object node_type, list path)
+    cpdef void set_node(self, object value, object node_type, EventTreeNode node, double timestamp=*)
+    cpdef void set_node_at_path(self, object value, object node_type, list path, double timestamp=*)
     cpdef EventTreeNode get_node(self, list path, EventTreeNode starting_node=*)
     cpdef EventTreeNode get_or_create_node(self, list path, EventTreeNode starting_node=*)
 
     cdef EventTreeNode _get_node(self, list path, EventTreeNode starting_node=*)
     cdef EventTreeNode _create_node_path(self, list path, EventTreeNode starting_node=*)
-    cdef void _set_node(self, EventTreeNode node, object value=*, object node_type=*)
+    cdef void _set_node(self, EventTreeNode node, object value=*, object node_type=*, double timestamp=*)

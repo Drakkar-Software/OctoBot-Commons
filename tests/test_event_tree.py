@@ -68,6 +68,7 @@ async def test_event_tree_get_relative_node():
     get_node_result = event_tree.get_or_create_node(["test-relative"], starting_node=created_node)
     assert relative_created_node is get_node_result
 
+
 @pytest.mark.asyncio
 async def test_event_tree_set_node():
     event_tree = EventTree()
@@ -75,6 +76,10 @@ async def test_event_tree_set_node():
     event_tree.set_node(1, None, created_node)
     assert created_node.node_value == 1
     assert created_node.node_type is None
+    event_tree.set_node(5, None, created_node, timestamp=10)
+    assert created_node.node_value == 5
+    assert created_node.node_type is None
+    assert created_node.node_value_time == 10
 
 
 @pytest.mark.asyncio
