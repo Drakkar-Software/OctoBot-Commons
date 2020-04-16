@@ -18,10 +18,11 @@ from asyncio import ALL_COMPLETED, Event
 
 
 class EventTreeNode(object):
-    __slots__ = ['node_value', 'node_event', 'node_clear_event', 'node_type', 'node_task', 'children']
+    __slots__ = ['node_value', 'node_value_time', 'node_event', 'node_clear_event', 'node_type', 'node_task', 'children']
 
     def __init__(self, node_value, node_type):
         self.node_value = node_value
+        self.node_value_time = None
         self.node_type = node_type
         self.node_event = Event()
         self.node_clear_event = Event()
@@ -59,30 +60,31 @@ class EventTree(object):
         """
         self.root = EventTreeNode(None, None)
 
-    def set_node(self, value, node_type, node):
+    def set_node(self, value, node_type, node, timestamp=0):
         """
         Set the node attributes
         Can raise an exception if the node doesn't exists
         :param value: the node 'node_value' attribute to set
         :param node_type: the node 'node_type' attribute to set
         :param node: the node to update
-        :return: void
+        :param timestamp: the value modification timestamp.
         """
-        self._set_node(node, value, node_type)
+        self._set_node(node, value, node_type, timestamp=timestamp)
 
-    def set_node_at_path(self, value, node_type, path):
+    def set_node_at_path(self, value, node_type, path, timestamp=0):
         """
         Set the node attributes
         Creates the node if it doesn't exists
         :param value: the node 'node_value' attribute to set
         :param node_type: the node 'node_type' attribute to set
-        :param path: the node path (as a list of string).
+        :param path: the node path (as a list of string)
+        :param timestamp: the value modification timestamp.
         For example:
         - If you created a first node with the path ["my-parent-node"]
         - You can create a child node of my-parent-node by using ["my-parent-node", "my-new-child-node"] as `path`
         :return: void
         """
-        self._set_node(self.get_or_create_node(path), value, node_type)
+        self._set_node(self.get_or_create_node(path), value, node_type, timestamp=timestamp)
 
     def get_node(self, path, starting_node=None):
         """
@@ -151,19 +153,22 @@ class EventTree(object):
 
         return current_node
 
-    def _set_node(self, node, value=None, node_type=None):
+    def _set_node(self, node, value=None, node_type=None, timestamp=0):
         """
         Sets the node attributes
         :param node: the node instance to update
         :param value: the node instance 'node_value' attribute to set (is ignored if None)
         :param node_type: the node instance 'node_type' attribute to set (is ignored if None)
-        :return: void
+        :param timestamp: the value modification timestamp.
         """
         if value is not None:
             node.node_value = value
 
         if node_type is not None:
             node.node_type = node_type
+
+        # set the node value modification timestamp
+        node.node_value_time = timestamp
 
         # set the node event
         node.set()
