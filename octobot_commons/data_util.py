@@ -18,7 +18,7 @@ import numpy as np
 
 
 def normalize_data(data):
-    if data.size > 0:
+    if data.size > 1:
         return (data - np.mean(data)) / (data.max() - data.min())
     else:
         return data
