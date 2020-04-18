@@ -35,20 +35,22 @@ error_notifier_callbacks = []
 LOGS_MAX_COUNT = 1000
 
 
-def add_log(level, source, message):
-    logs_database[LOG_DATABASE].append({
-        "Time": get_now_time(),
-        "Level": getLevelName(level),
-        "Source": str(source),
-        "Message": message
-    })
-    if len(logs_database[LOG_DATABASE]) > LOGS_MAX_COUNT:
-        logs_database[LOG_DATABASE].pop(0)
+def add_log(level, source, message, keep_log=True, call_notifiers=True):
+    if keep_log:
+        logs_database[LOG_DATABASE].append({
+            "Time": get_now_time(),
+            "Level": getLevelName(level),
+            "Source": str(source),
+            "Message": message
+        })
+        if len(logs_database[LOG_DATABASE]) > LOGS_MAX_COUNT:
+            logs_database[LOG_DATABASE].pop(0)
     if level >= ERROR:
         logs_database[LOG_NEW_ERRORS_COUNT] += 1
         logs_database[BACKTESTING_NEW_ERRORS_COUNT] += 1
-    for callback in error_notifier_callbacks:
-        callback()
+    if call_notifiers:
+        for callback in error_notifier_callbacks:
+            callback()
 
 
 def get_errors_count(counter=LOG_NEW_ERRORS_COUNT):
