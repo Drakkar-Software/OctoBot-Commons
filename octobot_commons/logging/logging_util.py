@@ -41,6 +41,8 @@ def set_logging_level(logger_names, level):
 
 
 class BotLogger:
+    error_publication_enabled = True
+    should_publish_logs_when_re_enabled = False
 
     def __init__(self, logger_name):
         self.logger_name = logger_name
@@ -78,14 +80,25 @@ class BotLogger:
     def _publish_log_if_necessary(self, message, level):
         if STORED_LOG_MIN_LEVEL <= level and get_global_logger_level() <= level:
             self._web_interface_publish_log(message, level)
+            if not BotLogger.error_publication_enabled:
+                BotLogger.should_publish_logs_when_re_enabled = True
 
     def _web_interface_publish_log(self, message, level):
-        add_log(level, self.logger_name, message)
+        add_log(level, self.logger_name, message, call_notifiers=BotLogger.error_publication_enabled)
 
     @staticmethod
-    def get_backtesting_errors():
+    def get_backtesting_errors_count():
         return get_errors_count(BACKTESTING_NEW_ERRORS_COUNT)
 
     @staticmethod
     def reset_backtesting_errors():
         reset_errors_count(BACKTESTING_NEW_ERRORS_COUNT)
+
+    @staticmethod
+    def set_error_publication_enabled(enabled):
+        BotLogger.error_publication_enabled = enabled
+        if enabled and BotLogger.should_publish_logs_when_re_enabled:
+            add_log(logging.ERROR, None, None, keep_log=False, call_notifiers=True)
+        else:
+            BotLogger.should_publish_logs_when_re_enabled = False
+
