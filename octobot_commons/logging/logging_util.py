@@ -80,7 +80,7 @@ class BotLogger:
     def _publish_log_if_necessary(self, message, level):
         if STORED_LOG_MIN_LEVEL <= level and get_global_logger_level() <= level:
             self._web_interface_publish_log(message, level)
-            if not BotLogger.error_publication_enabled:
+            if not BotLogger.error_publication_enabled and logging.ERROR <= level:
                 BotLogger.should_publish_logs_when_re_enabled = True
 
     def _web_interface_publish_log(self, message, level):
