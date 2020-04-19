@@ -67,7 +67,7 @@ class BotLogger:
     def exception(self, exception, publish_error_if_necessary=False, error_message=None):
         self.logger.exception(exception)
         if publish_error_if_necessary:
-            self.logger.error(exception if error_message is None else error_message)
+            self.error(exception if error_message is None else error_message)
 
     def critical(self, message):
         self.logger.critical(message)
