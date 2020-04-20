@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-
 import json
 import requests
 
@@ -24,7 +23,7 @@ from octobot_commons.constants import EXTERNAL_RESOURCE_URL
 def _handle_exception(exception, resource_key, catch_exception, default_response):
     if catch_exception:
         get_logger("ExternalResourcesManager") \
-            .error(f"Exception when calling get_external_resource for {resource_key} key: {exception}")
+            .warning(f"Exception when calling get_external_resource for {resource_key} key: {exception}")
         return default_response
     else:
         raise exception
