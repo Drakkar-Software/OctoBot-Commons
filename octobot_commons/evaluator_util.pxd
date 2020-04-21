@@ -15,4 +15,5 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-cpdef bint check_valid_eval_note(object eval_note, object eval_type=*, object expected_eval_type=*)
+cpdef bint check_valid_eval_note(object eval_note, object eval_type=*, object expected_eval_type=*,
+                                 object eval_time=*, object expiry_delay=*, object current_time=*)
