@@ -22,7 +22,8 @@ from octobot_commons.constants import START_PENDING_EVAL_NOTE
 UNSET_EVAL_TYPE = "unset_eval_type_param"
 
 
-def check_valid_eval_note(eval_note, eval_type=UNSET_EVAL_TYPE, expected_eval_type=None):
+def check_valid_eval_note(eval_note, eval_type=UNSET_EVAL_TYPE, expected_eval_type=None,
+                          eval_time=None, expiry_delay=None, current_time=None):
     """
     Will also test evaluation type if if eval_type is provided.
     :param eval_note:
@@ -35,4 +36,5 @@ def check_valid_eval_note(eval_note, eval_type=UNSET_EVAL_TYPE, expected_eval_ty
     return eval_note is not None \
         and eval_note is not START_PENDING_EVAL_NOTE \
         and not math.isnan(eval_note) \
-        and not np.isnan(eval_note)
+        and not np.isnan(eval_note) \
+        and (eval_time is None or eval_time + expiry_delay - current_time > 0)
