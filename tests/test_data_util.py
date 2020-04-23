@@ -30,10 +30,10 @@ def test_mean():
 
 
 def test_shift_value_array():
-    array = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    array = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9], dtype=np.float64)
     np.testing.assert_array_equal(shift_value_array(array, shift_count=-1, fill_value=np.nan),
-                                  np.array([2, 3, 4, 5, 6, 7, 8, 9, np.nan]))
+                                  np.array([2, 3, 4, 5, 6, 7, 8, 9, np.nan], dtype=np.float64))
 
-    array = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    array = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9], dtype=np.float64)
     np.testing.assert_array_equal(shift_value_array(array, shift_count=2, fill_value=np.nan),
-                                  np.array([np.nan, np.nan, 1, 2, 3, 4, 5, 6, 7]))
+                                  np.array([np.nan, np.nan, 1, 2, 3, 4, 5, 6, 7], dtype=np.float64))
