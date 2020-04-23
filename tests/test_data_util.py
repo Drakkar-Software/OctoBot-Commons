@@ -15,7 +15,7 @@
 #  License along with this library.
 import numpy as np
 
-from octobot_commons.data_util import drop_nan, mean
+from octobot_commons.data_util import drop_nan, mean, shift_value_array
 
 
 def test_drop_nan():
@@ -27,3 +27,13 @@ def test_mean():
     assert mean([1, 2, 3, 4, 5, 6, 7]) == 4.0
     assert mean([0.684, 1, 2, 3, 4, 5.5, 6, 7.5]) == 3.7105
     assert mean([]) == 0
+
+
+def test_shift_value_array():
+    array = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    np.testing.assert_array_equal(shift_value_array(array, shift_count=-1, fill_value=np.nan),
+                                  np.array([2, 3, 4, 5, 6, 7, 8, 9, np.nan]))
+
+    array = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    np.testing.assert_array_equal(shift_value_array(array, shift_count=2, fill_value=np.nan),
+                                  np.array([np.nan, np.nan, 1, 2, 3, 4, 5, 6, 7]))
