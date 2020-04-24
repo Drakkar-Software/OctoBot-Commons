@@ -22,8 +22,11 @@ from octobot_commons.evaluators_util import check_valid_eval_note
 
 def test_check_valid_eval_note():
     assert not check_valid_eval_note(START_PENDING_EVAL_NOTE)
-    assert not check_valid_eval_note(math.nan)
-    assert not check_valid_eval_note(np.nan)
+    assert check_valid_eval_note(True)
+    assert check_valid_eval_note({"a": 1})
+    assert check_valid_eval_note({"a": 1}, eval_time=1, expiry_delay=2, current_time=1)
+    assert check_valid_eval_note({"a": 1}, eval_time=1, expiry_delay=2, current_time=2)
+    assert not check_valid_eval_note({"a": 1}, eval_time=1, expiry_delay=2, current_time=3)
 
     assert check_valid_eval_note(INIT_EVAL_NOTE)
     # UNSET_EVAL_TYPE
