@@ -26,15 +26,16 @@ def check_valid_eval_note(eval_note, eval_type=UNSET_EVAL_TYPE, expected_eval_ty
                           eval_time=None, expiry_delay=None, current_time=None):
     """
     Will also test evaluation type if if eval_type is provided.
-    :param eval_note:
-    :param eval_type:
-    :param expected_eval_type: Default expected_eval_type is EVALUATOR_EVAL_DEFAULT_TYPE
-    :return:
+    :param eval_note: The evaluation value
+    :param eval_type:  The evaluation type
+    :param expected_eval_type: The expected type. Default is EVALUATOR_EVAL_DEFAULT_TYPE
+    :param eval_time:  The evaluation time
+    :param expiry_delay: The allowed evaluation delay
+    :param current_time: The current time
+    :return: True when evaluation value is valid
     """
     if eval_type != UNSET_EVAL_TYPE and (eval_type != expected_eval_type or expected_eval_type is None):
         return False
     return eval_note is not None \
         and eval_note is not START_PENDING_EVAL_NOTE \
-        and not math.isnan(eval_note) \
-        and not np.isnan(eval_note) \
         and (eval_time is None or eval_time + expiry_delay - current_time > 0)
