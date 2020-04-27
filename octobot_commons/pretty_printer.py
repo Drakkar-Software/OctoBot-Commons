@@ -54,7 +54,7 @@ class PrettyPrinter:
     @staticmethod
     def trade_pretty_printer(exchange_name, trade, markdown=False):
         try:
-            from octobot_trading.enums import ExchangeConstantsOrderColumns, TraderOrderType, TradeOrderSide
+            from octobot_trading.enums import ExchangeConstantsOrderColumns, TraderOrderType
             _, _, c = PrettyPrinter.get_markers(markdown)
             trade_type = trade.trade_type
             if trade_type == TraderOrderType.UNKNOWN:

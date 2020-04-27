@@ -14,9 +14,6 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-import math
-import numpy as np
-
 from octobot_commons.constants import START_PENDING_EVAL_NOTE
 
 UNSET_EVAL_TYPE = "unset_eval_type_param"
