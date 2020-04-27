@@ -16,31 +16,58 @@
 
 import logging
 
-from octobot_commons.logging import add_log, reset_errors_count, get_errors_count, BACKTESTING_NEW_ERRORS_COUNT, \
-    STORED_LOG_MIN_LEVEL
+from octobot_commons.logging import (
+    add_log,
+    reset_errors_count,
+    get_errors_count,
+    BACKTESTING_NEW_ERRORS_COUNT,
+    STORED_LOG_MIN_LEVEL,
+)
 
 
-def set_global_logger_level(level):
+def set_global_logger_level(level) -> None:
+    """
+    Set the global logger level
+    :param level: the level to set
+    """
     logger = logging.getLogger()
     logger.setLevel(level)
     for handler in logger.handlers:
         handler.setLevel(level)
 
 
-def get_global_logger_level():
+def get_global_logger_level() -> object:
+    """
+    Return the global logger level
+    :return: the global logger level
+    """
     return logging.getLogger().getEffectiveLevel()
 
 
-def get_logger(logger_name="Anonymous"):
+def get_logger(logger_name="Anonymous") -> object:
+    """
+    Return the logger from the logger_name
+    :param logger_name: the logger name
+    :return: the logger from the logger name
+    """
     return BotLogger(logger_name)
 
 
-def set_logging_level(logger_names, level):
+def set_logging_level(logger_names, level) -> None:
+    """
+    Set the logging level for the logger names
+    :param logger_names: the logger names
+    :param level: the level to set
+    """
     for name in logger_names:
         logging.getLogger(name).setLevel(level)
 
 
 class BotLogger:
+    """
+    The bot logger that manage all OctoBot's logs
+    """
+
     error_publication_enabled = True
     should_publish_logs_when_re_enabled = False
 
@@ -48,57 +75,114 @@ class BotLogger:
         self.logger_name = logger_name
         self.logger = logging.getLogger(logger_name)
 
-    def debug(self, message):
+    def debug(self, message) -> None:
+        """
+        Called for a debug log
+        :param message: the log message
+        """
         self.logger.debug(message)
         self._publish_log_if_necessary(message, logging.DEBUG)
 
-    def info(self, message):
+    def info(self, message) -> None:
+        """
+        Called for an info log
+        :param message: the log message
+        """
         self.logger.info(message)
         self._publish_log_if_necessary(message, logging.INFO)
 
-    def warning(self, message):
+    def warning(self, message) -> None:
+        """
+        Called for a warning log
+        :param message: the log message
+        """
         self.logger.warning(message)
         self._publish_log_if_necessary(message, logging.WARNING)
 
-    def error(self, message):
+    def error(self, message) -> None:
+        """
+        Called for an error log
+        :param message: the log message
+        """
         self.logger.error(message)
         self._publish_log_if_necessary(message, logging.ERROR)
 
-    def exception(self, exception, publish_error_if_necessary=False, error_message=None):
+    def exception(
+        self, exception, publish_error_if_necessary=False, error_message=None
+    ) -> None:
+        """
+        Called for an exception log
+        :param exception: the log exception
+        :param publish_error_if_necessary: if the error should be published
+        :param error_message: the log message
+        """
         self.logger.exception(exception)
         if publish_error_if_necessary:
             self.error(exception if error_message is None else error_message)
 
-    def critical(self, message):
+    def critical(self, message) -> None:
+        """
+        Called for a critical log
+        :param message: the log message
+        """
         self.logger.critical(message)
         self._publish_log_if_necessary(message, logging.CRITICAL)
 
-    def fatal(self, message):
+    def fatal(self, message) -> None:
+        """
+        Called for a fatal log
+        :param message: the log message
+        """
         self.logger.fatal(message)
         self._publish_log_if_necessary(message, logging.FATAL)
 
-    def _publish_log_if_necessary(self, message, level):
+    def _publish_log_if_necessary(self, message, level) -> None:
+        """
+        Publish the log message if necessary
+        :param message: the log message
+        :param level: the log level
+        """
         if STORED_LOG_MIN_LEVEL <= level and get_global_logger_level() <= level:
             self._web_interface_publish_log(message, level)
             if not BotLogger.error_publication_enabled and logging.ERROR <= level:
                 BotLogger.should_publish_logs_when_re_enabled = True
 
-    def _web_interface_publish_log(self, message, level):
-        add_log(level, self.logger_name, message, call_notifiers=BotLogger.error_publication_enabled)
+    def _web_interface_publish_log(self, message, level) -> None:
+        """
+        Publish log to web interface
+        :param message: the log message
+        :param level: the log level
+        """
+        add_log(
+            level,
+            self.logger_name,
+            message,
+            call_notifiers=BotLogger.error_publication_enabled,
+        )
 
     @staticmethod
-    def get_backtesting_errors_count():
+    def get_backtesting_errors_count() -> int:
+        """
+        Get backtesting errors count
+        :return: the backtesting errors count
+        """
         return get_errors_count(BACKTESTING_NEW_ERRORS_COUNT)
 
     @staticmethod
-    def reset_backtesting_errors():
+    def reset_backtesting_errors() -> None:
+        """
+        Reset the backtesting errors count
+        """
         reset_errors_count(BACKTESTING_NEW_ERRORS_COUNT)
 
     @staticmethod
-    def set_error_publication_enabled(enabled):
+    def set_error_publication_enabled(enabled) -> None:
+        """
+        Set the error publication enabling
+        :param enabled: if the error publication is enabled
+        """
         BotLogger.error_publication_enabled = enabled
         if enabled and BotLogger.should_publish_logs_when_re_enabled:
             add_log(logging.ERROR, None, None, keep_log=False, call_notifiers=True)
         else:
             BotLogger.should_publish_logs_when_re_enabled = False
-

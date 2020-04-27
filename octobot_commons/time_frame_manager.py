@@ -27,58 +27,90 @@ def __sort_time_frames(time_frames, reverse=False):
 TimeFramesRank = __sort_time_frames(TimeFramesMinutes)
 
 
-# requires EvaluatorCreator.init_time_frames_from_strategies(self.config) to be called previously
-def get_config_time_frame(config):
+def get_config_time_frame(config) -> list:
+    """
+    Get the time frame config list
+    Warning: requires EvaluatorCreator.init_time_frames_from_strategies(self.config) to be called previously
+    :param config: the config
+    :return: the time frame config list
+    """
     return config[CONFIG_TIME_FRAME]
 
 
-def sort_time_frames(time_frames, reverse=False):
+def sort_time_frames(time_frames, reverse=False) -> list:
+    """
+    Sort a time frame list
+    :param time_frames: the time frames to sort
+    :param reverse: if the sort should be reversed
+    :return: the time frame list sorted
+    """
     return __sort_time_frames(time_frames, reverse)
 
 
-def sort_config_time_frames(config):
+def sort_config_time_frames(config) -> None:
+    """
+    Sort the time frame config and save it in config
+    :param config: the config
+    """
     config[CONFIG_TIME_FRAME] = sort_time_frames(config[CONFIG_TIME_FRAME])
 
 
 def get_display_time_frame(config, default_display_time_frame):
+    """
+    Get display time frame
+    :param config: the config
+    :param default_display_time_frame: the default time frame display
+    :return: the time frame display
+    """
     if default_display_time_frame in get_config_time_frame(config):
         return default_display_time_frame
-    else:
-        # else: return largest time frame
-        return config[CONFIG_TIME_FRAME][-1]
+    # else: return largest time frame
+    return config[CONFIG_TIME_FRAME][-1]
 
 
 def get_previous_time_frame(config_time_frames, time_frame, origin_time_frame):
+    """
+    Get the previous time frame
+    :param config_time_frames: the time frame config
+    :param time_frame: the specified time frame
+    :param origin_time_frame: the origin time frame list
+    :return: the previous time frame of the specified time frame
+    """
     current_time_frame_index = TimeFramesRank.index(time_frame)
 
     if current_time_frame_index > 0:
         previous = TimeFramesRank[current_time_frame_index - 1]
         if previous in config_time_frames:
             return previous
-        else:
-            return get_previous_time_frame(config_time_frames, previous, origin_time_frame)
-    else:
-        if time_frame in config_time_frames:
-            return time_frame
-        else:
-            return origin_time_frame
+        return get_previous_time_frame(config_time_frames, previous, origin_time_frame)
+    if time_frame in config_time_frames:
+        return time_frame
+    return origin_time_frame
 
 
 def find_min_time_frame(time_frames, min_time_frame=None):
-    tf_list = time_frames
+    """
+    Find the minimum time frame
+    :param time_frames: the time frame list
+    :param min_time_frame: the min time frame
+    :return: the minimal time frame
+    """
+    time_frame_list = time_frames
     if time_frames and isinstance(next(iter(time_frames)), TimeFrames):
-        tf_list = [t.value for t in time_frames]
+        time_frame_list = [t.value for t in time_frames]
 
-    if not tf_list:  # if exchange has no time frame list, returns minimal time frame
+    if (
+        not time_frame_list
+    ):  # if exchange has no time frame list, returns minimal time frame
         return TimeFramesRank[0]
 
     min_index = 0
     if min_time_frame:
         min_index = TimeFramesRank.index(min_time_frame)
     # TimeFramesRank is the ordered list of timeframes
-    for index, tf in enumerate(TimeFramesRank):
-        tf_val = tf.value
-        if index >= min_index and tf_val in tf_list:
+    for index, time_frame in enumerate(TimeFramesRank):
+        tf_val = time_frame.value
+        if index >= min_index and tf_val in time_frame_list:
             try:
                 return TimeFrames(tf_val)
             except ValueError:
@@ -87,14 +119,19 @@ def find_min_time_frame(time_frames, min_time_frame=None):
 
 
 def parse_time_frames(time_frames_string_list):
+    """
+    Parse a time frame list as string
+    :param time_frames_string_list: the time frame list as string
+    :return: the parsed time frame list
+    """
     result_list = []
     for time_frame_string in time_frames_string_list:
         try:
             result_list.append(TimeFrames(time_frame_string))
         except ValueError:
-            get_logger(LOGGER_TAG).error("No time frame available for: '{0}'. Available time "
-                                         "frames are: {1}. '{0}' time frame requirement "
-                                         "ignored.".
-                                         format(time_frame_string,
-                                                [t.value for t in TimeFrames]))
+            get_logger(LOGGER_TAG).error(
+                "No time frame available for: '{0}'. Available time "
+                "frames are: {1}. '{0}' time frame requirement "
+                "ignored.".format(time_frame_string, [t.value for t in TimeFrames])
+            )
     return result_list

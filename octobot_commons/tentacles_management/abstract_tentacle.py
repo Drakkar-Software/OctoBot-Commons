@@ -18,6 +18,10 @@ from copy import deepcopy
 
 
 class AbstractTentacle:
+    """
+    The parent class of any OctoBot tentacle
+    """
+
     __metaclass__ = ABCMeta
 
     def __init__(self):
@@ -33,6 +37,10 @@ class AbstractTentacle:
 
     @classmethod
     def get_all_subclasses(cls) -> list:
+        """
+        Return all subclasses of this tentacle
+        :return: the subclasses
+        """
         subclasses_list = cls.__subclasses__()
         if cls.__subclasses__():
             for subclass in deepcopy(subclasses_list):

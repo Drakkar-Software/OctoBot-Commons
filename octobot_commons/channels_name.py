@@ -17,15 +17,27 @@ from enum import Enum
 
 
 class OctoBotEvaluatorsChannelsName(Enum):
+    """
+    OctoBot-Evaluators channel names
+    """
+
     MATRIX = "Matrix"
     EVALUATORS = "Evaluators"
 
 
 class OctoBotBacktestingChannelsName(Enum):
+    """
+    OctoBot-Backtesting channel names
+    """
+
     TIME_CHANNEL = "Time"
 
 
 class OctoBotTradingChannelsName(Enum):
+    """
+    OctoBot-Trading channel names
+    """
+
     TICKER_CHANNEL = "Ticker"
     MINI_TICKER_CHANNEL = "MiniTicker"
     RECENT_TRADES_CHANNEL = "RecentTrade"

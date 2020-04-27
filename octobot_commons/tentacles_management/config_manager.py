@@ -16,10 +16,20 @@
 from octobot_commons.config import load_config
 
 
-def reload_tentacle_config(config: dict,
-                           config_key: str,
-                           tentacle_config_path: str,
-                           raised_exception: Exception = None):
+def reload_tentacle_config(
+    config: dict,
+    config_key: str,
+    tentacle_config_path: str,
+    raised_exception: Exception = None,
+):
+    """
+    Reload tentacle configuration
+    :param config: the current config
+    :param config_key: the config key to reload
+    :param tentacle_config_path: the tentacle config path
+    :param raised_exception: the exception to be raised
+    :return: the reloaded config
+    """
     config[config_key] = load_config(tentacle_config_path, False)
     if config[config_key] is None:
         raise raised_exception if raised_exception is not None else Exception

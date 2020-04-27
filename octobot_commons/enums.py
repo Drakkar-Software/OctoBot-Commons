@@ -17,6 +17,10 @@ from enum import Enum
 
 
 class TimeFrames(Enum):
+    """
+    OctoBot supported time frames values
+    """
+
     ONE_MINUTE = "1m"
     THREE_MINUTES = "3m"
     FIVE_MINUTES = "5m"
@@ -56,6 +60,10 @@ TimeFramesMinutes = {
 
 
 class PriceIndexes(Enum):
+    """
+    Default candle price index correspondence
+    """
+
     IND_PRICE_TIME = 0
     IND_PRICE_OPEN = 1
     IND_PRICE_HIGH = 2
@@ -65,18 +73,30 @@ class PriceIndexes(Enum):
 
 
 class PlatformsName(Enum):
+    """
+    OctoBot supported platforms name
+    """
+
     WINDOWS = "nt"
     LINUX = "posix"
     MAC = "mac"
 
 
 class OctoBotTypes(Enum):
+    """
+    OctoBot running types
+    """
+
     BINARY = "binary"
     PYTHON = "python"
     DOCKER = "docker"
 
 
 class MarkdownFormat(Enum):
+    """
+    Markdown formating
+    """
+
     ITALIC = "_"
     BOLD = "*"
     CODE = "`"

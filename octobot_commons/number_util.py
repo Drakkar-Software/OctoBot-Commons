@@ -16,8 +16,22 @@
 
 
 def round_into_str_with_max_digits(number: float, digits_count: int) -> str:
+    """
+    Round the number with digits_count
+    :param number: the number to round
+    :param digits_count: the digit count
+    :return: the rounded number
+    """
     return "{:.{}f}".format(round(number, digits_count), digits_count)
 
 
 def round_into_float_with_max_digits(number: float, digits_count: int) -> float:
-    return float(round_into_str_with_max_digits(number=number, digits_count=digits_count))
+    """
+    Round the float number with digits_count
+    :param number: the number to round
+    :param digits_count: the digit count
+    :return: the rounded number
+    """
+    return float(
+        round_into_str_with_max_digits(number=number, digits_count=digits_count)
+    )

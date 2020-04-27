@@ -1,3 +1,4 @@
+# pylint: disable=W0703, W0613
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -23,10 +24,23 @@ from octobot_commons.constants import USER_FOLDER, CONFIG_FILE, DEFAULT_CONFIG_F
 
 
 def get_user_config():
+    """
+    Return user config path
+    :return: user config path
+    """
     return os.path.join(USER_FOLDER, CONFIG_FILE)
 
 
-def load_config(config_file=get_user_config(), error=True, fill_missing_fields=False) -> dict:
+def load_config(
+    config_file=get_user_config(), error=True, fill_missing_fields=False
+) -> dict:
+    """
+    Load a config from a config_file
+    :param config_file: the config file path
+    :param error: if error should be raised
+    :param fill_missing_fields: if missing fields should be filled
+    :return: the loaded config
+    """
     logger = logging.getLogger("CONFIG LOADER")
     basic_error = "Error when load config file {0}".format(config_file)
     try:
@@ -35,36 +49,45 @@ def load_config(config_file=get_user_config(), error=True, fill_missing_fields=F
             # if fill_missing_fields: TODO
             #     _fill_missing_config_fields(config)
         return config
-    except ValueError as e:
-        error_str = "{0} : json decoding failed ({1})".format(basic_error, e)
+    except ValueError as value_error:
+        error_str = "{0} : json decoding failed ({1})".format(basic_error, value_error)
         if error:
             raise Exception(error_str)
-        else:
-            logger.error(error_str)
-    except IOError as e:
-        error_str = "{0} : file opening failed ({1})".format(basic_error, e)
+        logger.error(error_str)
+    except IOError as io_error:
+        error_str = "{0} : file opening failed ({1})".format(basic_error, io_error)
         if error:
             raise Exception(error_str)
-        else:
-            logger.error(error_str)
-    except Exception as e:
-        error_str = f"{basic_error} : {e}"
+        logger.error(error_str)
+    except Exception as global_exception:
+        error_str = f"{basic_error} : {global_exception}"
         if error:
             raise Exception(error_str)
-        else:
-            logger.error(error_str)
+        logger.error(error_str)
     return None
 
 
-def init_config(config_file=get_user_config(), from_config_file=DEFAULT_CONFIG_FILE_PATH):
+def init_config(
+    config_file=get_user_config(), from_config_file=DEFAULT_CONFIG_FILE_PATH
+):
+    """
+    Initialize default config
+    :param config_file: the config file path
+    :param from_config_file: the default config file path
+    """
     try:
         if not os.path.exists(USER_FOLDER):
             os.makedirs(USER_FOLDER)
 
         copyfile(from_config_file, config_file)
-    except Exception as e:
-        raise Exception(f"Can't init config file {e}")
+    except Exception as global_exception:
+        raise Exception(f"Can't init config file {global_exception}")
 
 
 def is_config_empty_or_missing(config_file=get_user_config()):
+    """
+    Check if the config file at path is empty or is missing
+    :param config_file: the config file path
+    :return: the check result
+    """
     return (not os.path.isfile(config_file)) or os.stat(config_file).st_size == 0
