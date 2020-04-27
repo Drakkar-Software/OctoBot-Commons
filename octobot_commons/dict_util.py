@@ -38,25 +38,11 @@ def find_nested_value(dict_, field):
     return False, field
 
 
-def get_value_or_default(dictionary, key, default=None):
-    """
-
-    :param dictionary:
-    :param key:
-    :param default:
-    :return:
-    """
-    if dictionary is not None and key in dictionary:
-        value = dictionary[key]
-        return value or default
-    return default
-
-
 def check_and_merge_values_from_reference(
     current_dict, reference_dict, exception_list, logger=None
 ):
     """
-    Check and merge dicts
+     Check and merge dicts
     :param current_dict: the dict to be merged
     :param reference_dict: the reference dict
     :param exception_list: the merge exception list

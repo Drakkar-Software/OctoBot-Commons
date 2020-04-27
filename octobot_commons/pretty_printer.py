@@ -17,7 +17,6 @@
 
 from octobot_commons import DICT_BULLET_TOKEN_STR
 from octobot_commons.constants import PORTFOLIO_TOTAL, PORTFOLIO_AVAILABLE
-from octobot_commons.dict_util import get_value_or_default
 from octobot_commons.enums import MarkdownFormat
 from octobot_commons.logging.logging_util import get_logger
 from octobot_commons.symbol_util import split_symbol
