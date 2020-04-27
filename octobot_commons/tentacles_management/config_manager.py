@@ -22,6 +22,6 @@ def reload_tentacle_config(config: dict,
                            raised_exception: Exception = None):
     config[config_key] = load_config(tentacle_config_path, False)
     if config[config_key] is None:
-        raise raised_exception
+        raise raised_exception if raised_exception is not None else Exception
 
     return config
