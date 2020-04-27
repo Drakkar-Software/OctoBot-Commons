@@ -24,15 +24,28 @@ from octobot_commons.enums import OctoBotTypes, PlatformsName
 
 
 def get_current_platform():
-    # return examples:
-    #   windows: 'Windows:10:AMD64'
-    #   linux: 'Linux:4.15.0-46-generic:x86_64'
-    #   rasp: 'Linux:4.14.98-v7+:armv7l'
-    return f"{platform.system()}{PLATFORM_DATA_SEPARATOR}{platform.release()}{PLATFORM_DATA_SEPARATOR}" \
+    """
+    Return the current platform details
+    Return examples
+    For Windows :
+    >>> 'Windows:10:AMD64'
+    For Linux :
+    >>> 'Linux:4.15.0-46-generic:x86_64'
+    For Raspberry :
+    >>> 'Linux:4.14.98-v7+:armv7l'
+    :return: the current platform details
+    """
+    return (
+        f"{platform.system()}{PLATFORM_DATA_SEPARATOR}{platform.release()}{PLATFORM_DATA_SEPARATOR}"
         f"{platform.machine()}"
+    )
 
 
 def get_octobot_type():
+    """
+    Return OctoBot running type from OctoBotTypes
+    :return: the OctoBot running type
+    """
     try:
         execution_arg = sys.argv[0]
         # sys.argv[0] is always the name of the python script called when using a command "python xyz.py"
@@ -47,15 +60,23 @@ def get_octobot_type():
 
 
 def get_os():
+    """
+    Return the OS name
+    :return: the OS name
+    """
     return PlatformsName(os.name)
 
 
 def _is_on_docker():
-    file_to_check = '/proc/self/cgroup'
+    """
+    Check if the current platform is docker
+    :return: True if OctoBot is running with docker
+    """
+    file_to_check = "/proc/self/cgroup"
     try:
-        return (
-            os.path.exists('/.dockerenv') or
-            (os.path.isfile(file_to_check) and any('docker' in line for line in open(file_to_check)))
+        return os.path.exists("/.dockerenv") or (
+            os.path.isfile(file_to_check)
+            and any("docker" in line for line in open(file_to_check))
         )
     except FileNotFoundError:
         return False

@@ -13,3 +13,6 @@ setuptools
 wheel
 
 pur
+
+pylint
+black

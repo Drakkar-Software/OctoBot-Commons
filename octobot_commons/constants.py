@@ -85,7 +85,13 @@ COMMUNITY_TOPS_COUNT = 1000
 PLATFORM_DATA_SEPARATOR = ":"
 
 # default values in config files and interfaces
-DEFAULT_CONFIG_VALUES = {"your-api-key-here", "your-api-secret-here", "your-api-password-here", "NOKEY", "Empty"}
+DEFAULT_CONFIG_VALUES = {
+    "your-api-key-here",
+    "your-api-secret-here",
+    "your-api-password-here",
+    "NOKEY",
+    "Empty",
+}
 
 # Async settings
 DEFAULT_FUTURE_TIMEOUT = 120

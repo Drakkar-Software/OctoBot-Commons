@@ -1,3 +1,4 @@
+# pylint: disable=W0703
 #  Drakkar-Software OctoBot
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -21,27 +22,57 @@ from octobot_commons.constants import EXTERNAL_RESOURCE_URL
 
 
 def _handle_exception(exception, resource_key, catch_exception, default_response):
+    """
+    Handle exception when fetching external resources
+    :param exception: the exception
+    :param resource_key: the resource key
+    :param catch_exception: if exception should be caught
+    :param default_response: the default response
+    :return: the default response if an exception has been caught
+    """
     if catch_exception:
-        get_logger("ExternalResourcesManager") \
-            .warning(f"Exception when calling get_external_resource for {resource_key} key: {exception}")
+        get_logger("ExternalResourcesManager").warning(
+            f"Exception when calling get_external_resource for {resource_key} key: {exception}"
+        )
         return default_response
-    else:
-        raise exception
+    raise exception
 
 
-def get_external_resource(resource_key, catch_exception=False, default_response="") -> object:
+def get_external_resource(
+    resource_key, catch_exception=False, default_response=""
+) -> object:
+    """
+    Get an external resource
+    :param resource_key: the resource key
+    :param catch_exception: if exception should be caught
+    :param default_response: the default response
+    :return: the external resource key value
+    """
     try:
         external_resources = json.loads(requests.get(EXTERNAL_RESOURCE_URL).text)
         return external_resources[resource_key]
-    except Exception as e:
-        return _handle_exception(e, resource_key, catch_exception, default_response)
+    except Exception as global_exception:
+        return _handle_exception(
+            global_exception, resource_key, catch_exception, default_response
+        )
 
 
-async def async_get_external_resource(resource_key, aiohttp_session,
-                                      catch_exception=False, default_response="") -> object:
+async def async_get_external_resource(
+    resource_key, aiohttp_session, catch_exception=False, default_response=""
+) -> object:
+    """
+    Get an external resource in async way
+    :param resource_key: the resource key
+    :param aiohttp_session: the aiohttp session
+    :param catch_exception: if exception should be caught
+    :param default_response: the default reponse
+    :return: the external resource key value
+    """
     try:
         async with aiohttp_session.get(EXTERNAL_RESOURCE_URL) as resp:
             external_resources = json.loads(resp.text())
             return external_resources[resource_key]
-    except Exception as e:
-        return _handle_exception(e, resource_key, catch_exception, default_response)
+    except Exception as global_exception:
+        return _handle_exception(
+            global_exception, resource_key, catch_exception, default_response
+        )

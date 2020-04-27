@@ -16,16 +16,24 @@
 
 
 class ConfigError(Exception):
-    pass
+    """
+    Config related Exception
+    """
 
 
 class ConfigEvaluatorError(Exception):
-    pass
+    """
+    Evaluator config related Exception
+    """
 
 
 class ConfigTradingError(Exception):
-    pass
+    """
+    Trading config related Exception
+    """
 
 
 class TentacleNotFound(Exception):
-    pass
+    """
+    Tentacle not found related Exception
+    """

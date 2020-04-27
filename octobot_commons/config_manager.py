@@ -1,3 +1,4 @@
+# pylint: disable=C0415, R0913, W0703
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -22,16 +23,33 @@ from functools import reduce
 import jsonschema
 
 from octobot_commons.config import load_config, get_user_config
-from octobot_commons.config_util import decrypt, encrypt, has_invalid_default_config_value
-from octobot_commons.constants import CONFIG_FILE_SCHEMA, CONFIG_ACCEPTED_TERMS, \
-    CONFIG_ENABLED_OPTION, CONFIG_DEBUG_OPTION, CONFIG_METRICS, TEMP_RESTORE_CONFIG_FILE, \
-    CONFIG_CRYPTO_CURRENCIES
+from octobot_commons.config_util import (
+    decrypt,
+    encrypt,
+    has_invalid_default_config_value,
+)
+from octobot_commons.constants import (
+    CONFIG_FILE_SCHEMA,
+    CONFIG_ACCEPTED_TERMS,
+    CONFIG_ENABLED_OPTION,
+    CONFIG_DEBUG_OPTION,
+    CONFIG_METRICS,
+    TEMP_RESTORE_CONFIG_FILE,
+    CONFIG_CRYPTO_CURRENCIES,
+)
 from octobot_commons.logging.logging_util import get_logger
 
 DELETE_ELEMENT_VALUE = ""
 
 
-def save_config(config_file, config, temp_restore_config_file, json_data=None):
+def save_config(config_file, config, temp_restore_config_file, json_data=None) -> None:
+    """
+    Save a json config
+    :param config_file: the config file path
+    :param config: the json config
+    :param temp_restore_config_file: the temporary config file
+    :param json_data: json data if the data is already json
+    """
     try:
 
         # prepare a restoration config file
@@ -50,52 +68,92 @@ def save_config(config_file, config, temp_restore_config_file, json_data=None):
         remove_restore_file(temp_restore_config_file)
 
     # when fail restore the old config
-    except Exception as e:
-        get_logger().error(f"Save config failed : {e}")
+    except Exception as global_exception:
+        get_logger().error(f"Save config failed : {global_exception}")
         restore_config(temp_restore_config_file, config_file)
-        raise e
+        raise global_exception
 
 
-def validate_config_file(config=None, schema_file=CONFIG_FILE_SCHEMA):
+def validate_config_file(config=None, schema_file=CONFIG_FILE_SCHEMA) -> (bool, object):
+    """
+    Validate a config file
+    :param config: the config
+    :param schema_file: the config schema
+    :return: True if valid, the exception if caught
+    """
     try:
         with open(schema_file) as json_schema:
             loaded_schema = json.load(json_schema)
         jsonschema.validate(instance=config, schema=loaded_schema)
-    except Exception as e:
-        return False, e
+    except Exception as global_exception:
+        return False, global_exception
     return True, None
 
 
-def restore_config(restore_file, target_file):
+def restore_config(restore_file, target_file) -> None:
+    """
+    Restore a config file from a saved file
+    :param restore_file: the restore file path
+    :param target_file: the target file path
+    """
     shutil.copy(restore_file, target_file)
 
 
-def prepare_restore_file(restore_file, current_config_file):
+def prepare_restore_file(restore_file, current_config_file) -> None:
+    """
+    Prepare a config restoration file
+    :param restore_file: the restoration file
+    :param current_config_file: the file to be restored
+    """
     shutil.copy(current_config_file, restore_file)
 
 
-def remove_restore_file(restore_file):
+def remove_restore_file(restore_file) -> None:
+    """
+    Remove a restore file
+    :param restore_file: the restore file path
+    """
     os.remove(restore_file)
 
 
-def jsonify_config(config):
+def jsonify_config(config) -> str:
+    """
+    Jsonify a config
+    :param config: the config
+    :return: the jsonified config
+    """
     try:
-        from octobot_trading.constants import CONFIG_EXCHANGES, CONFIG_EXCHANGE_ENCRYPTED_VALUES
+        from octobot_trading.constants import (
+            CONFIG_EXCHANGES,
+            CONFIG_EXCHANGE_ENCRYPTED_VALUES,
+        )
+
         # check exchange keys encryption
         for exchange, exchange_config in config[CONFIG_EXCHANGES].items():
             try:
                 for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES:
                     _handle_encrypted_value(key, exchange_config)
             except Exception:
-                config[CONFIG_EXCHANGES][exchange] = {key: "" for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES}
+                config[CONFIG_EXCHANGES][exchange] = {
+                    key: "" for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES
+                }
 
         return dump_json(config)
     except ImportError:
-        get_logger().error(f"OctoBot_Commons/config_manager.py/jsonify_config requires "
-                           f"OctoBot-Trading package installed")
+        get_logger().error(
+            "OctoBot_Commons/config_manager.py/jsonify_config requires "
+            "OctoBot-Trading package installed"
+        )
 
 
 def _handle_encrypted_value(value_key, config_element, verbose=False):
+    """
+    Handle encrypted value
+    :param value_key: the value key
+    :param config_element: the config element
+    :param verbose: if verbosity is enabled
+    :return: True if the value can be decrypted
+    """
     if value_key in config_element:
         key = config_element[value_key]
         if not has_invalid_default_config_value(key):
@@ -105,31 +163,49 @@ def _handle_encrypted_value(value_key, config_element, verbose=False):
             except Exception:
                 config_element[value_key] = encrypt(key).decode()
                 if verbose:
-                    get_logger().warning(f"Non encrypted secret info found in config ({value_key}): replaced "
-                                         f"value with encrypted equivalent.")
+                    get_logger().warning(
+                        f"Non encrypted secret info found in config ({value_key}): replaced "
+                        f"value with encrypted equivalent."
+                    )
                 return False
     return True
 
 
-def dump_json(json_data):
+def dump_json(json_data) -> str:
+    """
+    The dumped json data
+    :param json_data: the json data to be dumped
+    :return: the dumped json data
+    """
     return json.dumps(json_data, indent=4, sort_keys=True)
 
 
-def check_config(config_file):
+def check_config(config_file) -> None:
+    """
+    Check a config file
+    :param config_file: the config file path
+    """
     try:
-        valid, e = validate_config_file(load_config(config_file=config_file))
+        valid, global_exception = validate_config_file(
+            load_config(config_file=config_file)
+        )
         if not valid:
-            raise e
-    except Exception as e:
-        raise e
+            raise global_exception  # pylint: disable=E0702
+    except Exception as global_exception:
+        raise global_exception
 
 
-def is_in_dev_mode(config):
+def is_in_dev_mode(config) -> None:
+    """
+    Check if dev mode is enabled
+    :param config: the config
+    :return: if dev mode is enabled
+    """
     # return True if "DEV-MODE": true in config.json
     return CONFIG_DEBUG_OPTION in config and config[CONFIG_DEBUG_OPTION]
 
 
-def remove_loaded_only_element(config):
+def remove_loaded_only_element(config):  # pylint: disable=C0116, W0613
     # OctoBot 0.3.X
     # # remove service instances
     # for service in config[CONFIG_CATEGORY_SERVICES]:
@@ -154,7 +230,16 @@ def remove_loaded_only_element(config):
     pass
 
 
-def filter_to_update_data(to_update_data, current_config, in_backtesting):
+def filter_to_update_data(
+    to_update_data, current_config, in_backtesting
+):  # pylint: disable=W0613
+    """
+    Filter data to update
+    :param to_update_data: the data to be updated
+    :param current_config: the config
+    :param in_backtesting: if backtesting is enabled
+    :return: the updated data
+    """
     if in_backtesting:
         for key in set(to_update_data.keys()):
             # remove changes to currency config when in backtesting
@@ -162,8 +247,23 @@ def filter_to_update_data(to_update_data, current_config, in_backtesting):
                 to_update_data.pop(key)
 
 
-def update_global_config(to_update_data, current_config, in_backtesting,
-                         config_separator, update_input=False, delete=False):
+def update_global_config(
+    to_update_data,
+    current_config,
+    in_backtesting,
+    config_separator,
+    update_input=False,
+    delete=False,
+) -> None:
+    """
+    Update the global config
+    :param to_update_data: the data to update
+    :param current_config: the current config
+    :param in_backtesting: if backtesting is enabled
+    :param config_separator: the config separator
+    :param update_input: if input should be updated
+    :param delete: if the data should be removed
+    """
     new_current_config = copy(current_config)
 
     filter_to_update_data(to_update_data, current_config, in_backtesting)
@@ -174,8 +274,10 @@ def update_global_config(to_update_data, current_config, in_backtesting,
     new_current_config = deepcopy(new_current_config)
 
     if delete:
-        removed_configs = [parse_and_update(data_key, DELETE_ELEMENT_VALUE, config_separator)
-                           for data_key in to_update_data]
+        removed_configs = [
+            parse_and_update(data_key, DELETE_ELEMENT_VALUE, config_separator)
+            for data_key in to_update_data
+        ]
         reduce(clear_dictionaries_by_keys, [new_current_config] + removed_configs)
         if update_input:
             reduce(clear_dictionaries_by_keys, [current_config] + removed_configs)
@@ -185,15 +287,24 @@ def update_global_config(to_update_data, current_config, in_backtesting,
             for data_key, data_value in to_update_data.items()
         ]
         # merge configs
-        reduce(merge_dictionaries_by_appending_keys, [new_current_config] + updated_configs)
+        reduce(
+            merge_dictionaries_by_appending_keys, [new_current_config] + updated_configs
+        )
         if update_input:
-            reduce(merge_dictionaries_by_appending_keys, [current_config] + updated_configs)
+            reduce(
+                merge_dictionaries_by_appending_keys, [current_config] + updated_configs
+            )
 
     # save config
     save_config(get_user_config(), new_current_config, TEMP_RESTORE_CONFIG_FILE)
 
 
-def simple_save_config_update(updated_config):
+def simple_save_config_update(updated_config) -> bool:
+    """
+    Simple config update saving
+    :param updated_config: the updated config
+    :return: True if successfully updated
+    """
     to_save_config = copy(updated_config)
     remove_loaded_only_element(to_save_config)
     save_config(get_user_config(), to_save_config, TEMP_RESTORE_CONFIG_FILE)
@@ -201,6 +312,13 @@ def simple_save_config_update(updated_config):
 
 
 def parse_and_update(key, new_data, config_separator):
+    """
+    Parse and update key
+    :param key: the key to update
+    :param new_data: the new data
+    :param config_separator: the config separator
+    :return: the key updated
+    """
     parsed_data_array = key.split(config_separator)
     new_config = {}
     current_dict = new_config
@@ -218,16 +336,27 @@ def parse_and_update(key, new_data, config_separator):
 
     return new_config
 
-def are_of_compatible_type(val1, val2):
+
+def are_of_compatible_type(val1, val2) -> bool:
+    """
+    Check if types are compatibles
+    :param val1: the first value
+    :param val2: the second value
+    :return: True if types are compatible
+    """
     return (
-            (
-                    isinstance(val1, val2.__class__) or
-                    (isinstance(val1, (float, int)) and isinstance(val2, (float, int)))
-            ) and isinstance(val1, (bool, str, float, int))
-    )
+        isinstance(val1, val2.__class__)
+        or (isinstance(val1, (float, int)) and isinstance(val2, (float, int)))
+    ) and isinstance(val1, (bool, str, float, int))
 
 
-def merge_dictionaries_by_appending_keys(dict_dest, dict_src):
+def merge_dictionaries_by_appending_keys(dict_dest, dict_src) -> dict:
+    """
+    Merge dictionnaries by appending keys
+    :param dict_dest: the destination dictionnary
+    :param dict_src: the source dictionnary
+    :return: the merged dictionnary
+    """
     for key in dict_src:
         src_val = dict_src[key]
         if key in dict_dest:
@@ -250,6 +379,12 @@ def merge_dictionaries_by_appending_keys(dict_dest, dict_src):
 
 
 def clear_dictionaries_by_keys(dict_dest, dict_src):
+    """
+    Clear dictionnaries by keys
+    :param dict_dest: the destination dictionnary
+    :param dict_src: the source dictionnary
+    :return: the cleaned dictionnary
+    """
     for key in dict_src:
         src_val = dict_src[key]
         if key in dict_dest:
@@ -259,25 +394,44 @@ def clear_dictionaries_by_keys(dict_dest, dict_src):
             elif isinstance(dest_val, dict) and isinstance(src_val, dict):
                 dict_dest[key] = clear_dictionaries_by_keys(dest_val, src_val)
             else:
-                get_logger().error(f"Conflict when deleting dict element with key : {key}")
+                get_logger().error(
+                    f"Conflict when deleting dict element with key : {key}"
+                )
 
     return dict_dest
 
 
-def get_metrics_enabled(config):
-    if CONFIG_METRICS in config and config[CONFIG_METRICS] and \
-            CONFIG_ENABLED_OPTION in config[CONFIG_METRICS]:
+def get_metrics_enabled(config) -> bool:
+    """
+    Check if metrics are enabled
+    :param config: the config
+    :return: the check result
+    """
+    if (
+        CONFIG_METRICS in config
+        and config[CONFIG_METRICS]
+        and CONFIG_ENABLED_OPTION in config[CONFIG_METRICS]
+    ):
         return bool(config[CONFIG_METRICS][CONFIG_ENABLED_OPTION])
-    else:
-        return True
+    return True
 
 
-def accepted_terms(config):
+def accepted_terms(config) -> bool:
+    """
+    Check if terms has been accepted
+    :param config: the config
+    :return: the check result
+    """
     if CONFIG_ACCEPTED_TERMS in config:
         return config[CONFIG_ACCEPTED_TERMS]
     return False
 
 
-def accept_terms(config, accepted):
+def accept_terms(config, accepted) -> None:
+    """
+    Perform terms acceptation
+    :param config: the config
+    :param accepted: accepted or not
+    """
     config[CONFIG_ACCEPTED_TERMS] = accepted
     simple_save_config_update(config)

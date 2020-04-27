@@ -27,7 +27,7 @@ BACKTESTING_NEW_ERRORS_COUNT: str = "log_backtesting_errors_count"
 logs_database = {
     LOG_DATABASE: [],
     LOG_NEW_ERRORS_COUNT: 0,
-    BACKTESTING_NEW_ERRORS_COUNT: 0
+    BACKTESTING_NEW_ERRORS_COUNT: 0,
 }
 
 error_notifier_callbacks = []
@@ -36,13 +36,23 @@ LOGS_MAX_COUNT = 1000
 
 
 def add_log(level, source, message, keep_log=True, call_notifiers=True):
+    """
+    Add a log to the log database
+    :param level: the log level
+    :param source: the log source
+    :param message: the log message
+    :param keep_log: if the log should be stored
+    :param call_notifiers: if the log should trigger the notifiers
+    """
     if keep_log:
-        logs_database[LOG_DATABASE].append({
-            "Time": get_now_time(),
-            "Level": getLevelName(level),
-            "Source": str(source),
-            "Message": message
-        })
+        logs_database[LOG_DATABASE].append(
+            {
+                "Time": get_now_time(),
+                "Level": getLevelName(level),
+                "Source": str(source),
+                "Message": message,
+            }
+        )
         if len(logs_database[LOG_DATABASE]) > LOGS_MAX_COUNT:
             logs_database[LOG_DATABASE].pop(0)
     if level >= ERROR:
@@ -54,12 +64,25 @@ def add_log(level, source, message, keep_log=True, call_notifiers=True):
 
 
 def get_errors_count(counter=LOG_NEW_ERRORS_COUNT):
+    """
+    Return the error count according to the specified counter
+    :param counter: the counter to use
+    :return: the error count
+    """
     return logs_database[counter]
 
 
 def reset_errors_count(counter=LOG_NEW_ERRORS_COUNT):
+    """
+    Reset the specified counter error count
+    :param counter: the counter to use
+    """
     logs_database[counter] = 0
 
 
 def register_error_notifier(callback):
+    """
+    Register an error notifier
+    :param callback: the callback to call when the notifier is triggered
+    """
     error_notifier_callbacks.append(callback)

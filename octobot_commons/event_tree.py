@@ -1,3 +1,4 @@
+# pylint: disable=R0201
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -17,8 +18,20 @@ import asyncio
 from asyncio import ALL_COMPLETED, Event
 
 
-class EventTreeNode(object):
-    __slots__ = ['node_value', 'node_value_time', 'node_event', 'node_clear_event', 'node_type', 'node_task', 'children']
+class EventTreeNode:
+    """
+    Node element of a EventTree
+    """
+
+    __slots__ = [
+        "node_value",
+        "node_value_time",
+        "node_event",
+        "node_clear_event",
+        "node_type",
+        "node_task",
+        "children",
+    ]
 
     def __init__(self, node_value, node_type):
         self.node_value = node_value
@@ -48,11 +61,17 @@ class EventTreeNode(object):
 
 
 class NodeExistsError(Exception):
-    pass
+    """
+    Node doesn't exist error
+    """
 
 
-class EventTree(object):
-    __slots__ = ['root']
+class EventTree:
+    """
+    Event Tree based on EventTreeNodes
+    """
+
+    __slots__ = ["root"]
 
     def __init__(self):
         """
@@ -84,7 +103,9 @@ class EventTree(object):
         - You can create a child node of my-parent-node by using ["my-parent-node", "my-new-child-node"] as `path`
         :return: void
         """
-        self._set_node(self.get_or_create_node(path), value, node_type, timestamp=timestamp)
+        self._set_node(
+            self.get_or_create_node(path), value, node_type, timestamp=timestamp
+        )
 
     def get_node(self, path, starting_node=None):
         """
@@ -146,7 +167,9 @@ class EventTree(object):
                 current_node.children[key] = EventTreeNode(None, None)
 
                 # update parent node event to gather its children event
-                current_node.node_task = asyncio.create_task(self._set_node_event_from_children(current_node))
+                current_node.node_task = asyncio.create_task(
+                    self._set_node_event_from_children(current_node)
+                )
 
                 # change to the new node
                 current_node = current_node.children[key]
@@ -188,7 +211,10 @@ class EventTree(object):
                 node.clear()
 
                 # wait until each children has trigger its event
-                await asyncio.wait([n.node_event.wait() for n in node.children.values()], return_when=ALL_COMPLETED)
+                await asyncio.wait(
+                    [n.node_event.wait() for n in node.children.values()],
+                    return_when=ALL_COMPLETED,
+                )
 
                 # notify
                 node.set()

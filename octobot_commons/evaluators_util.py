@@ -1,3 +1,4 @@
+# pylint: disable=R0913
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -19,8 +20,14 @@ from octobot_commons.constants import START_PENDING_EVAL_NOTE
 UNSET_EVAL_TYPE = "unset_eval_type_param"
 
 
-def check_valid_eval_note(eval_note, eval_type=UNSET_EVAL_TYPE, expected_eval_type=None,
-                          eval_time=None, expiry_delay=None, current_time=None):
+def check_valid_eval_note(
+    eval_note,
+    eval_type=UNSET_EVAL_TYPE,
+    expected_eval_type=None,
+    eval_time=None,
+    expiry_delay=None,
+    current_time=None,
+):
     """
     Will also test evaluation type if if eval_type is provided.
     :param eval_note: The evaluation value
@@ -31,8 +38,12 @@ def check_valid_eval_note(eval_note, eval_type=UNSET_EVAL_TYPE, expected_eval_ty
     :param current_time: The current time
     :return: True when evaluation value is valid
     """
-    if eval_type != UNSET_EVAL_TYPE and (eval_type != expected_eval_type or expected_eval_type is None):
+    if eval_type != UNSET_EVAL_TYPE and (
+        eval_type != expected_eval_type or expected_eval_type is None
+    ):
         return False
-    return eval_note is not None \
-        and eval_note is not START_PENDING_EVAL_NOTE \
+    return (
+        eval_note is not None
+        and eval_note is not START_PENDING_EVAL_NOTE
         and (eval_time is None or eval_time + expiry_delay - current_time > 0)
+    )

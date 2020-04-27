@@ -17,30 +17,55 @@
 from octobot_commons import MARKET_SEPARATOR
 
 
-# Return currency, market
 def split_symbol(symbol):
+    """
+    Split the specified symbol
+    :param symbol: the symbol to split
+    :return: currency, market
+    """
     try:
-        splitted = symbol.split(MARKET_SEPARATOR)
-        return splitted[0], splitted[1]
+        separated_symbol = symbol.split(MARKET_SEPARATOR)
+        return separated_symbol[0], separated_symbol[1]
     except IndexError:
         return symbol
 
 
-# Return merged currency and market without /
 def merge_symbol(symbol):
+    """
+    Return merged currency and market without /
+    :param symbol: the specified symbol
+    :return: merged currency and market without /
+    """
     return symbol.replace(MARKET_SEPARATOR, "")
 
 
-# Merge currency and market
 def merge_currencies(currency, market, separator=MARKET_SEPARATOR):
+    """
+    Merge currency and market
+    :param currency: the currency
+    :param market: the currency
+    :param separator: the separator
+    :return: currency and market merged
+    """
     return f"{currency}{separator}{market}"
 
 
-# convert symbol
-def convert_symbol(symbol, symbol_separator,
-                   new_symbol_separator=MARKET_SEPARATOR,
-                   should_uppercase=False,
-                   should_lowercase=False):
+def convert_symbol(
+    symbol,
+    symbol_separator,
+    new_symbol_separator=MARKET_SEPARATOR,
+    should_uppercase=False,
+    should_lowercase=False,
+):
+    """
+    Convert symbol according to parameter
+    :param symbol: the symbol to convert
+    :param symbol_separator: the symbol separator
+    :param new_symbol_separator: the new symbol separator
+    :param should_uppercase: if it should be concerted to uppercase
+    :param should_lowercase: if it should be concerted to lowercase
+    :return:
+    """
     if should_uppercase:
         return symbol.replace(symbol_separator, new_symbol_separator).upper()
     if should_lowercase:

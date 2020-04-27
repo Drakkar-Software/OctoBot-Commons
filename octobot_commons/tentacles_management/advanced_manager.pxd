@@ -15,12 +15,12 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-cdef void __init_class_list_config(dict config)
-cdef dict __get_advanced_classes(dict config)
-cdef dict __get_advanced_instances(dict config)
-cdef void __append_to_class(dict config, str class_name, object class_type)
-cdef bint __check_duplicate(list list_to_check)
-cdef void __get_advanced(dict config, object class_type, object abstract_class=*)
+cdef void _init_class_list_config(dict config)
+cdef dict _get_advanced_classes(dict config)
+cdef dict _get_advanced_instances(dict config)
+cdef void _append_to_class(dict config, str class_name, object class_type)
+cdef bint _check_duplicate(list list_to_check)
+cdef void _get_advanced(dict config, object class_type, object abstract_class=*)
 
 cpdef bint is_abstract(object class_type)
 cpdef void create_classes_list(dict config, object abstract_class)
