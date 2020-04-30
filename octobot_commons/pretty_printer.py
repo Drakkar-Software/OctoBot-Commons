@@ -50,19 +50,11 @@ def open_order_pretty_printer(exchange_name, dict_order, markdown=False) -> str:
         order_type = parse_order_type(dict_order)
         if order_type == TraderOrderType.UNKNOWN:
             order_type = TradeOrderSide(
-                get_value_or_default(
-                    dict_order, ExchangeConstantsOrderColumns.SIDE.value
-                )
+                dict_order.get(ExchangeConstantsOrderColumns.SIDE.value)
             )
-        quantity = get_value_or_default(
-            dict_order, ExchangeConstantsOrderColumns.AMOUNT.value, 0.0
-        )
-        price = get_value_or_default(
-            dict_order, ExchangeConstantsOrderColumns.PRICE.value, 0.0
-        )
-        creation_time = get_value_or_default(
-            dict_order, ExchangeConstantsOrderColumns.TIMESTAMP.value, 0
-        )
+        quantity = dict_order.get(ExchangeConstantsOrderColumns.AMOUNT.value, 0.0)
+        price = dict_order.get(ExchangeConstantsOrderColumns.PRICE.value, 0.0)
+        creation_time = dict_order.get(ExchangeConstantsOrderColumns.TIMESTAMP.value, 0)
 
         return (
             f"{code}{order_type.name.replace('_', ' ')}{code}: {code}"
