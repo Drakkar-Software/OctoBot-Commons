@@ -18,6 +18,11 @@ env:
 install:
   - python3 -m pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
 
+stages:
+  - compile
+  - deploy
+  - notify
+
 jobs:
   include:
   - name: "Linux - Python 3.8-dev - Python sources"
@@ -104,3 +109,13 @@ deploy:
       branch: "$DEPLOY_BRANCH"
       tags: true
       condition: "$TRAVIS_OS_NAME = 'osx'"
+
+after_success:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh success https://discordapp.com/api/webhooks/$WEBHOOK_TOKEN
+
+after_failure:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure https://discordapp.com/api/webhooks/$WEBHOOK_TOKEN
