@@ -110,11 +110,6 @@ deploy:
       tags: true
       condition: "$TRAVIS_OS_NAME = 'osx'"
 
-after_success:
-  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
-  - chmod +x send.sh
-  - ./send.sh success https://discordapp.com/api/webhooks/$WEBHOOK_TOKEN
-
 after_failure:
   - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
   - chmod +x send.sh
