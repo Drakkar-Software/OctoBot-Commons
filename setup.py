@@ -44,6 +44,7 @@ PACKAGES = find_packages(exclude=["tests"])
 packages_list = ["octobot_commons.event_tree",
                  "octobot_commons.evaluators_util",
                  "octobot_commons.data_util",
+                 "octobot_commons.list_util",
                  "octobot_commons.pretty_printer",
                  "octobot_commons.singleton.singleton_class",
                  "octobot_commons.logging.logging_util",
