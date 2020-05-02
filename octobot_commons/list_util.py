@@ -17,4 +17,11 @@ from functools import reduce
 
 
 def flatten_list(list_to_flatten):
-    return reduce(lambda first_level, second_level: first_level + second_level, list_to_flatten)
+    """
+    Flatten the list :list_to_flatten:
+    :param list_to_flatten: the list to flatten
+    :return: the flattened list
+    """
+    return reduce(
+        lambda first_level, second_level: first_level + second_level, list_to_flatten
+    )
