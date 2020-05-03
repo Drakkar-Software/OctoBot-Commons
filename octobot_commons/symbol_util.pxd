@@ -1,3 +1,4 @@
+# cython: language_level=3
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -13,22 +14,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from octobot_commons.config import load_config
 
-
-def reload_tentacle_config(
-    config, config_key, tentacle_config_path, raised_exception=None
-):
-    """
-    Reload tentacle configuration
-    :param config: the current config
-    :param config_key: the config key to reload
-    :param tentacle_config_path: the tentacle config path
-    :param raised_exception: the exception to be raised
-    :return: the reloaded config
-    """
-    config[config_key] = load_config(tentacle_config_path, False)
-    if config[config_key] is None:
-        raise raised_exception if raised_exception is not None else Exception
-
-    return config
+cpdef object split_symbol(str symbol)
+cpdef str merge_symbol(str symbol)
+cpdef str merge_currencies(str currency, str market, str separator=*)
+cpdef str convert_symbol(
+    str symbol,
+    str symbol_separator,
+    str new_symbol_separator=*,
+    bint should_uppercase=*,
+    bint should_lowercase=*)

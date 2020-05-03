@@ -20,11 +20,11 @@ from octobot_commons.enums import TimeFramesMinutes, TimeFrames
 LOGGER_TAG = "TimeFrameManager"
 
 
-def __sort_time_frames(time_frames, reverse=False):
+def _sort_time_frames(time_frames, reverse=False):
     return sorted(time_frames, key=TimeFramesMinutes.__getitem__, reverse=reverse)
 
 
-TimeFramesRank = __sort_time_frames(TimeFramesMinutes)
+TimeFramesRank = _sort_time_frames(list(TimeFramesMinutes))
 
 
 def get_config_time_frame(config) -> list:
@@ -44,7 +44,7 @@ def sort_time_frames(time_frames, reverse=False) -> list:
     :param reverse: if the sort should be reversed
     :return: the time frame list sorted
     """
-    return __sort_time_frames(time_frames, reverse)
+    return _sort_time_frames(time_frames, reverse)
 
 
 def sort_config_time_frames(config) -> None:
