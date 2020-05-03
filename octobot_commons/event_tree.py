@@ -26,10 +26,7 @@ class EventTreeNode:
     __slots__ = [
         "node_value",
         "node_value_time",
-        "node_event",
-        "node_clear_event",
         "node_type",
-        "node_task",
         "children",
     ]
 
@@ -37,27 +34,7 @@ class EventTreeNode:
         self.node_value = node_value
         self.node_value_time = None
         self.node_type = node_type
-        self.node_event = Event()
-        self.node_clear_event = Event()
-        self.node_task = None
         self.children = {}
-
-        # set node clear event default value
-        self.node_clear_event.set()
-
-    def set(self):
-        """
-        Set the node event
-        """
-        self.node_event.set()
-        self.node_clear_event.clear()
-
-    def clear(self):
-        """
-        Reset the node event
-        """
-        self.node_event.clear()
-        self.node_clear_event.set()
 
 
 class NodeExistsError(Exception):
@@ -166,11 +143,6 @@ class EventTree:
                 # create a new node as the current node child
                 current_node.children[key] = EventTreeNode(None, None)
 
-                # update parent node event to gather its children event
-                current_node.node_task = asyncio.create_task(
-                    self._set_node_event_from_children(current_node)
-                )
-
                 # change to the new node
                 current_node = current_node.children[key]
 
@@ -192,31 +164,3 @@ class EventTree:
 
         # set the node value modification timestamp
         node.node_value_time = timestamp
-
-        # set the node event
-        node.set()
-
-        # reset the node event
-        asyncio.get_event_loop().call_soon(node.clear)
-
-    async def _set_node_event_from_children(self, node: EventTreeNode):
-        """
-        Should be run in a Task
-        :param node: the node instance related to the task
-        :return: void
-        """
-        try:
-            while True:
-                # reset the event
-                node.clear()
-
-                # wait until each children has trigger its event
-                await asyncio.wait(
-                    [n.node_event.wait() for n in node.children.values()],
-                    return_when=ALL_COMPLETED,
-                )
-
-                # notify
-                node.set()
-        except asyncio.CancelledError:
-            pass
