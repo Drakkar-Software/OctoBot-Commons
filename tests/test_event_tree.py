@@ -94,29 +94,3 @@ async def test_event_tree_set_node_at_path():
     assert not event_tree.get_or_create_node(["test", "test2", "test3"]).children
     assert event_tree.get_or_create_node(["test", "test2", "test3"]).node_value == "test-string"
     assert event_tree.get_or_create_node(["test", "test2", "test3"]).node_type == "test-type"
-
-
-@pytest.mark.asyncio
-async def test_event_tree_set_node_event():
-    event_tree = EventTree()
-    created_node = event_tree.get_or_create_node(["test"])
-    with patch('asyncio.Event.set') as event_set:
-        event_tree.set_node(2, None, created_node)
-        event_set.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_event_tree_clear_node_event():
-    event_tree = EventTree()
-    created_node = event_tree.get_or_create_node(["test"])
-    with patch('asyncio.Event.clear') as event_clear:
-        event_tree.set_node(2, None, created_node)
-        asyncio.get_event_loop().call_soon(event_clear.assert_called_once)
-
-
-@pytest.mark.asyncio
-async def test_event_tree_parent_node_event():
-    event_tree = EventTree()
-    created_node = event_tree.get_or_create_node(["test"])
-    await asyncio.gather(*[async_event_tree_set_node(event_tree, 2, None, created_node),
-                           event_tree.root.node_event.wait()])
