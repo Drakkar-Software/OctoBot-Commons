@@ -1,3 +1,4 @@
+# cython: language_level=3
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -13,22 +14,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from octobot_commons.config import load_config
 
+cdef list _sort_time_frames(list time_frames, bint reverse=*)
 
-def reload_tentacle_config(
-    config, config_key, tentacle_config_path, raised_exception=None
-):
-    """
-    Reload tentacle configuration
-    :param config: the current config
-    :param config_key: the config key to reload
-    :param tentacle_config_path: the tentacle config path
-    :param raised_exception: the exception to be raised
-    :return: the reloaded config
-    """
-    config[config_key] = load_config(tentacle_config_path, False)
-    if config[config_key] is None:
-        raise raised_exception if raised_exception is not None else Exception
-
-    return config
+cpdef list get_config_time_frame(dict config)
+cpdef list sort_time_frames(list time_frames, bint reverse=*)
+cpdef void sort_config_time_frames(dict config)
+cpdef object get_display_time_frame(dict config, object default_display_time_frame)
+cpdef object get_previous_time_frame(list config_time_frames, object time_frame, object origin_time_frame)
+cpdef object find_min_time_frame(list time_frames, object min_time_frame=*)
+cpdef list parse_time_frames(list time_frames_string_list)

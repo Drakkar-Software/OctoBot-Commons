@@ -16,7 +16,7 @@
 from octobot_commons.enums import TimeFrames
 from octobot_commons.tests.test_config import load_test_config
 from octobot_commons.time_frame_manager import get_config_time_frame, parse_time_frames, find_min_time_frame, \
-    get_previous_time_frame, get_display_time_frame
+    get_previous_time_frame, get_display_time_frame, sort_time_frames
 
 
 def test_get_config_time_frame():
@@ -25,6 +25,14 @@ def test_get_config_time_frame():
 
 def test_parse_time_frames():
     assert parse_time_frames(["3d", "5d", "1m", "6h"]) == [TimeFrames("3d"), TimeFrames("1m"), TimeFrames("6h")]
+
+
+def test_sort_time_frames():
+    assert sort_time_frames([TimeFrames("3d"), TimeFrames("1m"), TimeFrames("6h")]) == \
+           [TimeFrames("1m"), TimeFrames("6h"), TimeFrames("3d")]
+    assert sort_time_frames([TimeFrames("1M"), TimeFrames("3d"), TimeFrames("12h"), TimeFrames("1h"),
+                             TimeFrames("1m"), TimeFrames("6h")]) == \
+           [TimeFrames("1m"), TimeFrames("1h"), TimeFrames("6h"), TimeFrames("12h"), TimeFrames("3d"), TimeFrames("1M")]
 
 
 def test_find_min_time_frame():

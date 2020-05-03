@@ -46,10 +46,13 @@ packages_list = ["octobot_commons.event_tree",
                  "octobot_commons.data_util",
                  "octobot_commons.list_util",
                  "octobot_commons.pretty_printer",
+                 "octobot_commons.symbol_util",
+                 "octobot_commons.time_frame_manager",
                  "octobot_commons.singleton.singleton_class",
                  "octobot_commons.logging.logging_util",
                  "octobot_commons.tentacles_management.advanced_manager",
-                 "octobot_commons.tentacles_management.class_inspector"]
+                 "octobot_commons.tentacles_management.class_inspector",
+                 "octobot_commons.tentacles_management.config_manager"]
 
 ext_modules = [
     Extension(package, [f"{package.replace('.', '/')}.py"], include_dirs=[np.get_include()])
