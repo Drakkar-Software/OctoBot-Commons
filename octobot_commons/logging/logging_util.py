@@ -160,29 +160,29 @@ class BotLogger:
             call_notifiers=BotLogger.error_publication_enabled,
         )
 
-    @staticmethod
-    def get_backtesting_errors_count() -> int:
-        """
-        Get backtesting errors count
-        :return: the backtesting errors count
-        """
-        return get_errors_count(BACKTESTING_NEW_ERRORS_COUNT)
 
-    @staticmethod
-    def reset_backtesting_errors() -> None:
-        """
-        Reset the backtesting errors count
-        """
-        reset_errors_count(BACKTESTING_NEW_ERRORS_COUNT)
+def get_backtesting_errors_count() -> int:
+    """
+    Get backtesting errors count
+    :return: the backtesting errors count
+    """
+    return get_errors_count(BACKTESTING_NEW_ERRORS_COUNT)
 
-    @staticmethod
-    def set_error_publication_enabled(enabled) -> None:
-        """
-        Set the error publication enabling
-        :param enabled: if the error publication is enabled
-        """
-        BotLogger.error_publication_enabled = enabled
-        if enabled and BotLogger.should_publish_logs_when_re_enabled:
-            add_log(logging.ERROR, None, None, keep_log=False, call_notifiers=True)
-        else:
-            BotLogger.should_publish_logs_when_re_enabled = False
+
+def reset_backtesting_errors() -> None:
+    """
+    Reset the backtesting errors count
+    """
+    reset_errors_count(BACKTESTING_NEW_ERRORS_COUNT)
+
+
+def set_error_publication_enabled(enabled) -> None:
+    """
+    Set the error publication enabling
+    :param enabled: if the error publication is enabled
+    """
+    BotLogger.error_publication_enabled = enabled
+    if enabled and BotLogger.should_publish_logs_when_re_enabled:
+        add_log(logging.ERROR, None, None, keep_log=False, call_notifiers=True)
+    else:
+        BotLogger.should_publish_logs_when_re_enabled = False

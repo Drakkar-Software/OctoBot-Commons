@@ -35,11 +35,7 @@ cdef class BotLogger:
     cdef void _publish_log_if_necessary(self, str message, object level)
     cdef void _web_interface_publish_log(self, str message, object level)
 
-    # @staticmethod
-    # cpdef list get_backtesting_errors_count()
-    #
-    # @staticmethod
-    # cpdef void reset_backtesting_errors()
-    #
-    # @staticmethod
-    # cpdef void set_error_publication_enabled(bint enabled)
+
+cpdef list get_backtesting_errors_count()
+cpdef void reset_backtesting_errors()
+cpdef void set_error_publication_enabled(bint enabled)
