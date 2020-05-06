@@ -1,3 +1,4 @@
+# pylint: disable=W0603
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -23,6 +24,9 @@ from octobot_commons.logging import (
     BACKTESTING_NEW_ERRORS_COUNT,
     STORED_LOG_MIN_LEVEL,
 )
+
+ERROR_PUBLICATION_ENABLED = True
+SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED = False
 
 
 def set_global_logger_level(level) -> None:
@@ -67,9 +71,6 @@ class BotLogger:
     """
     The bot logger that manage all OctoBot's logs
     """
-
-    error_publication_enabled = True
-    should_publish_logs_when_re_enabled = False
 
     def __init__(self, logger_name):
         self.logger_name = logger_name
@@ -144,8 +145,9 @@ class BotLogger:
         """
         if STORED_LOG_MIN_LEVEL <= level and get_global_logger_level() <= level:
             self._web_interface_publish_log(message, level)
-            if not BotLogger.error_publication_enabled and logging.ERROR <= level:
-                BotLogger.should_publish_logs_when_re_enabled = True
+            if not ERROR_PUBLICATION_ENABLED and logging.ERROR <= level:
+                global SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED
+                SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED = True
 
     def _web_interface_publish_log(self, message, level) -> None:
         """
@@ -154,10 +156,7 @@ class BotLogger:
         :param level: the log level
         """
         add_log(
-            level,
-            self.logger_name,
-            message,
-            call_notifiers=BotLogger.error_publication_enabled,
+            level, self.logger_name, message, call_notifiers=ERROR_PUBLICATION_ENABLED,
         )
 
 
@@ -181,8 +180,10 @@ def set_error_publication_enabled(enabled) -> None:
     Set the error publication enabling
     :param enabled: if the error publication is enabled
     """
-    BotLogger.error_publication_enabled = enabled
-    if enabled and BotLogger.should_publish_logs_when_re_enabled:
+    global ERROR_PUBLICATION_ENABLED
+    global SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED
+    ERROR_PUBLICATION_ENABLED = enabled
+    if enabled and SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED:
         add_log(logging.ERROR, None, None, keep_log=False, call_notifiers=True)
     else:
-        BotLogger.should_publish_logs_when_re_enabled = False
+        SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED = False

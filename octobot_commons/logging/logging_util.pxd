@@ -15,11 +15,6 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-cpdef void set_global_logger_level(level)
-cpdef object get_global_logger_level()
-cpdef object get_logger(str logger_name=*)
-cpdef void set_logging_level(list logger_names, object level)
-
 cdef class BotLogger:
     cdef str logger_name
     cdef object logger
@@ -35,7 +30,10 @@ cdef class BotLogger:
     cdef void _publish_log_if_necessary(self, str message, object level)
     cdef void _web_interface_publish_log(self, str message, object level)
 
-
+cpdef void set_global_logger_level(level)
+cpdef object get_global_logger_level()
+cpdef object get_logger(str logger_name=*)
+cpdef void set_logging_level(list logger_names, object level)
 cpdef list get_backtesting_errors_count()
 cpdef void reset_backtesting_errors()
 cpdef void set_error_publication_enabled(bint enabled)
