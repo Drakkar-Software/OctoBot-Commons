@@ -73,4 +73,4 @@ class ErrorContainer:
         :return: None
         """
         if self.errors:
-            raise AssertionError(self.errors)
+            raise AssertionError(str(self.errors))
