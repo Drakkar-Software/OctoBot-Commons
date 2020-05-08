@@ -65,7 +65,7 @@ class ErrorContainer:
         :param context: the context dict of the exception
         :return: None
         """
-        self.errors.append(context["exception"])
+        self.errors.append(context)
 
     async def check(self) -> None:
         """
@@ -73,4 +73,4 @@ class ErrorContainer:
         :return: None
         """
         if self.errors:
-            raise AssertionError(str(self.errors))
+            raise AssertionError(self.errors)
