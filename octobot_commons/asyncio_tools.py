@@ -13,7 +13,6 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-
 import asyncio
 
 from octobot_commons.constants import DEFAULT_FUTURE_TIMEOUT
@@ -49,3 +48,29 @@ def run_coroutine_in_asyncio_loop(coroutine, async_loop):
             f"{coroutine} coroutine raised an exception: {global_exception}",
         )
         raise global_exception
+
+
+class ErrorContainer:
+    """
+    ErrorContainer is used to catch exceptions in as asyncio loop context
+    """
+
+    def __init__(self):
+        self.errors = []
+
+    def exception_handler(self, _, context) -> None:
+        """
+        To be set in the watched asyncio loop via loop.set_exception_handler()
+        :param _: the loop argument, not used
+        :param context: the context dict of the exception
+        :return: None
+        """
+        self.errors.append(context["exception"])
+
+    async def check(self) -> None:
+        """
+        Will raise AssertionError if an exception has been raised in the registered loop(s)
+        :return: None
+        """
+        if self.errors:
+            raise AssertionError(self.errors)
