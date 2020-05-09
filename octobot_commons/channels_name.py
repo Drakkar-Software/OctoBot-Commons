@@ -16,6 +16,14 @@
 from enum import Enum
 
 
+class OctoBotChannelsName(Enum):
+    """
+    OctoBot-Evaluators channel names
+    """
+
+    OCTOBOT_CHANNEL = "OctoBot"
+
+
 class OctoBotEvaluatorsChannelsName(Enum):
     """
     OctoBot-Evaluators channel names
