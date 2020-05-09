@@ -29,8 +29,8 @@ class OctoBotEvaluatorsChannelsName(Enum):
     OctoBot-Evaluators channel names
     """
 
-    MATRIX = "Matrix"
-    EVALUATORS = "Evaluators"
+    MATRIX_CHANNEL = "Matrix"
+    EVALUATORS_CHANNEL = "Evaluators"
 
 
 class OctoBotBacktestingChannelsName(Enum):
