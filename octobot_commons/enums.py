@@ -102,3 +102,15 @@ class MarkdownFormat(Enum):
     CODE = "`"
     IGNORE = 1
     NONE = 0
+
+
+class OctoBotChannelSubjects(Enum):
+    """
+    OctoBot Channel subjects
+    """
+
+    NOTIFICATION = "notification"
+    CREATION = "creation"
+    UPDATE = "update"
+    DELETION = "deletion"
+    ERROR = "error"
