@@ -61,3 +61,17 @@ def decrypt(data, silent_on_invalid_token=False):
     except Exception as global_exception:
         logging.getLogger().error(f"Failed to decrypt : {data} ({global_exception})")
         raise global_exception
+
+
+def decrypt_element_if_possible(value_key, config_element, default="") -> str:
+    """
+    Return decrypted values, handles placeholder values
+    :param value_key: the value key
+    :param config_element: the config element
+    :param default: the default value if no decrypt possible
+    :return: True if the value can be decrypted
+    """
+    element = config_element.get(value_key, "")
+    if element and not has_invalid_default_config_value(element):
+        return decrypt(element)
+    return default
