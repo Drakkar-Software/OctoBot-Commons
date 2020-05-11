@@ -54,24 +54,6 @@ jobs:
       - pylint --rcfile=standard.rc $PACKAGE_FOLDER
       - if [ $? -ne 1 ]; then exit 0; fi
 
-  - name: "OSX - Python 3.7-dev - Installed"
-    stage: test
-    os: osx
-    osx_image: xcode11    # Python 3.7.2 running on macOS 10.14.3
-    language: shell       # 'language: python' is an error on Travis CI macOS
-    # python: 3.7         # 'python:' is ignored on Travis CI macOS
-    before_install: python3 --version ; pip3 --version ; sw_vers
-    before_cache:
-      - rm -f "$HOME/Library/Caches/pip/log/debug.log"
-    cache:
-      directories:
-        - "$HOME/Library/Caches/pip"
-    script:
-      - python3 setup.py build_ext --inplace
-      - python3 setup.py install
-      - rm -rf $PACKAGE_FOLDER
-      - pytest tests
-
 deploy:
   - provider: pypi
     username: __token__
@@ -84,7 +66,6 @@ deploy:
       repo: "$GH_REPO"
       branch: "$DEPLOY_BRANCH"
       tags: true
-      condition: "$TRAVIS_OS_NAME = 'linux'"
   - provider: script
     script: docker run -it -e PYPI_USERNAME=$PYPI_USERNAME -e PYPI_PASSWORD=$PYPI_PASSWORD -v $(pwd):/project drakkarsoftware/octobot-pypi-deploy:i686 "i686" "cp37-cp37m" "cp37"
     cleanup: true
@@ -92,7 +73,6 @@ deploy:
       repo: "$GH_REPO"
       branch: "$DEPLOY_BRANCH"
       tags: true
-      condition: "$TRAVIS_OS_NAME = 'linux'"
   - provider: script
     script: docker run -it -e PYPI_USERNAME=$PYPI_USERNAME -e PYPI_PASSWORD=$PYPI_PASSWORD -v $(pwd):/project drakkarsoftware/octobot-pypi-deploy:x86_64 "x86_64" "cp37-cp37m" "cp37"
     cleanup: true
@@ -100,15 +80,6 @@ deploy:
       repo: "$GH_REPO"
       branch: "$DEPLOY_BRANCH"
       tags: true
-      condition: "$TRAVIS_OS_NAME = 'linux'"
-  - provider: script
-    script: python3 setup.py bdist_wheel && python3 -m twine upload dist/* -u $PYPI_USERNAME -p $PYPI_PASSWORD --skip-existing
-    cleanup: true
-    on:
-      repo: "$GH_REPO"
-      branch: "$DEPLOY_BRANCH"
-      tags: true
-      condition: "$TRAVIS_OS_NAME = 'osx'"
 
 after_failure:
   - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
