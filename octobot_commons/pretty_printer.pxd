@@ -16,7 +16,7 @@
 #  License along with this library.
 
 cpdef str open_order_pretty_printer(str exchange_name, dict dict_order, bint markdown=*)
-cpdef str trade_pretty_printer(str exchange_name, dict trade, bint markdown=*)
+cpdef str trade_pretty_printer(str exchange_name, object trade, bint markdown=*)
 cpdef tuple cryptocurrency_alert(object result, object final_eval)
 cpdef str global_portfolio_pretty_print(object global_portfolio, str separator=*, bint markdown=*)
 cpdef str portfolio_profitability_pretty_print(double profitability, double profitability_percent, str reference)

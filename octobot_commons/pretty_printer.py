@@ -72,7 +72,7 @@ def trade_pretty_printer(exchange_name, trade, markdown=False) -> str:
     """
     Trade pretty printer
     :param exchange_name: the exchange name
-    :param trade: the trade dict
+    :param trade: the trade object
     :param markdown: if printer use markdown
     :return: the trade pretty printed
     """
