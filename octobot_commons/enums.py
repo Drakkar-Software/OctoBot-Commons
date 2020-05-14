@@ -114,3 +114,14 @@ class OctoBotChannelSubjects(Enum):
     UPDATE = "update"
     DELETION = "deletion"
     ERROR = "error"
+
+
+class ChannelConsumerPriorityLevels(Enum):
+    """
+    Channel consumer priority levels
+    """
+
+    HIGH = 0
+    MEDIUM = 1
+    # LOW = 2 not necessary for now
+    OPTIONAL = 2
