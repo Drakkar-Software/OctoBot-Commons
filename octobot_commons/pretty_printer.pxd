@@ -19,7 +19,7 @@ cpdef str open_order_pretty_printer(str exchange_name, dict dict_order, bint mar
 cpdef str trade_pretty_printer(str exchange_name, object trade, bint markdown=*)
 cpdef tuple cryptocurrency_alert(object result, object final_eval)
 cpdef str global_portfolio_pretty_print(object global_portfolio, str separator=*, bint markdown=*)
-cpdef str portfolio_profitability_pretty_print(double profitability, double profitability_percent, str reference)
+cpdef str portfolio_profitability_pretty_print(double profitability, object profitability_percent, str reference)
 # cpdef str pretty_print_dict(dict dict_content, default=*, bint markdown=*)
 cpdef double round_with_decimal_count(double number, int max_digits=*)
 cpdef str get_min_string_from_number(double number, int max_digits=*)
