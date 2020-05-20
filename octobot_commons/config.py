@@ -18,9 +18,8 @@
 import json
 import logging
 import os
-from shutil import copyfile
 
-from octobot_commons.constants import USER_FOLDER, CONFIG_FILE, DEFAULT_CONFIG_FILE_PATH
+from octobot_commons.constants import USER_FOLDER, CONFIG_FILE
 
 
 def get_user_config():
@@ -65,23 +64,6 @@ def load_config(
             raise Exception(error_str)
         logger.error(error_str)
     return None
-
-
-def init_config(
-    config_file=get_user_config(), from_config_file=DEFAULT_CONFIG_FILE_PATH
-):
-    """
-    Initialize default config
-    :param config_file: the config file path
-    :param from_config_file: the default config file path
-    """
-    try:
-        if not os.path.exists(USER_FOLDER):
-            os.makedirs(USER_FOLDER)
-
-        copyfile(from_config_file, config_file)
-    except Exception as global_exception:
-        raise Exception(f"Can't init config file {global_exception}")
 
 
 def is_config_empty_or_missing(config_file=get_user_config()):
