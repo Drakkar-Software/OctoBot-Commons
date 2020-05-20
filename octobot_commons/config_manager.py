@@ -42,12 +42,15 @@ from octobot_commons.logging.logging_util import get_logger
 DELETE_ELEMENT_VALUE = ""
 
 
-def save_config(config_file, config, temp_restore_config_file, json_data=None) -> None:
+def save_config(
+    config_file, config, temp_restore_config_file, schema_file=None, json_data=None
+) -> None:
     """
     Save a json config
     :param config_file: the config file path
     :param config: the json config
     :param temp_restore_config_file: the temporary config file
+    :param schema_file: path to the json schema to validate the updated config
     :param json_data: json data if the data is already json
     """
     try:
@@ -61,8 +64,9 @@ def save_config(config_file, config, temp_restore_config_file, json_data=None) -
         with open(config_file, "w") as cg_file:
             cg_file.write(new_content)
 
-        # check if the new config file is correct
-        check_config(config_file)
+        if schema_file is not None:
+            # check if the new config file is correct
+            check_config(config_file, schema_file)
 
         # remove temp file
         remove_restore_file(temp_restore_config_file)
@@ -180,14 +184,15 @@ def dump_json(json_data) -> str:
     return json.dumps(json_data, indent=4, sort_keys=True)
 
 
-def check_config(config_file) -> None:
+def check_config(config_file, schema_file) -> None:
     """
     Check a config file
     :param config_file: the config file path
+    :param schema_file: path to the json schema to validate the updated config
     """
     try:
         valid, global_exception = validate_config_file(
-            load_config(config_file=config_file)
+            load_config(config_file=config_file), schema_file=schema_file
         )
         if not valid:
             raise global_exception  # pylint: disable=E0702
@@ -250,6 +255,7 @@ def filter_to_update_data(
 def update_global_config(
     to_update_data,
     current_config,
+    schema_file,
     in_backtesting,
     config_separator,
     update_input=False,
@@ -259,6 +265,7 @@ def update_global_config(
     Update the global config
     :param to_update_data: the data to update
     :param current_config: the current config
+    :param schema_file: path to the json schema to validate the updated config
     :param in_backtesting: if backtesting is enabled
     :param config_separator: the config separator
     :param update_input: if input should be updated
@@ -296,18 +303,23 @@ def update_global_config(
             )
 
     # save config
-    save_config(get_user_config(), new_current_config, TEMP_RESTORE_CONFIG_FILE)
+    save_config(
+        get_user_config(), new_current_config, TEMP_RESTORE_CONFIG_FILE, schema_file
+    )
 
 
-def simple_save_config_update(updated_config) -> bool:
+def simple_save_config_update(updated_config, schema_file=None) -> bool:
     """
     Simple config update saving
     :param updated_config: the updated config
+    :param schema_file: path to the json schema to validate the updated config
     :return: True if successfully updated
     """
     to_save_config = copy(updated_config)
     remove_loaded_only_element(to_save_config)
-    save_config(get_user_config(), to_save_config, TEMP_RESTORE_CONFIG_FILE)
+    save_config(
+        get_user_config(), to_save_config, TEMP_RESTORE_CONFIG_FILE, schema_file
+    )
     return True
 
 

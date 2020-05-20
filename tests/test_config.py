@@ -14,9 +14,10 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import os
+from shutil import copy
 
-from octobot_commons.config import is_config_empty_or_missing, init_config
-from octobot_commons.constants import CONFIG_FILE, DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_FILE
+from octobot_commons.config import is_config_empty_or_missing
+from octobot_commons.constants import CONFIG_FILE, DEFAULT_CONFIG_FILE
 from octobot_commons.tests.test_config import load_test_config, TEST_CONFIG_FOLDER
 
 
@@ -33,19 +34,8 @@ def test_is_config_empty_or_missing():
         os.remove(get_fake_config_path())
 
     assert is_config_empty_or_missing(config_file=get_fake_config_path())
-    init_config(config_file=get_fake_config_path(), from_config_file=os.path.join(TEST_CONFIG_FOLDER,
-                                                                                  DEFAULT_CONFIG_FILE))
+    copy(os.path.join(TEST_CONFIG_FOLDER, DEFAULT_CONFIG_FILE), get_fake_config_path())
     assert not is_config_empty_or_missing(config_file=get_fake_config_path())
 
     if os.path.isfile(get_fake_config_path()):
         os.remove(get_fake_config_path())
-
-
-def test_init_config():
-    if os.path.isfile(get_fake_config_path()):
-        os.remove(get_fake_config_path())
-
-    init_config(config_file=get_fake_config_path(), from_config_file=os.path.join(TEST_CONFIG_FOLDER,
-                                                                                  DEFAULT_CONFIG_FILE))
-    assert os.path.isfile(get_fake_config_path())
-    os.remove(get_fake_config_path())
