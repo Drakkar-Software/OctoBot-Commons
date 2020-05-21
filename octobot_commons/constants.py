@@ -63,10 +63,6 @@ START_PENDING_EVAL_NOTE = "0"
 # tentacles
 TENTACLE_DEFAULT_CONFIG = "default_config"
 
-# Advanced
-CONFIG_ADVANCED_CLASSES = "advanced_classes"
-CONFIG_ADVANCED_INSTANCES = "advanced_instances"
-
 # terms of service
 CONFIG_ACCEPTED_TERMS = "accepted_terms"
 
