@@ -210,31 +210,6 @@ def is_in_dev_mode(config) -> None:
     return CONFIG_DEBUG_OPTION in config and config[CONFIG_DEBUG_OPTION]
 
 
-def remove_loaded_only_element(config):  # pylint: disable=C0116, W0613
-    # OctoBot 0.3.X
-    # # remove service instances
-    # for service in config[CONFIG_CATEGORY_SERVICES]:
-    #     config[CONFIG_CATEGORY_SERVICES][service].pop(CONFIG_SERVICE_INSTANCE, None)
-    #
-    # # remove non config keys
-    # config.pop(CONFIG_EVALUATOR, None)
-    # config.pop(CONFIG_TRADING_TENTACLES, None)
-    # config.pop(CONFIG_INTERFACES, None)
-    # config.pop(CONFIG_ADVANCED_CLASSES, None)
-    # config.pop(CONFIG_TIME_FRAME, None)
-    # config.pop(CONFIG_NOTIFICATION_INSTANCE, None)
-    # config.pop(CONFIG_ADVANCED_INSTANCES, None)
-    #
-    # # remove backtesting specific differences
-    # if backtesting_enabled(config):
-    #     if CONFIG_BACKTESTING in config:
-    #         config[CONFIG_BACKTESTING].pop(CONFIG_ENABLED_OPTION, None)
-    #         config[CONFIG_BACKTESTING].pop(CONFIG_ANALYSIS_ENABLED_OPTION, None)
-
-    # OctoBot 0.4.X
-    pass
-
-
 def filter_to_update_data(
     to_update_data, current_config, in_backtesting
 ):  # pylint: disable=W0613
@@ -275,8 +250,6 @@ def update_global_config(
 
     filter_to_update_data(to_update_data, current_config, in_backtesting)
 
-    remove_loaded_only_element(new_current_config)
-
     # now can make a deep copy
     new_current_config = deepcopy(new_current_config)
 
@@ -316,7 +289,6 @@ def simple_save_config_update(updated_config, schema_file=None) -> bool:
     :return: True if successfully updated
     """
     to_save_config = copy(updated_config)
-    remove_loaded_only_element(to_save_config)
     save_config(
         get_user_config(), to_save_config, TEMP_RESTORE_CONFIG_FILE, schema_file
     )

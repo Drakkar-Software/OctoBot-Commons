@@ -13,8 +13,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-
 import inspect
+
+from octobot_commons.logging.logging_util import get_logger
 
 
 def default_parent_inspection(element, parent):
@@ -120,19 +121,6 @@ def get_class_from_string(
     return None
 
 
-def get_deep_class_from_string(class_string, module):
-    """
-    Search for a class string in module
-    :param class_string: the class name to search
-    :param module: the module
-    :return: the class if found else None
-    """
-    for member in inspect.getmembers(module):
-        if member[0] == class_string:
-            return getattr(module, class_string)
-    return None
-
-
 def is_abstract_using_inspection_and_class_naming(clazz):
     """
     Check if a class is abstract
@@ -140,3 +128,50 @@ def is_abstract_using_inspection_and_class_naming(clazz):
     :return: the check result
     """
     return inspect.isabstract(clazz) or "abstract" in clazz.__name__.lower()
+
+
+def get_all_classes_from_parent(parent_class) -> list:
+    """
+    Get all class from parent
+    :param parent_class: the parent class
+    :return: the class from parent
+    """
+    classes = []
+    for subclass in parent_class.__subclasses__():
+        if subclass.__subclasses__():
+            classes += get_all_classes_from_parent(subclass)
+        else:
+            classes.append(subclass)
+    return classes
+
+
+def search_class_name_in_class_list(class_name, parent_class_list) -> object:
+    """
+    Search for a class name in a class list
+    :param class_name: the class name to search
+    :param parent_class_list: the class list
+    :return: the class if found else None
+    """
+    for subclass in parent_class_list:
+        if isinstance(subclass, list):
+            return search_class_name_in_class_list(class_name, subclass)
+        if subclass.get_name() == class_name:
+            return subclass
+    return None
+
+
+def get_single_deepest_child_class(clazz) -> object:
+    """
+    Get the single deepest child class
+    :param clazz: the class
+    :return: the single deepest child class
+    """
+    children_classes = clazz.__subclasses__()
+    if len(children_classes) == 0:
+        return clazz
+    if len(children_classes) > 1:
+        get_logger(__name__).error(
+            f"More than one child class of {clazz}, expecting one, "
+            f"using {children_classes[0]}"
+        )
+    return get_single_deepest_child_class(children_classes[0])
