@@ -42,3 +42,29 @@ steps:
       - tag
     repo:
       - Drakkar-Software/OctoBot-Commons
+
+---
+kind: pipeline
+name: deploy-python3.7-arm
+
+workspace:
+  base: /project
+
+platform:
+  os: linux
+  arch: arm
+
+steps:
+- name: pypi_publish
+  pull: always
+  image: drakkarsoftware/pypi-builder
+  environment:
+    PYPI_USERNAME:
+      from_secret: pypi_username
+    PYPI_PASSWORD:
+      from_secret: pypi_password
+  when:
+    event:
+      - tag
+    repo:
+      - Drakkar-Software/OctoBot-Commons
