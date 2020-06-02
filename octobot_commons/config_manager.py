@@ -220,13 +220,10 @@ def is_in_dev_mode(config) -> None:
     return CONFIG_DEBUG_OPTION in config and config[CONFIG_DEBUG_OPTION]
 
 
-def filter_to_update_data(
-    to_update_data, current_config, in_backtesting
-):  # pylint: disable=W0613
+def filter_to_update_data(to_update_data, in_backtesting):
     """
     Filter data to update
     :param to_update_data: the data to be updated
-    :param current_config: the config
     :param in_backtesting: if backtesting is enabled
     :return: the updated data
     """
@@ -258,7 +255,7 @@ def update_global_config(
     """
     new_current_config = copy(current_config)
 
-    filter_to_update_data(to_update_data, current_config, in_backtesting)
+    filter_to_update_data(to_update_data, in_backtesting)
 
     # now can make a deep copy
     new_current_config = deepcopy(new_current_config)
