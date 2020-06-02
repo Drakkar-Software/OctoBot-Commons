@@ -14,6 +14,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import hashlib
 import json
 import os
 import shutil
@@ -173,6 +174,15 @@ def _handle_encrypted_value(value_key, config_element, verbose=False):
                     )
                 return False
     return True
+
+
+def get_password_hash(password):
+    """
+    Returns the password's hex digest
+    :param password: the password to hash
+    :return: the hash digest
+    """
+    return hashlib.sha256(password.encode()).hexdigest()
 
 
 def dump_json(json_data) -> str:
