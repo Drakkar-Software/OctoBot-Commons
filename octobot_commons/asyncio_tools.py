@@ -18,7 +18,6 @@ import asyncio
 from octobot_commons.constants import DEFAULT_FUTURE_TIMEOUT
 from octobot_commons.logging.logging_util import get_logger
 
-
 LOGGER = get_logger("asyncio_tools")
 
 
@@ -74,3 +73,14 @@ class ErrorContainer:
         """
         if self.errors:
             raise AssertionError(self.errors)
+
+
+async def wait_asyncio_next_cycle():
+    """
+    Wait for next asyncio next loop cycle
+    """
+
+    async def do_nothing():
+        pass
+
+    await asyncio.create_task(do_nothing())
