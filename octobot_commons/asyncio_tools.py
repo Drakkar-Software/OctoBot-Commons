@@ -56,6 +56,8 @@ class ErrorContainer:
 
     def __init__(self):
         self.errors = []
+        # set to True when investigating post loop closing exceptions (ex: on task __del__)
+        self.print_received_exceptions = True
 
     def exception_handler(self, _, context) -> None:
         """
@@ -65,6 +67,8 @@ class ErrorContainer:
         :return: None
         """
         self.errors.append(context)
+        if self.print_received_exceptions:
+            print(context)
 
     async def check(self) -> None:
         """
