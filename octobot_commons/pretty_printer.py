@@ -60,7 +60,7 @@ def open_order_pretty_printer(exchange_name, dict_order, markdown=False) -> str:
             f"{code}{order_type.name.replace('_', ' ')}{code}: {code}"
             f"{get_min_string_from_number(quantity)} {currency}{code} at {code}"
             f"{get_min_string_from_number(price)} {market}{code} {exchange_name.capitalize()} "
-            f"{convert_timestamp_to_datetime(creation_time, time_format=ORDER_TIME_FORMAT)}"
+            f"{convert_timestamp_to_datetime(creation_time, time_format=ORDER_TIME_FORMAT) if creation_time else ''}"
         )
     except ImportError:
         LOGGER.error(
@@ -84,12 +84,19 @@ def trade_pretty_printer(exchange_name, trade, markdown=False) -> str:
         if trade_type == TraderOrderType.UNKNOWN:
             trade_type = trade.side
 
+        trade_executed_time_str = (
+            convert_timestamp_to_datetime(
+                trade.executed_time, time_format=ORDER_TIME_FORMAT
+            )
+            if trade.executed_time
+            else ""
+        )
         return (
             f"{code}{trade_type.name.replace('_', ' ')}{code}: {code}"
             f"{get_min_string_from_number(trade.executed_quantity)} {trade.currency}{code} at {code}"
             f"{get_min_string_from_number(trade.executed_price)} {trade.market}{code} "
             f"{exchange_name.capitalize()} "
-            f"{convert_timestamp_to_datetime(trade.executed_time, time_format=ORDER_TIME_FORMAT)}"
+            f"{trade_executed_time_str} "
         )
     except ImportError:
         LOGGER.error(
