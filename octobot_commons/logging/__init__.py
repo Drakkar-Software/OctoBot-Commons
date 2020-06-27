@@ -55,9 +55,10 @@ def add_log(level, source, message, keep_log=True, call_notifiers=True):
         )
         if len(logs_database[LOG_DATABASE]) > LOGS_MAX_COUNT:
             logs_database[LOG_DATABASE].pop(0)
-    if level >= ERROR:
-        logs_database[LOG_NEW_ERRORS_COUNT] += 1
-        logs_database[BACKTESTING_NEW_ERRORS_COUNT] += 1
+        # do not count this error if keep_log is False
+        if level >= ERROR:
+            logs_database[LOG_NEW_ERRORS_COUNT] += 1
+            logs_database[BACKTESTING_NEW_ERRORS_COUNT] += 1
     if call_notifiers:
         for callback in error_notifier_callbacks:
             callback()
