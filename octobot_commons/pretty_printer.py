@@ -54,13 +54,11 @@ def open_order_pretty_printer(exchange_name, dict_order, markdown=False) -> str:
             )
         quantity = dict_order.get(ExchangeConstantsOrderColumns.AMOUNT.value, 0.0)
         price = dict_order.get(ExchangeConstantsOrderColumns.PRICE.value, 0.0)
-        creation_time = dict_order.get(ExchangeConstantsOrderColumns.TIMESTAMP.value, 0)
 
         return (
             f"{code}{order_type.name.replace('_', ' ')}{code}: {code}"
             f"{get_min_string_from_number(quantity)} {currency}{code} at {code}"
-            f"{get_min_string_from_number(price)} {market}{code} {exchange_name.capitalize()} "
-            f"{convert_timestamp_to_datetime(creation_time, time_format=ORDER_TIME_FORMAT) if creation_time else ''}"
+            f"{get_min_string_from_number(price)} {market}{code} on {exchange_name.capitalize()}"
         )
     except ImportError:
         LOGGER.error(
