@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.41] - 2020-07-25
+### Removed
+- search_class_name_in_class_list from tentacles manager 
+
 ## [1.3.40] - 2020-06-28
 ### Updated
 - Requirements
