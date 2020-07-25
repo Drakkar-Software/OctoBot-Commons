@@ -132,7 +132,7 @@ def is_abstract_using_inspection_and_class_naming(clazz):
 
 def get_all_classes_from_parent(parent_class) -> list:
     """
-    Get all class from parent
+    Get all sub classes from parent including multi level sub-classes
     :param parent_class: the parent class
     :return: the class from parent
     """
@@ -143,21 +143,6 @@ def get_all_classes_from_parent(parent_class) -> list:
         else:
             classes.append(subclass)
     return classes
-
-
-def search_class_name_in_class_list(class_name, parent_class_list) -> object:
-    """
-    Search for a class name in a class list
-    :param class_name: the class name to search
-    :param parent_class_list: the class list
-    :return: the class if found else None
-    """
-    for subclass in parent_class_list:
-        if isinstance(subclass, list):
-            return search_class_name_in_class_list(class_name, subclass)
-        if subclass.get_name() == class_name:
-            return subclass
-    return None
 
 
 def get_single_deepest_child_class(clazz) -> object:

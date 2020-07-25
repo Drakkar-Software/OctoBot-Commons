@@ -26,5 +26,4 @@ cpdef object get_deep_class_from_parent_subclasses(str class_string, object pare
 cpdef bint is_abstract_using_inspection_and_class_naming(object clazz)
 
 cpdef list get_all_classes_from_parent(object parent_class)
-cpdef object search_class_name_in_class_list(str class_name, list parent_class_list)
 cpdef object get_single_deepest_child_class(object clazz)
