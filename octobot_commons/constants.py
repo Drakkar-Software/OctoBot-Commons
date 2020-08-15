@@ -86,6 +86,7 @@ DEFAULT_CONFIG_VALUES = {
     "your-api-secret-here",
     "your-api-password-here",
     "NOKEY",
+    "NO KEY",
     "Empty",
 }
 
