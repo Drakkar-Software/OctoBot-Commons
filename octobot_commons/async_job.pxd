@@ -1,4 +1,4 @@
-# pylint: disable=W0511
+# cython: language_level=3
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -15,10 +15,22 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.3.44"  # major.minor.revision
+cdef class AsyncJob:
+    cdef object logger      # logging.Logger
+    cdef object callback    # Callable
+    cdef object job_task    # Asyncio.Task
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
+    cdef bint is_running
+    cdef bint is_scheduled
 
-OCTOBOT_KEY = b"uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0="  # TODO temp
+    cdef double last_execution_time
+    cdef double execution_interval_delay
+    cdef double min_execution_delay
+
+    cdef list job_dependencies
+
+    cpdef bint is_job_running(self)
+    cpdef void clear(self)
+    cpdef void stop(self)
+
+    cdef bint _should_run(self)
