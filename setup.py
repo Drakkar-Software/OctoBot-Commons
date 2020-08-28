@@ -41,7 +41,8 @@ from octobot_commons import PROJECT_NAME, VERSION
 
 PACKAGES = find_packages(exclude=["tests"])
 
-packages_list = ["octobot_commons.event_tree",
+packages_list = ["octobot_commons.async_job",
+                 "octobot_commons.event_tree",
                  "octobot_commons.evaluators_util",
                  "octobot_commons.data_util",
                  "octobot_commons.list_util",

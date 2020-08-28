@@ -41,6 +41,7 @@ jobs:
     python: 3.8-dev
     language: python
     script:
+      - export CYTHON_IGNORE=true
       - python3 setup.py install
       - rm -rf $PACKAGE_FOLDER
       - pytest tests

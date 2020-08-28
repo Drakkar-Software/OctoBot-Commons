@@ -13,6 +13,7 @@ steps:
     OCTOBOT_PYPI_URL:
       from_secret: OCTOBOT_PYPI_URL
   commands:
+    - export CYTHON_IGNORE=true
     - pip install --extra-index-url $OCTOBOT_PYPI_URL --prefer-binary -r dev_requirements.txt -r requirements.txt
     - python3 setup.py install
     - pytest --cov=. --cov-config=.coveragerc --durations=0 -rw tests
