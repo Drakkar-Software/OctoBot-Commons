@@ -44,6 +44,7 @@ class AsyncJob:
         self.should_stop = False
         self.is_periodic = is_periodic
         self.enable_multiple_runs = enable_multiple_runs
+        self.simultaneous_calls = 0
 
         self.last_execution_time = 0
         self.execution_interval_delay = execution_interval_delay
@@ -147,9 +148,10 @@ class AsyncJob:
                         )
                     )
 
-                await asyncio.gather(
-                    *events_to_wait,
-                )
+                if events_to_wait:
+                    await asyncio.gather(
+                        *events_to_wait,
+                    )
             except asyncio.TimeoutError:
                 self.logger.warning("Job has been timed out")
             finally:
@@ -174,15 +176,19 @@ class AsyncJob:
         Reset the last_execution_time
         """
         # Clear to be able to await the event
-        self.idle_task_event.clear()
+        if self.simultaneous_calls == 0:
+            self.idle_task_event.clear()
+        self.simultaneous_calls += 1
         try:
             await self.callback(**kwargs)
         except Exception as exception:
             self.logger.error(f"Failed to run job action : {exception}")
         finally:
             self.last_execution_time = time.time()
-            # Set the event to trigger event waiters
-            self.idle_task_event.set()
+            self.simultaneous_calls -= 1
+            if self.simultaneous_calls == 0:
+                # Set the event to trigger event waiters
+                self.idle_task_event.set()
 
     def _should_run_job(self, force=False, ignore_dependencies=False):
         """
@@ -190,7 +196,7 @@ class AsyncJob:
         :param ignore_dependencies: If True, ignore _are_job_dependencies_running() result
         :return: True if the job is not already running and if _should_run is True
         """
-        return self.is_job_idle() and (
+        return (self.is_job_idle() or self.enable_multiple_runs) and (
             (self._are_job_dependencies_idle() or ignore_dependencies)
             and (self._has_enough_time_elapsed() or force)
         )
