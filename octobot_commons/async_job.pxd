@@ -26,6 +26,7 @@ cdef class AsyncJob:
     cdef bint should_stop
     cdef bint is_periodic
     cdef bint enable_multiple_runs
+    cdef int simultaneous_calls
 
     cdef double last_execution_time
     cdef double execution_interval_delay
