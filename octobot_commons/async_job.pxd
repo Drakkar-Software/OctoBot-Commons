@@ -16,12 +16,16 @@
 #  License along with this library.
 
 cdef class AsyncJob:
-    cdef object logger      # logging.Logger
-    cdef object callback    # Callable
-    cdef object job_task    # Asyncio.Task
+    cdef object logger                      # logging.Loggerr
+    cdef object callback                    # Callable
+    cdef object job_task                    # Asyncio.Task
+    cdef object job_periodic_task           # Asyncio.Task
+    cpdef object idle_task_event            # Asyncio.Event
 
-    cdef bint is_running
-    cdef bint is_scheduled
+    cdef bint is_started
+    cdef bint should_stop
+    cdef bint is_periodic
+    cdef bint enable_multiple_runs
 
     cdef double last_execution_time
     cdef double execution_interval_delay
@@ -29,8 +33,11 @@ cdef class AsyncJob:
 
     cdef list job_dependencies
 
-    cpdef bint is_job_running(self)
+    cpdef void add_job_dependency(self, AsyncJob job)
+    cpdef bint is_job_idle(self)
     cpdef void clear(self)
     cpdef void stop(self)
 
-    cdef bint _should_run(self)
+    cdef bint _should_run_job(self, bint force=*, ignore_dependencies=*)
+    cdef bint _has_enough_time_elapsed(self)
+    cdef bint _are_job_dependencies_idle(self)

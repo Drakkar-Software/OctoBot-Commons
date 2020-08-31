@@ -26,93 +26,203 @@ class AsyncJob:
     Async job management
     """
 
-    NO_DELAY = -1
+    NO_DELAY = 0.1
+    DEPENDENCIES_WAIT_TIMEOUT = 300
+    SELF_RUNNING_WAIT_TIMEOUT = 30
 
     def __init__(
         self,
         callback,
         execution_interval_delay=NO_DELAY,
         min_execution_delay=NO_DELAY,
-        job_dependencies=None,
+        is_periodic=True,
+        enable_multiple_runs=False,
     ):
-        self.logger = get_logger(self.__class__.__name__)
-        self.is_running = False
-        self.is_scheduled = False
+        self.logger = get_logger(f"{self.__class__.__name__}-{callback.__name__}")
+        self.callback = callback
+        self.is_started = False
+        self.should_stop = False
+        self.is_periodic = is_periodic
+        self.enable_multiple_runs = enable_multiple_runs
+
         self.last_execution_time = 0
         self.execution_interval_delay = execution_interval_delay
         self.min_execution_delay = min_execution_delay
-        self.callback = callback
-        self.job_dependencies = job_dependencies if job_dependencies else []
-        self.job_task = None
 
-    async def run(self, force=False):
+        self.job_dependencies = []
+        self.idle_task_event = asyncio.Event()
+        self.idle_task_event.set()
+
+        self.job_task = None
+        self.job_periodic_task = None
+
+    async def run(
+        self,
+        force=False,
+        wait_for_task_execution=False,
+        ignore_dependencies_check=False,
+        **kwargs,
+    ):
         """
         Run the job if possible
-        Reschedule the jab in the end
+        Reschedule the job in the end
         :param force: When True, force the execution of the job
+        :param wait_for_task_execution: When True, await idle_task_event
+        :param ignore_dependencies_check: When True, ignore dependencies wait
         """
-        if not self.is_running and (self._should_run() or force):
-            await self._run()
-        if not self.is_scheduled:
-            await self._reschedule()
+        if not self.is_started and self.is_periodic:
+            self.should_stop = False
+            self.job_periodic_task = asyncio.create_task(
+                self._run_periodic_task(**kwargs)
+            )
+        else:
+            if self._should_run_job(force=force, ignore_dependencies=True):
+                if wait_for_task_execution:
+                    await self._run_task_as_soon_as_possible(
+                        force=force,
+                        ignore_dependencies_check=ignore_dependencies_check,
+                        **kwargs,
+                    )
+                else:
+                    self.job_task = asyncio.create_task(
+                        self._run_task_as_soon_as_possible(
+                            force=force,
+                            ignore_dependencies_check=ignore_dependencies_check,
+                            **kwargs,
+                        )
+                    )
 
-    def is_job_running(self):
+    async def _run_periodic_task(self, **kwargs):
+        """
+        Calls _run() periodically until self.should_stop == True or cancellation
+        """
+        while not self.should_stop:
+            self.is_started = True
+            elapsed_time_since_last_execution = time.time() - self.last_execution_time
+
+            # when elapsed time < min_execution_delay, wait for min_execution_delay
+            if elapsed_time_since_last_execution < self.min_execution_delay:
+                await asyncio.sleep(self.min_execution_delay)
+            else:
+                await asyncio.sleep(
+                    0
+                    if elapsed_time_since_last_execution
+                    >= self.execution_interval_delay
+                    else self.execution_interval_delay
+                )
+            await self._run_task_as_soon_as_possible(**kwargs)
+        self.is_started = False
+
+    async def _run_task_as_soon_as_possible(
+        self, force=False, ignore_dependencies_check=False, **kwargs
+    ):
+        """
+        Wait until job _run() can be called
+        :param force: if True, force job task execution
+        """
+        if self._should_run_job(force=force):
+            await self._run(**kwargs)
+        else:
+            # wait for job dependencies to stop running
+            # and also this job to stop running
+            try:
+                events_to_wait = []
+
+                # add dependencies event wait_for coroutines
+                if not ignore_dependencies_check:
+                    events_to_wait += [
+                        asyncio.wait_for(
+                            dependency.idle_task_event.wait(),
+                            self.DEPENDENCIES_WAIT_TIMEOUT,
+                        )
+                        for dependency in self.job_dependencies
+                    ]
+
+                # add self idle event wait_for coroutine
+                if not self.enable_multiple_runs:
+                    events_to_wait.append(
+                        asyncio.wait_for(
+                            self.idle_task_event.wait(),
+                            self.SELF_RUNNING_WAIT_TIMEOUT,
+                        )
+                    )
+
+                await asyncio.gather(
+                    *events_to_wait,
+                )
+            except asyncio.TimeoutError:
+                self.logger.warning("Job has been timed out")
+            finally:
+                await self._run(**kwargs)
+
+    def is_job_idle(self):
         """
         :return: publicly is_running attribute value
         """
-        return self.is_running
+        return self.idle_task_event.is_set()
 
-    async def _run(self):
+    def add_job_dependency(self, job):
+        """
+        Add a new job dependency
+        :param job: the new job dependency
+        """
+        self.job_dependencies.append(job)
+
+    async def _run(self, **kwargs):
         """
         Execute the job callback
         Reset the last_execution_time
         """
-        self.is_running = True
+        # Clear to be able to await the event
+        self.idle_task_event.clear()
         try:
-            await self.callback()
+            await self.callback(**kwargs)
         except Exception as exception:
             self.logger.error(f"Failed to run job action : {exception}")
         finally:
             self.last_execution_time = time.time()
-            self.is_running = False
-            self.is_scheduled = False
+            # Set the event to trigger event waiters
+            self.idle_task_event.set()
 
-    async def _reschedule(self):
+    def _should_run_job(self, force=False, ignore_dependencies=False):
         """
-        Reschedule the job according to execution_interval_delay
-        if execution_interval_delay == AsyncJob.NO_DELAY, tries to execute without delay (in the next async loop)
-        else schedule the execution at now + execution_interval_delay
+        :param force: If True, enabled job execution even if min_execution_delay > last_execution_time
+        :param ignore_dependencies: If True, ignore _are_job_dependencies_running() result
+        :return: True if the job is not already running and if _should_run is True
         """
-        if self.execution_interval_delay != AsyncJob.NO_DELAY:
-            self.job_task = asyncio.create_task(self._postpone_run())
-        else:
-            await self.run()
-        self.is_scheduled = True
+        return self.is_job_idle() and (
+            (self._are_job_dependencies_idle() or ignore_dependencies)
+            and (self._has_enough_time_elapsed() or force)
+        )
 
-    async def _postpone_run(self):
+    def _has_enough_time_elapsed(self):
         """
-        Postpone the run() call at execution_interval_delay
+        :return: True if min_execution_delay < last_execution_time
         """
-        await asyncio.sleep(self.execution_interval_delay)
-        await self.run()
-
-    def _should_run(self):
-        """
-        Return True if the job is not already running, if dependent jobs are also not running
-        and if min_execution_delay < last_execution_time
-        """
-        return not any([job.is_running for job in self.job_dependencies]) and (
+        return (
             time.time() - self.min_execution_delay > self.last_execution_time
             or self.min_execution_delay == AsyncJob.NO_DELAY
             or self.last_execution_time == 0
         )
 
+    def _are_job_dependencies_idle(self):
+        """
+        :return: True if a dependent jobs is idle
+        """
+        return all([job.is_job_idle() for job in self.job_dependencies])
+
     def stop(self):
         """
         Stop the job by cancelling the execution task
         """
+        self.should_stop = True
         if self.job_task is not None:
             self.job_task.cancel()
+            self.job_task = None
+        if self.job_periodic_task is not None:
+            self.job_periodic_task.cancel()
+            self.job_periodic_task = None
+        self.is_started = False
 
     def clear(self):
         """

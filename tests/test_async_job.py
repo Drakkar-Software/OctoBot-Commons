@@ -30,73 +30,118 @@ async def callback():
     pass
 
 
-async def test_should_run():
+async def test_has_enough_time_elapsed():
     job = AsyncJob(callback)
     if not os.getenv('CYTHON_IGNORE'):
-        assert job._should_run()
+        assert job._has_enough_time_elapsed()
         job.last_execution_time = time.time()
-        assert job._should_run()
+        assert job._has_enough_time_elapsed()
     job.stop()
 
 
-async def test_should_run_with_delays():
-    job = AsyncJob(callback, min_execution_delay=1)
+async def test_has_enough_time_elapsed_with_delays():
+    job = AsyncJob(callback, min_execution_delay=0.2)
     if not os.getenv('CYTHON_IGNORE'):
-        assert job._should_run()
+        assert job._has_enough_time_elapsed()
         job.last_execution_time = time.time()
-        assert not job._should_run()
-        await asyncio.sleep(1)
-        assert job._should_run()
+        assert not job._has_enough_time_elapsed()
+        await asyncio.sleep(0.2)
+        assert job._has_enough_time_elapsed()
     job.stop()
 
 
 async def test_should_run_with_dependencies():
     job2 = AsyncJob(callback)
     job3 = AsyncJob(callback)
-    job = AsyncJob(callback, job_dependencies=[job2, job3])
+    job = AsyncJob(callback)
+    job.add_job_dependency(job2)
+    job.add_job_dependency(job3)
     if not os.getenv('CYTHON_IGNORE'):
-        assert job._should_run()
-        job2.is_running = True
-        assert not job._should_run()
-        job2.is_running = True
-        job3.is_running = True
-        assert not job._should_run()
-        job2.is_running = False
-        assert not job._should_run()
-        job3.is_running = False
-        assert job._should_run()
+        assert job._should_run_job()
+        job2.idle_task_event.clear()
+        assert not job._are_job_dependencies_idle()
+        job2.idle_task_event.clear()
+        job3.idle_task_event.clear()
+        assert not job._are_job_dependencies_idle()
+        job2.idle_task_event.set()
+        assert not job._are_job_dependencies_idle()
+        job3.idle_task_event.set()
+        assert job._are_job_dependencies_idle()
     job.stop()
 
 
 async def test_clear():
-    AsyncJob(callback).clear()
+    job = AsyncJob(callback)
+    job.clear()
+    if not os.getenv('CYTHON_IGNORE'):
+        assert not job.job_dependencies
+        assert not job.job_task
+        assert not job.job_periodic_task
 
 
-async def test_run():
-    job = AsyncJob(callback, execution_interval_delay=5, min_execution_delay=2)
+async def test_run_stop_run():
+    job = AsyncJob(callback, execution_interval_delay=0.5, min_execution_delay=0.2)
     if not os.getenv('CYTHON_IGNORE'):
         with patch.object(job, 'callback', new=AsyncMock()) as mocked_test_job_callback:
             await wait_asyncio_next_cycle()
             mocked_test_job_callback.assert_not_called()
-            assert not job.is_scheduled
+            assert not job.is_started
             await job.run()
             await wait_asyncio_next_cycle()
             mocked_test_job_callback.assert_called_once()
-            assert job.is_scheduled
+            assert job.is_started
+            job.stop()
+            await wait_asyncio_next_cycle()
+            assert not job.is_started
+            mocked_test_job_callback.assert_called_once()
+            await job.run()
+            await asyncio.sleep(0.3)
+            assert job.is_started
+            assert mocked_test_job_callback.call_count == 2
+
+            await asyncio.sleep(0.1)
+            assert mocked_test_job_callback.call_count == 3
+
+
+async def test_run():
+    job = AsyncJob(callback, execution_interval_delay=0.5, min_execution_delay=0.2)
+    if not os.getenv('CYTHON_IGNORE'):
+        with patch.object(job, 'callback', new=AsyncMock()) as mocked_test_job_callback:
+            await wait_asyncio_next_cycle()
+            mocked_test_job_callback.assert_not_called()
+            assert not job.is_started
+            await job.run()
+            await wait_asyncio_next_cycle()
+            mocked_test_job_callback.assert_called_once()
+            assert job.is_started
 
             # delay has not been waited
             await job.run()
             await wait_asyncio_next_cycle()
             mocked_test_job_callback.assert_called_once()
-            assert job.is_scheduled
+            assert job.is_started
 
-            await asyncio.sleep(3)
+            await asyncio.sleep(0.1)
             mocked_test_job_callback.assert_called_once()
 
-            await asyncio.sleep(3)
+            await asyncio.sleep(0.3)
             assert mocked_test_job_callback.call_count == 2
 
-            await job.run(force=True)
+            await job.run(force=True, wait_for_task_execution=True)
             assert mocked_test_job_callback.call_count == 3
+
+            await wait_asyncio_next_cycle()
+            # no periodic trigger yet
+            assert mocked_test_job_callback.call_count == 3
+
+            await job.run(force=True, wait_for_task_execution=False)
+            # task not yet executed
+            assert mocked_test_job_callback.call_count == 3
+            await wait_asyncio_next_cycle()
+            assert mocked_test_job_callback.call_count == 4
+
+            await asyncio.sleep(0.1)
+            # periodic auto trigger
+            assert mocked_test_job_callback.call_count == 5
 
     job.stop()
