@@ -95,12 +95,13 @@ async def test_run_stop_run():
             assert not job.is_started
             mocked_test_job_callback.assert_called_once()
             await job.run()
-            await asyncio.sleep(0.3)
+            await asyncio.sleep(0.7)
             assert job.is_started
             assert mocked_test_job_callback.call_count == 2
 
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.5)
             assert mocked_test_job_callback.call_count == 3
+            job.stop()
 
 
 async def test_run():
@@ -124,7 +125,7 @@ async def test_run():
             await asyncio.sleep(0.1)
             mocked_test_job_callback.assert_called_once()
 
-            await asyncio.sleep(0.3)
+            await asyncio.sleep(0.6)
             assert mocked_test_job_callback.call_count == 2
 
             await job.run(force=True, wait_for_task_execution=True)
@@ -140,7 +141,7 @@ async def test_run():
             await wait_asyncio_next_cycle()
             assert mocked_test_job_callback.call_count == 4
 
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.7)
             # periodic auto trigger
             assert mocked_test_job_callback.call_count == 5
 
