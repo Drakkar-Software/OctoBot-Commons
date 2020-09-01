@@ -99,18 +99,12 @@ class AsyncJob:
         """
         while not self.should_stop:
             self.is_started = True
-            elapsed_time_since_last_execution = time.time() - self.last_execution_time
-
-            # when elapsed time < min_execution_delay, wait for min_execution_delay
-            if elapsed_time_since_last_execution < self.min_execution_delay:
-                await asyncio.sleep(self.min_execution_delay)
-            else:
-                await asyncio.sleep(
-                    0
-                    if elapsed_time_since_last_execution
-                    >= self.execution_interval_delay
-                    else self.execution_interval_delay
-                )
+            await asyncio.sleep(
+                0
+                if time.time() - self.last_execution_time
+                >= self.execution_interval_delay
+                else self.execution_interval_delay
+            )
             await self._run_task_as_soon_as_possible(**kwargs)
         self.is_started = False
 
