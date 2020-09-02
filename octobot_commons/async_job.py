@@ -29,6 +29,7 @@ class AsyncJob:
     NO_DELAY = 0.1
     DEPENDENCIES_WAIT_TIMEOUT = 300
     SELF_RUNNING_WAIT_TIMEOUT = 30
+    MAXIMUM_ALLOWED_SUCCESSIVE_FAILURES = 2
 
     def __init__(
         self,
@@ -37,6 +38,7 @@ class AsyncJob:
         min_execution_delay=NO_DELAY,
         is_periodic=True,
         enable_multiple_runs=False,
+        max_successive_failures=MAXIMUM_ALLOWED_SUCCESSIVE_FAILURES,
     ):
         self.logger = get_logger(f"{self.__class__.__name__}-{callback.__name__}")
         self.callback = callback
@@ -45,6 +47,10 @@ class AsyncJob:
         self.is_periodic = is_periodic
         self.enable_multiple_runs = enable_multiple_runs
         self.simultaneous_calls = 0
+        self.successive_failures = 0
+
+        # Set this attribute to 0 to log on any periodic refresh exception.
+        self.max_successive_failures = max_successive_failures
 
         self.last_execution_time = 0
         self.execution_interval_delay = execution_interval_delay
@@ -105,18 +111,24 @@ class AsyncJob:
                 >= self.execution_interval_delay
                 else self.execution_interval_delay
             )
-            await self._run_task_as_soon_as_possible(**kwargs)
+            await self._run_task_as_soon_as_possible(
+                error_on_single_failure=False, **kwargs
+            )
         self.is_started = False
 
     async def _run_task_as_soon_as_possible(
-        self, force=False, ignore_dependencies_check=False, **kwargs
+        self,
+        force=False,
+        ignore_dependencies_check=False,
+        error_on_single_failure=True,
+        **kwargs,
     ):
         """
         Wait until job _run() can be called
         :param force: if True, force job task execution
         """
         if self._should_run_job(force=force):
-            await self._run(**kwargs)
+            await self._run(error_on_single_failure=error_on_single_failure, **kwargs)
         else:
             # wait for job dependencies to stop running
             # and also this job to stop running
@@ -149,7 +161,9 @@ class AsyncJob:
             except asyncio.TimeoutError:
                 self.logger.warning("Job has been timed out")
             finally:
-                await self._run(**kwargs)
+                await self._run(
+                    error_on_single_failure=error_on_single_failure, **kwargs
+                )
 
     def is_job_idle(self):
         """
@@ -164,7 +178,7 @@ class AsyncJob:
         """
         self.job_dependencies.append(job)
 
-    async def _run(self, **kwargs):
+    async def _run(self, error_on_single_failure=True, **kwargs):
         """
         Execute the job callback
         Reset the last_execution_time
@@ -175,14 +189,31 @@ class AsyncJob:
         self.simultaneous_calls += 1
         try:
             await self.callback(**kwargs)
+            self.successive_failures = 0
         except Exception as exception:
-            self.logger.error(f"Failed to run job action : {exception}")
+            self._handle_run_exception(exception, error_on_single_failure)
+
         finally:
             self.last_execution_time = time.time()
             self.simultaneous_calls -= 1
             if self.simultaneous_calls == 0:
                 # Set the event to trigger event waiters
                 self.idle_task_event.set()
+
+    def _handle_run_exception(self, exception, error_on_single_failure):
+        self.successive_failures += 1
+        error_message = f"Failed to run job action, exception: {exception.__class__.__name__}: {exception}"
+        if error_on_single_failure:
+            self.logger.exception(exception, True, error_message)
+        else:
+            if self.successive_failures > self.max_successive_failures:
+                self.logger.exception(
+                    exception,
+                    True,
+                    f"{error_message} ({self.successive_failures} failures in a row)",
+                )
+            else:
+                self.logger.debug(error_message)
 
     def _should_run_job(self, force=False, ignore_dependencies=False):
         """
