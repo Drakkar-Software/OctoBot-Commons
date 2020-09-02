@@ -27,6 +27,8 @@ cdef class AsyncJob:
     cdef bint is_periodic
     cdef bint enable_multiple_runs
     cdef int simultaneous_calls
+    cdef int successive_failures
+    cdef int max_successive_failures
 
     cdef double last_execution_time
     cdef double execution_interval_delay
@@ -39,6 +41,7 @@ cdef class AsyncJob:
     cpdef void clear(self)
     cpdef void stop(self)
 
+    cdef void _handle_run_exception(self, object exception, bint error_on_single_failure)
     cdef bint _should_run_job(self, bint force=*, ignore_dependencies=*)
     cdef bint _has_enough_time_elapsed(self)
     cdef bint _are_job_dependencies_idle(self)
