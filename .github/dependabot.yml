@@ -1,0 +1,17 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: "daily"
+  open-pull-requests-limit: 10
+  allow:
+    - dependency-name: "jsonschema"
+    - dependency-name: "cython"
+    - dependency-name: "numpy"
+  reviewers:
+  - Herklos
+  - GuillaumeDSM
+  assignees:
+  - Herklos
+  - GuillaumeDSM
