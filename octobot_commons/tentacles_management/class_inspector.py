@@ -139,6 +139,10 @@ def get_all_classes_from_parent(parent_class) -> list:
     classes = []
     for subclass in parent_class.__subclasses__():
         if subclass.__subclasses__():
+            # append this subclass
+            classes.append(subclass)
+
+            # and all its subclasses
             classes += get_all_classes_from_parent(subclass)
         else:
             classes.append(subclass)
