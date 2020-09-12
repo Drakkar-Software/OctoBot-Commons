@@ -13,18 +13,21 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import time
-
-from octobot_commons.timestamp_util import is_valid_timestamp, get_now_time, datetime_to_timestamp, \
-    convert_timestamp_to_datetime
+from octobot_commons.tentacles_management.abstract_tentacle import AbstractTentacle
 
 
-def test_is_valid_timestamp():
-    assert not is_valid_timestamp(get_now_time())
-    assert is_valid_timestamp(time.time())
+class TestTentacle(AbstractTentacle):
+    pass
 
 
-def test_datetime_to_timestamp():
-    assert datetime_to_timestamp(convert_timestamp_to_datetime(322548600, time_format="%d/%m/%y %H:%M"),
-                                 date_time_format="%d/%m/%y %H:%M") == 322548600
+class ChildTestTentacle(TestTentacle):
+    pass
 
+
+def test_get_name():
+    assert TestTentacle().get_name() == "TestTentacle"
+    assert ChildTestTentacle().get_name() == "ChildTestTentacle"
+
+
+def test_get_all_subclasses():
+    assert TestTentacle().get_all_subclasses() == [ChildTestTentacle]
