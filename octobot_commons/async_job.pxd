@@ -16,11 +16,11 @@
 #  License along with this library.
 
 cdef class AsyncJob:
-    cdef object logger                      # logging.Loggerr
+    cdef object logger                      # logging.Logger
     cdef object callback                    # Callable
     cdef object job_task                    # Asyncio.Task
     cdef object job_periodic_task           # Asyncio.Task
-    cpdef object idle_task_event            # Asyncio.Event
+    cdef public object idle_task_event      # Asyncio.Event
 
     cdef bint is_started
     cdef bint should_stop
