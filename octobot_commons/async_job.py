@@ -261,5 +261,5 @@ class AsyncJob:
         """
         Clear job object references and stop it
         """
-        self.job_dependencies = None
+        self.job_dependencies = []
         self.stop()
