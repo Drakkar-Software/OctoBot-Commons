@@ -156,7 +156,10 @@ class BotLogger:
         :param level: the log level
         """
         add_log(
-            level, self.logger_name, message, call_notifiers=ERROR_PUBLICATION_ENABLED,
+            level,
+            self.logger_name,
+            message,
+            call_notifiers=ERROR_PUBLICATION_ENABLED,
         )
 
 
