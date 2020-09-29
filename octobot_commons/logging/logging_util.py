@@ -109,7 +109,7 @@ class BotLogger:
         self._publish_log_if_necessary(message, logging.ERROR)
 
     def exception(
-        self, exception, publish_error_if_necessary=False, error_message=None
+        self, exception, publish_error_if_necessary=True, error_message=None
     ) -> None:
         """
         Called for an exception log

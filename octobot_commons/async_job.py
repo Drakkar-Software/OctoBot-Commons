@@ -215,7 +215,7 @@ class AsyncJob:
             else:
                 self.logger.debug(error_message)
                 # always at least print stacktrace in logs
-                self.logger.exception(exception)
+                self.logger.exception(exception, False)
 
     def _should_run_job(self, force=False, ignore_dependencies=False):
         """
