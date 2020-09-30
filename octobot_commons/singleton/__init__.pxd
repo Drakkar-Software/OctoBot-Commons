@@ -13,3 +13,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+
+from octobot_commons.singleton cimport singleton_class
+
+from octobot_commons.singleton.singleton_class cimport (
+    Singleton,
+)
+
+__all__ = [
+    "Singleton",
+]
