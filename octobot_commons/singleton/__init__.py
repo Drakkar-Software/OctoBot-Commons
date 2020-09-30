@@ -13,3 +13,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+
+from octobot_commons.singleton import singleton_class
+
+from octobot_commons.singleton.singleton_class import (
+    Singleton,
+)
+
+__all__ = [
+    "Singleton",
+]
