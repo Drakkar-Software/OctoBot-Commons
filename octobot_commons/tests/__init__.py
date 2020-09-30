@@ -13,3 +13,27 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+
+from octobot_commons.tests import test_config
+
+from octobot_commons.tests.test_config import (
+    get_test_config,
+    init_config_time_frame_for_tests,
+    load_test_config,
+    TEST_CONFIG_FOLDER,
+    TEST_CONFIG_FOLDER,
+    CONFIG_FILE,
+    CONFIG_TIME_FRAME,
+    CONFIG_TIME_FRAME,
+)
+
+__all__ = [
+    "get_test_config",
+    "init_config_time_frame_for_tests",
+    "load_test_config",
+    "TEST_CONFIG_FOLDER",
+    "TEST_CONFIG_FOLDER",
+    "CONFIG_FILE",
+    "CONFIG_TIME_FRAME",
+    "CONFIG_TIME_FRAME",
+]

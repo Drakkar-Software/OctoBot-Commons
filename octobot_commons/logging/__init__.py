@@ -14,14 +14,27 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-from logging import ERROR, getLevelName, WARNING
+import logging
 
-from octobot_commons.timestamp_util import get_now_time
+import octobot_commons.timestamp_util as timestamp_util
+
+from octobot_commons.logging import logging_util
+
+from octobot_commons.logging.logging_util import (
+    BotLogger,
+    set_global_logger_level,
+    get_global_logger_level,
+    get_logger,
+    set_logging_level,
+    get_backtesting_errors_count,
+    reset_backtesting_errors,
+    set_error_publication_enabled,
+)
 
 LOG_DATABASE = "log_db"
 LOG_NEW_ERRORS_COUNT = "log_new_errors_count"
 
-STORED_LOG_MIN_LEVEL = WARNING
+STORED_LOG_MIN_LEVEL = logging.WARNING
 BACKTESTING_NEW_ERRORS_COUNT: str = "log_backtesting_errors_count"
 
 logs_database = {
@@ -47,8 +60,8 @@ def add_log(level, source, message, keep_log=True, call_notifiers=True):
     if keep_log:
         logs_database[LOG_DATABASE].append(
             {
-                "Time": get_now_time(),
-                "Level": getLevelName(level),
+                "Time": timestamp_util.get_now_time(),
+                "Level": logging.getLevelName(level),
                 "Source": str(source),
                 "Message": message,
             }
@@ -56,7 +69,7 @@ def add_log(level, source, message, keep_log=True, call_notifiers=True):
         if len(logs_database[LOG_DATABASE]) > LOGS_MAX_COUNT:
             logs_database[LOG_DATABASE].pop(0)
         # do not count this error if keep_log is False
-        if level >= ERROR:
+        if level >= logging.ERROR:
             logs_database[LOG_NEW_ERRORS_COUNT] += 1
             logs_database[BACKTESTING_NEW_ERRORS_COUNT] += 1
     if call_notifiers:
@@ -87,3 +100,17 @@ def register_error_notifier(callback):
     :param callback: the callback to call when the notifier is triggered
     """
     error_notifier_callbacks.append(callback)
+
+
+__all__ = [
+    "BotLogger",
+    "set_global_logger_level",
+    "get_global_logger_level",
+    "get_logger",
+    "set_logging_level",
+    "get_backtesting_errors_count",
+    "reset_backtesting_errors",
+    "set_error_publication_enabled",
+    "BACKTESTING_NEW_ERRORS_COUNT",
+    "BACKTESTING_NEW_ERRORS_COUNT",
+]
