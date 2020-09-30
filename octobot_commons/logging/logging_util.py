@@ -119,7 +119,10 @@ class BotLogger:
         """
         self.logger.exception(exception)
         if publish_error_if_necessary:
-            self.error(exception if error_message is None else error_message)
+            message = error_message
+            if message is None:
+                message = exception if str(exception) else exception.__class__.__name__
+            self.error(message)
 
     def critical(self, message) -> None:
         """
