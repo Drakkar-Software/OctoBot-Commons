@@ -15,7 +15,7 @@
 #  License along with this library.
 import inspect
 
-from octobot_commons.logging.logging_util import get_logger
+import octobot_commons.logging as logging_util
 
 
 def default_parent_inspection(element, parent):
@@ -159,7 +159,7 @@ def get_single_deepest_child_class(clazz) -> object:
     if len(children_classes) == 0:
         return clazz
     if len(children_classes) > 1:
-        get_logger(__name__).error(
+        logging_util.get_logger(__name__).error(
             f"More than one child class of {clazz}, expecting one, "
             f"using {children_classes[0]}"
         )

@@ -15,10 +15,10 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import logging
-from cryptography.fernet import Fernet, InvalidToken
+import cryptography.fernet as fernet
 
-from octobot_commons import OCTOBOT_KEY
-from octobot_commons.constants import DEFAULT_CONFIG_VALUES
+import octobot_commons
+import octobot_commons.constants as constants
 
 
 def has_invalid_default_config_value(*config_values):
@@ -27,7 +27,7 @@ def has_invalid_default_config_value(*config_values):
     :param config_values: the config values to check
     :return: the check result
     """
-    return any(value in DEFAULT_CONFIG_VALUES for value in config_values)
+    return any(value in constants.DEFAULT_CONFIG_VALUES for value in config_values)
 
 
 def encrypt(data):
@@ -37,7 +37,7 @@ def encrypt(data):
     :return: the encrypted data
     """
     try:
-        return Fernet(OCTOBOT_KEY).encrypt(data.encode())
+        return fernet.Fernet(octobot_commons.OCTOBOT_KEY).encrypt(data.encode())
     except Exception as global_exception:
         logging.getLogger().error(f"Failed to encrypt : {data}")
         raise global_exception
@@ -51,8 +51,10 @@ def decrypt(data, silent_on_invalid_token=False):
     :return: the decrypted data
     """
     try:
-        return Fernet(OCTOBOT_KEY).decrypt(data.encode()).decode()
-    except InvalidToken as invalid_token_error:
+        return (
+            fernet.Fernet(octobot_commons.OCTOBOT_KEY).decrypt(data.encode()).decode()
+        )
+    except fernet.InvalidToken as invalid_token_error:
         if not silent_on_invalid_token:
             logging.getLogger().error(
                 f"Failed to decrypt : {data} ({invalid_token_error})"

@@ -13,10 +13,10 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from enum import Enum
+import enum
 
 
-class TimeFrames(Enum):
+class TimeFrames(enum.Enum):
     """
     OctoBot supported time frames values
     """
@@ -59,7 +59,7 @@ TimeFramesMinutes = {
 }
 
 
-class PriceIndexes(Enum):
+class PriceIndexes(enum.Enum):
     """
     Default candle price index correspondence
     """
@@ -72,7 +72,7 @@ class PriceIndexes(Enum):
     IND_PRICE_VOL = 5
 
 
-class PlatformsName(Enum):
+class PlatformsName(enum.Enum):
     """
     OctoBot supported platforms name
     """
@@ -82,7 +82,7 @@ class PlatformsName(Enum):
     MAC = "mac"
 
 
-class OctoBotTypes(Enum):
+class OctoBotTypes(enum.Enum):
     """
     OctoBot running types
     """
@@ -92,7 +92,7 @@ class OctoBotTypes(Enum):
     DOCKER = "docker"
 
 
-class MarkdownFormat(Enum):
+class MarkdownFormat(enum.Enum):
     """
     Markdown formating
     """
@@ -104,7 +104,7 @@ class MarkdownFormat(Enum):
     NONE = 0
 
 
-class OctoBotChannelSubjects(Enum):
+class OctoBotChannelSubjects(enum.Enum):
     """
     OctoBot Channel subjects
     """
@@ -116,7 +116,7 @@ class OctoBotChannelSubjects(Enum):
     ERROR = "error"
 
 
-class ChannelConsumerPriorityLevels(Enum):
+class ChannelConsumerPriorityLevels(enum.Enum):
     """
     Channel consumer priority levels
     """

@@ -15,10 +15,10 @@
 #  License along with this library.
 import asyncio
 
-from octobot_commons.constants import DEFAULT_FUTURE_TIMEOUT
-from octobot_commons.logging.logging_util import get_logger
+import octobot_commons.constants as constants
+import octobot_commons.logging as logging_util
 
-LOGGER = get_logger("asyncio_tools")
+LOGGER = logging_util.get_logger("asyncio_tools")
 
 
 def run_coroutine_in_asyncio_loop(coroutine, async_loop):
@@ -31,7 +31,7 @@ def run_coroutine_in_asyncio_loop(coroutine, async_loop):
     current_task_before_start = asyncio.current_task(async_loop)
     future = asyncio.run_coroutine_threadsafe(coroutine, async_loop)
     try:
-        return future.result(DEFAULT_FUTURE_TIMEOUT)
+        return future.result(constants.DEFAULT_FUTURE_TIMEOUT)
     except asyncio.TimeoutError as timeout_error:
         LOGGER.error(
             f"{coroutine} coroutine took too long to execute, cancelling the task. "

@@ -17,8 +17,8 @@
 import json
 import requests
 
-from octobot_commons.logging.logging_util import get_logger
-from octobot_commons.constants import EXTERNAL_RESOURCE_URL
+import octobot_commons.logging as logging_util
+import octobot_commons.constants as constants
 
 
 def _handle_exception(exception, resource_key, catch_exception, default_response):
@@ -31,7 +31,7 @@ def _handle_exception(exception, resource_key, catch_exception, default_response
     :return: the default response if an exception has been caught
     """
     if catch_exception:
-        get_logger("ExternalResourcesManager").warning(
+        logging_util.get_logger("ExternalResourcesManager").warning(
             f"Exception when calling get_external_resource for {resource_key} key: {exception}"
         )
         return default_response
@@ -49,7 +49,9 @@ def get_external_resource(
     :return: the external resource key value
     """
     try:
-        external_resources = json.loads(requests.get(EXTERNAL_RESOURCE_URL).text)
+        external_resources = json.loads(
+            requests.get(constants.EXTERNAL_RESOURCE_URL).text
+        )
         return external_resources[resource_key]
     except Exception as global_exception:
         return _handle_exception(
@@ -69,7 +71,7 @@ async def async_get_external_resource(
     :return: the external resource key value
     """
     try:
-        async with aiohttp_session.get(EXTERNAL_RESOURCE_URL) as resp:
+        async with aiohttp_session.get(constants.EXTERNAL_RESOURCE_URL) as resp:
             external_resources = json.loads(resp.text())
             return external_resources[resource_key]
     except Exception as global_exception:

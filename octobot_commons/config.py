@@ -19,7 +19,7 @@ import json
 import logging
 import os
 
-from octobot_commons.constants import USER_FOLDER, CONFIG_FILE
+import octobot_commons.constants as constants
 
 
 def get_user_config():
@@ -27,7 +27,7 @@ def get_user_config():
     Return user config path
     :return: user config path
     """
-    return os.path.join(USER_FOLDER, CONFIG_FILE)
+    return os.path.join(constants.USER_FOLDER, constants.CONFIG_FILE)
 
 
 def load_config(

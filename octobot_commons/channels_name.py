@@ -13,10 +13,10 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from enum import Enum
+import enum
 
 
-class OctoBotChannelsName(Enum):
+class OctoBotChannelsName(enum.Enum):
     """
     OctoBot-Evaluators channel names
     """
@@ -24,7 +24,7 @@ class OctoBotChannelsName(Enum):
     OCTOBOT_CHANNEL = "OctoBot"
 
 
-class OctoBotEvaluatorsChannelsName(Enum):
+class OctoBotEvaluatorsChannelsName(enum.Enum):
     """
     OctoBot-Evaluators channel names
     """
@@ -33,7 +33,7 @@ class OctoBotEvaluatorsChannelsName(Enum):
     EVALUATORS_CHANNEL = "Evaluators"
 
 
-class OctoBotBacktestingChannelsName(Enum):
+class OctoBotBacktestingChannelsName(enum.Enum):
     """
     OctoBot-Backtesting channel names
     """
@@ -41,7 +41,7 @@ class OctoBotBacktestingChannelsName(Enum):
     TIME_CHANNEL = "Time"
 
 
-class OctoBotTradingChannelsName(Enum):
+class OctoBotTradingChannelsName(enum.Enum):
     """
     OctoBot-Trading channel names
     """

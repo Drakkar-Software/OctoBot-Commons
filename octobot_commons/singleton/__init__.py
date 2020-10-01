@@ -16,9 +16,7 @@
 
 from octobot_commons.singleton import singleton_class
 
-from octobot_commons.singleton.singleton_class import (
-    Singleton,
-)
+from octobot_commons.singleton.singleton_class import Singleton
 
 __all__ = [
     "Singleton",

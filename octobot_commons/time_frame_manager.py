@@ -13,18 +13,18 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from octobot_commons.constants import CONFIG_TIME_FRAME
-from octobot_commons.logging.logging_util import get_logger
-from octobot_commons.enums import TimeFramesMinutes, TimeFrames
+import octobot_commons.constants as constants
+import octobot_commons.logging as logging_util
+import octobot_commons.enums as enums
 
 LOGGER_TAG = "TimeFrameManager"
 
 
 def _sort_time_frames(time_frames, reverse=False):
-    return sorted(time_frames, key=TimeFramesMinutes.__getitem__, reverse=reverse)
+    return sorted(time_frames, key=enums.TimeFramesMinutes.__getitem__, reverse=reverse)
 
 
-TimeFramesRank = _sort_time_frames(list(TimeFramesMinutes))
+TimeFramesRank = _sort_time_frames(list(enums.TimeFramesMinutes))
 
 
 def get_config_time_frame(config) -> list:
@@ -34,7 +34,7 @@ def get_config_time_frame(config) -> list:
     :param config: the config
     :return: the time frame config list
     """
-    return config[CONFIG_TIME_FRAME]
+    return config[constants.CONFIG_TIME_FRAME]
 
 
 def sort_time_frames(time_frames, reverse=False) -> list:
@@ -52,7 +52,9 @@ def sort_config_time_frames(config) -> None:
     Sort the time frame config and save it in config
     :param config: the config
     """
-    config[CONFIG_TIME_FRAME] = sort_time_frames(config[CONFIG_TIME_FRAME])
+    config[constants.CONFIG_TIME_FRAME] = sort_time_frames(
+        config[constants.CONFIG_TIME_FRAME]
+    )
 
 
 def get_display_time_frame(config, default_display_time_frame):
@@ -65,7 +67,7 @@ def get_display_time_frame(config, default_display_time_frame):
     if default_display_time_frame in get_config_time_frame(config):
         return default_display_time_frame
     # else: return largest time frame
-    return config[CONFIG_TIME_FRAME][-1]
+    return config[constants.CONFIG_TIME_FRAME][-1]
 
 
 def get_previous_time_frame(config_time_frames, time_frame, origin_time_frame):
@@ -96,7 +98,7 @@ def find_min_time_frame(time_frames, min_time_frame=None):
     :return: the minimal time frame
     """
     time_frame_list = time_frames
-    if time_frames and isinstance(next(iter(time_frames)), TimeFrames):
+    if time_frames and isinstance(next(iter(time_frames)), enums.TimeFrames):
         time_frame_list = [t.value for t in time_frames]
 
     if (
@@ -112,7 +114,7 @@ def find_min_time_frame(time_frames, min_time_frame=None):
         tf_val = time_frame.value
         if index >= min_index and tf_val in time_frame_list:
             try:
-                return TimeFrames(tf_val)
+                return enums.TimeFrames(tf_val)
             except ValueError:
                 pass
     return min_time_frame
@@ -127,11 +129,13 @@ def parse_time_frames(time_frames_string_list):
     result_list = []
     for time_frame_string in time_frames_string_list:
         try:
-            result_list.append(TimeFrames(time_frame_string))
+            result_list.append(enums.TimeFrames(time_frame_string))
         except ValueError:
-            get_logger(LOGGER_TAG).error(
+            logging_util.get_logger(LOGGER_TAG).error(
                 "No time frame available for: '{0}'. Available time "
                 "frames are: {1}. '{0}' time frame requirement "
-                "ignored.".format(time_frame_string, [t.value for t in TimeFrames])
+                "ignored.".format(
+                    time_frame_string, [t.value for t in enums.TimeFrames]
+                )
             )
     return result_list

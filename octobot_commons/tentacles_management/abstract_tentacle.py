@@ -13,8 +13,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from abc import ABCMeta
-from copy import deepcopy
+import abc
+import copy
 
 
 class AbstractTentacle:
@@ -22,7 +22,7 @@ class AbstractTentacle:
     The parent class of any OctoBot tentacle
     """
 
-    __metaclass__ = ABCMeta
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self):
         self.logger = None
@@ -43,6 +43,6 @@ class AbstractTentacle:
         """
         subclasses_list = cls.__subclasses__()
         if cls.__subclasses__():
-            for subclass in deepcopy(subclasses_list):
+            for subclass in copy.deepcopy(subclasses_list):
                 subclasses_list += subclass.get_all_subclasses()
         return subclasses_list
