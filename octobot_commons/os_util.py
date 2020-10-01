@@ -19,8 +19,8 @@ import sys
 import os
 import platform
 
-from octobot_commons.constants import PLATFORM_DATA_SEPARATOR
-from octobot_commons.enums import OctoBotTypes, PlatformsName
+import octobot_commons.constants as constants
+import octobot_commons.enums as enums
 
 
 def get_current_platform():
@@ -36,7 +36,7 @@ def get_current_platform():
     :return: the current platform details
     """
     return (
-        f"{platform.system()}{PLATFORM_DATA_SEPARATOR}{platform.release()}{PLATFORM_DATA_SEPARATOR}"
+        f"{platform.system()}{constants.PLATFORM_DATA_SEPARATOR}{platform.release()}{constants.PLATFORM_DATA_SEPARATOR}"
         f"{platform.machine()}"
     )
 
@@ -51,12 +51,12 @@ def get_octobot_type():
         # sys.argv[0] is always the name of the python script called when using a command "python xyz.py"
         if execution_arg.endswith(".py"):
             if _is_on_docker():
-                return OctoBotTypes.DOCKER.value
-            return OctoBotTypes.PYTHON.value
+                return enums.OctoBotTypes.DOCKER.value
+            return enums.OctoBotTypes.PYTHON.value
         # sys.argv[0] is the name of the binary when using a binary version: ends with nothing or .exe"
-        return OctoBotTypes.BINARY.value
+        return enums.OctoBotTypes.BINARY.value
     except IndexError:
-        return OctoBotTypes.BINARY.value
+        return enums.OctoBotTypes.BINARY.value
 
 
 def get_os():
@@ -64,7 +64,7 @@ def get_os():
     Return the OS name
     :return: the OS name
     """
-    return PlatformsName(os.name)
+    return enums.PlatformsName(os.name)
 
 
 def _is_on_docker():

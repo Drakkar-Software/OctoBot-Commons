@@ -18,27 +18,15 @@ import hashlib
 import json
 import os
 import shutil
-from copy import copy, deepcopy
-from functools import reduce
+import copy
+import functools
 
 import jsonschema
 
-from octobot_commons.config import load_config, get_user_config
-from octobot_commons.config_util import (
-    decrypt,
-    encrypt,
-    has_invalid_default_config_value,
-)
-from octobot_commons.constants import (
-    CONFIG_FILE_SCHEMA,
-    CONFIG_ACCEPTED_TERMS,
-    CONFIG_ENABLED_OPTION,
-    CONFIG_DEBUG_OPTION,
-    CONFIG_METRICS,
-    TEMP_RESTORE_CONFIG_FILE,
-    CONFIG_CRYPTO_CURRENCIES,
-)
-from octobot_commons.logging.logging_util import get_logger
+import octobot_commons.config as commons_config
+import octobot_commons.config_util as config_util
+import octobot_commons.constants as constants
+import octobot_commons.logging as logging_util
 
 DELETE_ELEMENT_VALUE = ""
 
@@ -74,12 +62,14 @@ def save_config(
 
     # when fail restore the old config
     except Exception as global_exception:
-        get_logger().error(f"Save config failed : {global_exception}")
+        logging_util.get_logger().error(f"Save config failed : {global_exception}")
         restore_config(temp_restore_config_file, config_file)
         raise global_exception
 
 
-def validate_config_file(config=None, schema_file=CONFIG_FILE_SCHEMA) -> (bool, object):
+def validate_config_file(
+    config=None, schema_file=constants.CONFIG_FILE_SCHEMA
+) -> (bool, object):
     """
     Validate a config file
     :param config: the config
@@ -145,7 +135,7 @@ def jsonify_config(config) -> str:
 
         return dump_json(config)
     except ImportError:
-        get_logger().error(
+        logging_util.get_logger().error(
             "OctoBot_Commons/config_manager.py/jsonify_config requires "
             "OctoBot-Trading package installed"
         )
@@ -161,14 +151,14 @@ def _handle_encrypted_value(value_key, config_element, verbose=False):
     """
     if value_key in config_element:
         key = config_element[value_key]
-        if not has_invalid_default_config_value(key):
+        if not config_util.has_invalid_default_config_value(key):
             try:
-                decrypt(key, silent_on_invalid_token=True)
+                config_util.decrypt(key, silent_on_invalid_token=True)
                 return True
             except Exception:
-                config_element[value_key] = encrypt(key).decode()
+                config_element[value_key] = config_util.encrypt(key).decode()
                 if verbose:
-                    get_logger().warning(
+                    logging_util.get_logger().warning(
                         f"Non encrypted secret info found in config ({value_key}): replaced "
                         f"value with encrypted equivalent."
                     )
@@ -202,7 +192,7 @@ def check_config(config_file, schema_file) -> None:
     """
     try:
         valid, global_exception = validate_config_file(
-            load_config(config_file=config_file), schema_file=schema_file
+            commons_config.load_config(config_file=config_file), schema_file=schema_file
         )
         if not valid:
             raise global_exception  # pylint: disable=E0702
@@ -217,7 +207,10 @@ def is_in_dev_mode(config) -> None:
     :return: if dev mode is enabled
     """
     # return True if "DEV-MODE": true in config.json
-    return CONFIG_DEBUG_OPTION in config and config[CONFIG_DEBUG_OPTION]
+    return (
+        constants.CONFIG_DEBUG_OPTION in config
+        and config[constants.CONFIG_DEBUG_OPTION]
+    )
 
 
 def filter_to_update_data(to_update_data, in_backtesting):
@@ -230,7 +223,7 @@ def filter_to_update_data(to_update_data, in_backtesting):
     if in_backtesting:
         for key in set(to_update_data.keys()):
             # remove changes to currency config when in backtesting
-            if CONFIG_CRYPTO_CURRENCIES in key:
+            if constants.CONFIG_CRYPTO_CURRENCIES in key:
                 to_update_data.pop(key)
 
 
@@ -253,38 +246,45 @@ def update_global_config(
     :param update_input: if input should be updated
     :param delete: if the data should be removed
     """
-    new_current_config = copy(current_config)
+    new_current_config = copy.copy(current_config)
 
     filter_to_update_data(to_update_data, in_backtesting)
 
     # now can make a deep copy
-    new_current_config = deepcopy(new_current_config)
+    new_current_config = copy.deepcopy(new_current_config)
 
     if delete:
         removed_configs = [
             parse_and_update(data_key, DELETE_ELEMENT_VALUE, config_separator)
             for data_key in to_update_data
         ]
-        reduce(clear_dictionaries_by_keys, [new_current_config] + removed_configs)
+        functools.reduce(
+            clear_dictionaries_by_keys, [new_current_config] + removed_configs
+        )
         if update_input:
-            reduce(clear_dictionaries_by_keys, [current_config] + removed_configs)
+            functools.reduce(
+                clear_dictionaries_by_keys, [current_config] + removed_configs
+            )
     else:
         updated_configs = [
             parse_and_update(data_key, data_value, config_separator)
             for data_key, data_value in to_update_data.items()
         ]
         # merge configs
-        reduce(
+        functools.reduce(
             merge_dictionaries_by_appending_keys, [new_current_config] + updated_configs
         )
         if update_input:
-            reduce(
+            functools.reduce(
                 merge_dictionaries_by_appending_keys, [current_config] + updated_configs
             )
 
     # save config
     save_config(
-        get_user_config(), new_current_config, TEMP_RESTORE_CONFIG_FILE, schema_file
+        commons_config.get_user_config(),
+        new_current_config,
+        constants.TEMP_RESTORE_CONFIG_FILE,
+        schema_file,
     )
 
 
@@ -295,9 +295,12 @@ def simple_save_config_update(updated_config, schema_file=None) -> bool:
     :param schema_file: path to the json schema to validate the updated config
     :return: True if successfully updated
     """
-    to_save_config = copy(updated_config)
+    to_save_config = copy.copy(updated_config)
     save_config(
-        get_user_config(), to_save_config, TEMP_RESTORE_CONFIG_FILE, schema_file
+        commons_config.get_user_config(),
+        to_save_config,
+        constants.TEMP_RESTORE_CONFIG_FILE,
+        schema_file,
     )
     return True
 
@@ -362,7 +365,9 @@ def merge_dictionaries_by_appending_keys(dict_dest, dict_src) -> dict:
             elif isinstance(dest_val, list) and isinstance(src_val, list):
                 dict_dest[key] = src_val
             else:
-                get_logger().error(f"Conflict when merging dict with key : {key}")
+                logging_util.get_logger().error(
+                    f"Conflict when merging dict with key : {key}"
+                )
         else:
             dict_dest[key] = src_val
 
@@ -385,7 +390,7 @@ def clear_dictionaries_by_keys(dict_dest, dict_src):
             elif isinstance(dest_val, dict) and isinstance(src_val, dict):
                 dict_dest[key] = clear_dictionaries_by_keys(dest_val, src_val)
             else:
-                get_logger().error(
+                logging_util.get_logger().error(
                     f"Conflict when deleting dict element with key : {key}"
                 )
 
@@ -399,11 +404,11 @@ def get_metrics_enabled(config) -> bool:
     :return: the check result
     """
     if (
-        CONFIG_METRICS in config
-        and config[CONFIG_METRICS]
-        and CONFIG_ENABLED_OPTION in config[CONFIG_METRICS]
+        constants.CONFIG_METRICS in config
+        and config[constants.CONFIG_METRICS]
+        and constants.CONFIG_ENABLED_OPTION in config[constants.CONFIG_METRICS]
     ):
-        return bool(config[CONFIG_METRICS][CONFIG_ENABLED_OPTION])
+        return bool(config[constants.CONFIG_METRICS][constants.CONFIG_ENABLED_OPTION])
     return True
 
 
@@ -413,8 +418,8 @@ def accepted_terms(config) -> bool:
     :param config: the config
     :return: the check result
     """
-    if CONFIG_ACCEPTED_TERMS in config:
-        return config[CONFIG_ACCEPTED_TERMS]
+    if constants.CONFIG_ACCEPTED_TERMS in config:
+        return config[constants.CONFIG_ACCEPTED_TERMS]
     return False
 
 
@@ -424,5 +429,5 @@ def accept_terms(config, accepted) -> None:
     :param config: the config
     :param accepted: accepted or not
     """
-    config[CONFIG_ACCEPTED_TERMS] = accepted
+    config[constants.CONFIG_ACCEPTED_TERMS] = accepted
     simple_save_config_update(config)

@@ -15,9 +15,9 @@
 #  License along with this library.
 import os
 
-from octobot_commons.config import load_config
-from octobot_commons.constants import CONFIG_TIME_FRAME, CONFIG_FILE
-from octobot_commons.enums import TimeFrames
+import octobot_commons.config as commons_config
+import octobot_commons.constants as constants
+import octobot_commons.enums as enums
 
 TEST_CONFIG_FOLDER = "tests/static"
 
@@ -27,7 +27,7 @@ def get_test_config():
     Return test default config
     :return: test default config
     """
-    return os.path.join(TEST_CONFIG_FOLDER, CONFIG_FILE)
+    return os.path.join(TEST_CONFIG_FOLDER, constants.CONFIG_FILE)
 
 
 def init_config_time_frame_for_tests(config):
@@ -37,16 +37,16 @@ def init_config_time_frame_for_tests(config):
     :return: the test config with time frames
     """
     result = []
-    for time_frame in config[CONFIG_TIME_FRAME]:
-        result.append(TimeFrames(time_frame))
-    config[CONFIG_TIME_FRAME] = result
+    for time_frame in config[constants.CONFIG_TIME_FRAME]:
+        result.append(enums.TimeFrames(time_frame))
+    config[constants.CONFIG_TIME_FRAME] = result
 
 
 def load_test_config():
     """
-    Return the complete default test config
+    Return the complete default test configs
     :return: the complete default test config
     """
-    config = load_config(get_test_config())
+    config = commons_config.load_config(get_test_config())
     init_config_time_frame_for_tests(config)
     return config

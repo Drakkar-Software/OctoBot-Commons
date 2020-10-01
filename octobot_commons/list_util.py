@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-from functools import reduce
+import functools
 
 
 def flatten_list(list_to_flatten):
@@ -22,6 +22,6 @@ def flatten_list(list_to_flatten):
     :param list_to_flatten: the list to flatten
     :return: the flattened list
     """
-    return reduce(
+    return functools.reduce(
         lambda first_level, second_level: first_level + second_level, list_to_flatten
     )

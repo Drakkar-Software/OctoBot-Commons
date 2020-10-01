@@ -15,7 +15,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-from octobot_commons.constants import START_PENDING_EVAL_NOTE
+import octobot_commons.constants as constants
 
 UNSET_EVAL_TYPE = "unset_eval_type_param"
 
@@ -44,6 +44,6 @@ def check_valid_eval_note(
         return False
     return (
         eval_note is not None
-        and eval_note is not START_PENDING_EVAL_NOTE
+        and eval_note is not constants.START_PENDING_EVAL_NOTE
         and (eval_time is None or eval_time + expiry_delay - current_time > 0)
     )

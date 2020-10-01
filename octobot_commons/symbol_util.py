@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-from octobot_commons import MARKET_SEPARATOR
+import octobot_commons
 
 
 def split_symbol(symbol):
@@ -24,7 +24,7 @@ def split_symbol(symbol):
     :return: currency, market
     """
     try:
-        separated_symbol = symbol.split(MARKET_SEPARATOR)
+        separated_symbol = symbol.split(octobot_commons.MARKET_SEPARATOR)
         return separated_symbol[0], separated_symbol[1]
     except IndexError:
         return symbol
@@ -36,10 +36,10 @@ def merge_symbol(symbol):
     :param symbol: the specified symbol
     :return: merged currency and market without /
     """
-    return symbol.replace(MARKET_SEPARATOR, "")
+    return symbol.replace(octobot_commons.MARKET_SEPARATOR, "")
 
 
-def merge_currencies(currency, market, separator=MARKET_SEPARATOR):
+def merge_currencies(currency, market, separator=octobot_commons.MARKET_SEPARATOR):
     """
     Merge currency and market
     :param currency: the currency
@@ -53,7 +53,7 @@ def merge_currencies(currency, market, separator=MARKET_SEPARATOR):
 def convert_symbol(
     symbol,
     symbol_separator,
-    new_symbol_separator=MARKET_SEPARATOR,
+    new_symbol_separator=octobot_commons.MARKET_SEPARATOR,
     should_uppercase=False,
     should_lowercase=False,
 ):

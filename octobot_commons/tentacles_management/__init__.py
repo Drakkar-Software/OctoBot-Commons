@@ -17,9 +17,7 @@
 from octobot_commons.tentacles_management import abstract_tentacle
 from octobot_commons.tentacles_management import class_inspector
 
-from octobot_commons.tentacles_management.abstract_tentacle import (
-    AbstractTentacle,
-)
+from octobot_commons.tentacles_management.abstract_tentacle import AbstractTentacle
 from octobot_commons.tentacles_management.class_inspector import (
     default_parent_inspection,
     default_parents_inspection,

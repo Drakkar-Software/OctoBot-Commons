@@ -15,16 +15,16 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-from octobot_commons import DICT_BULLET_TOKEN_STR
-from octobot_commons.constants import PORTFOLIO_TOTAL, PORTFOLIO_AVAILABLE
-from octobot_commons.enums import MarkdownFormat
-from octobot_commons.logging.logging_util import get_logger
-from octobot_commons.symbol_util import split_symbol
-from octobot_commons.timestamp_util import convert_timestamp_to_datetime
-from octobot_commons.number_util import round_into_str_with_max_digits
+import octobot_commons
+import octobot_commons.constants as constants
+import octobot_commons.enums as enums
+import octobot_commons.logging as logging_util
+import octobot_commons.symbol_util as symbol_util
+import octobot_commons.timestamp_util as timestamp_util
+import octobot_commons.number_util as number_util
 
 ORDER_TIME_FORMAT = "%m-%d %H:%M"
-LOGGER = get_logger("PrettyPrinter")
+LOGGER = logging_util.get_logger("PrettyPrinter")
 
 
 def open_order_pretty_printer(exchange_name, dict_order, markdown=False) -> str:
@@ -44,7 +44,7 @@ def open_order_pretty_printer(exchange_name, dict_order, markdown=False) -> str:
         from octobot_trading.api.orders import parse_order_type
 
         _, _, code = get_markers(markdown)
-        currency, market = split_symbol(
+        currency, market = symbol_util.split_symbol(
             str(dict_order.get(ExchangeConstantsOrderColumns.SYMBOL.value, ""))
         )
         order_type = parse_order_type(dict_order)
@@ -83,7 +83,7 @@ def trade_pretty_printer(exchange_name, trade, markdown=False) -> str:
             trade_type = trade.side
 
         trade_executed_time_str = (
-            convert_timestamp_to_datetime(
+            timestamp_util.convert_timestamp_to_datetime(
                 trade.executed_time, time_format=ORDER_TIME_FORMAT
             )
             if trade.executed_time
@@ -136,12 +136,12 @@ def global_portfolio_pretty_print(
     """
     result = []
     for currency, amounts in global_portfolio.items():
-        if amounts[PORTFOLIO_TOTAL] > 0:
+        if amounts[constants.PORTFOLIO_TOTAL] > 0:
             # fill lines with empty spaces if necessary
-            total = get_min_string_from_number(amounts[PORTFOLIO_TOTAL])
+            total = get_min_string_from_number(amounts[constants.PORTFOLIO_TOTAL])
             if markdown:
                 total = "{:<10}".format(total)
-            available = f"({get_min_string_from_number(amounts[PORTFOLIO_AVAILABLE])})"
+            available = f"({get_min_string_from_number(amounts[constants.PORTFOLIO_AVAILABLE])})"
             if markdown:
                 available = "{:<12}".format(available)
 
@@ -179,10 +179,11 @@ def pretty_print_dict(dict_content, default="0", markdown=False) -> str:
     """
     _, _, code = get_markers(markdown)
     if dict_content:
-        result_str = DICT_BULLET_TOKEN_STR
+        result_str = octobot_commons.DICT_BULLET_TOKEN_STR
         return (
             f"{result_str}{code}"
-            f"{DICT_BULLET_TOKEN_STR.join(f'{value} {key}' for key, value in dict_content.items())}{code}"
+            f"{octobot_commons.DICT_BULLET_TOKEN_STR.join(f'{value} {key}' for key, value in dict_content.items())}"
+            f"{code}"
         )
     return default
 
@@ -209,7 +210,7 @@ def get_min_string_from_number(number, max_digits=8) -> str:
     if number is None or round(number, max_digits) == 0.0:
         return "0"
     if number % 1 != 0:
-        number_str = round_into_str_with_max_digits(number, max_digits)
+        number_str = number_util.round_into_str_with_max_digits(number, max_digits)
         if "." in number_str:
             number_str = number_str.rstrip("0.")
         return number_str
@@ -225,8 +226,8 @@ def get_markers(markdown=False) -> (str, str, str):
     """
     if markdown:
         return (
-            MarkdownFormat.ITALIC.value,
-            MarkdownFormat.BOLD.value,
-            MarkdownFormat.CODE.value,
+            enums.MarkdownFormat.ITALIC.value,
+            enums.MarkdownFormat.BOLD.value,
+            enums.MarkdownFormat.CODE.value,
         )
     return "", "", ""

@@ -18,7 +18,7 @@ import asyncio
 
 import time
 
-from octobot_commons.logging.logging_util import get_logger
+import octobot_commons.logging as logging_util
 
 
 class AsyncJob:
@@ -40,7 +40,9 @@ class AsyncJob:
         enable_multiple_runs=False,
         max_successive_failures=MAXIMUM_ALLOWED_SUCCESSIVE_FAILURES,
     ):
-        self.logger = get_logger(f"{self.__class__.__name__}-{callback.__name__}")
+        self.logger = logging_util.get_logger(
+            f"{self.__class__.__name__}-{callback.__name__}"
+        )
         self.callback = callback
         self.is_started = False
         self.should_stop = False

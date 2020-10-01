@@ -21,10 +21,6 @@ from octobot_commons.tests.test_config import (
     init_config_time_frame_for_tests,
     load_test_config,
     TEST_CONFIG_FOLDER,
-    TEST_CONFIG_FOLDER,
-    CONFIG_FILE,
-    CONFIG_TIME_FRAME,
-    CONFIG_TIME_FRAME,
 )
 
 __all__ = [
@@ -32,8 +28,4 @@ __all__ = [
     "init_config_time_frame_for_tests",
     "load_test_config",
     "TEST_CONFIG_FOLDER",
-    "TEST_CONFIG_FOLDER",
-    "CONFIG_FILE",
-    "CONFIG_TIME_FRAME",
-    "CONFIG_TIME_FRAME",
 ]

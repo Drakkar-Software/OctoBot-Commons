@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-from octobot_commons.enums import TimeFrames
+import octobot_commons.enums as enums
 
 # time
 MSECONDS_TO_SECONDS = 1000
@@ -56,7 +56,7 @@ CONFIG_CRYPTO_ADD = "add"
 PLATFORM_DATA_SEPARATOR = ":"
 
 # Evaluators
-MIN_EVAL_TIME_FRAME = TimeFrames.ONE_MINUTE
+MIN_EVAL_TIME_FRAME = enums.TimeFrames.ONE_MINUTE
 INIT_EVAL_NOTE = 0
 START_PENDING_EVAL_NOTE = "0"
 
