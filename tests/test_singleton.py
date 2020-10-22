@@ -16,18 +16,18 @@
 from octobot_commons.singleton.singleton_class import Singleton
 
 
-class TestSingleton(Singleton):
+class SingletonTest(Singleton):
     def __init__(self):
         self.test_attr = ""
 
 
-instance = TestSingleton().instance()
+instance = SingletonTest().instance()
 
 
 def test_create_instance():
-    assert TestSingleton.instance() is instance
+    assert SingletonTest.instance() is instance
 
 
 def test_instance_attribute():
     instance.test_attr = "test"
-    assert TestSingleton.instance().test_attr == "test"
+    assert SingletonTest.instance().test_attr == "test"
