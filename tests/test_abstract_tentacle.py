@@ -16,18 +16,18 @@
 from octobot_commons.tentacles_management.abstract_tentacle import AbstractTentacle
 
 
-class TestTentacle(AbstractTentacle):
+class TentacleTest(AbstractTentacle):
     pass
 
 
-class ChildTestTentacle(TestTentacle):
+class TentacleTestChild(TentacleTest):
     pass
 
 
 def test_get_name():
-    assert TestTentacle().get_name() == "TestTentacle"
-    assert ChildTestTentacle().get_name() == "ChildTestTentacle"
+    assert TentacleTest().get_name() == "TentacleTest"
+    assert TentacleTestChild().get_name() == "TentacleTestChild"
 
 
 def test_get_all_subclasses():
-    assert TestTentacle().get_all_subclasses() == [ChildTestTentacle]
+    assert TentacleTest().get_all_subclasses() == [TentacleTestChild]

@@ -29,6 +29,7 @@ async def test_without_error_container():
 
 async def test_with_error_container():
     error_container = ErrorContainer()
+    error_container.print_received_exceptions = False
     asyncio.get_event_loop().set_exception_handler(error_container.exception_handler)
     asyncio.get_event_loop().set_exception_handler(error_container.exception_handler)
     # will propagate exception
