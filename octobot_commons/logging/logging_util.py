@@ -204,6 +204,13 @@ class BotLogger:
         self.logger.fatal(message)
         self._publish_log_if_necessary(message, logging.FATAL)
 
+    def disable(self, disabled):
+        """
+        Used to disable or enable this logger
+        :param disabled: True to disable
+        """
+        self.logger.disabled = disabled
+
     def _publish_log_if_necessary(self, message, level) -> None:
         """
         Publish the log message if necessary
