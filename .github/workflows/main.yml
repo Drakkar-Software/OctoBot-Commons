@@ -29,12 +29,21 @@ jobs:
 
   tests:
     needs: lint
-    name: ${{ matrix.os }} - Python 3.8 - ${{ matrix.type }} - tests
+    name: ${{ matrix.os }}${{ matrix.arch }} - Python 3.8 - ${{ matrix.type }} - tests
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
+        arch: [ x64, x86 ]
         type: [sources, cython]
+        exclude:
+          - os: macos-latest # currently not supported
+            arch: x86
+          - os: ubuntu-latest # currently not supported
+            arch: x86
+          - os: windows-latest # don't test 'sources' twice on windows
+            arch: x86
+            type: sources
 
     steps:
     - uses: actions/checkout@v2
@@ -42,7 +51,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.8.x'
-        architecture: 'x64'
+        architecture: ${{ matrix.arch }}
 
     - name: Install dependencies
       run: pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
@@ -65,7 +74,7 @@ jobs:
 
 #  linux-wheels:
 #    needs: tests
-#    name: ubuntu latest - Python 3.8 - deploy
+#    name: ubuntu-latest${{ matrix.arch }} - Python 3.8 - deploy
 #    runs-on: ubuntu-latest
 #    strategy:
 #      matrix:
@@ -100,12 +109,15 @@ jobs:
 
   other-wheels:
     needs: tests
-    name: ${{ matrix.os }} - Python 3.8 - deploy
+    name: ${{ matrix.os }}${{ matrix.arch }} - Python 3.8 - deploy
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ macos-latest, windows-latest ]
         arch: [ x64, x86 ]
+        exclude:
+          - os: macos-latest # currently not supported
+            arch: x86
 
     steps:
     - uses: actions/checkout@v2
@@ -124,9 +136,5 @@ jobs:
 
     - name: Publish package
       #      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_PASSWORD }}
-        verify_metadata: true
-        skip_existing: true
+      run: |
+        python -m twine upload --repository-url https://upload.pypi.org/legacy/ -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} --skip-existing dist/*
