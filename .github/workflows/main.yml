@@ -72,43 +72,53 @@ jobs:
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
-#  linux-wheels:
-#    needs: tests
-#    name: ubuntu-latest${{ matrix.arch }} - Python 3.8 - deploy
-#    runs-on: ubuntu-latest
-#    strategy:
-#      matrix:
-#        arch: [ manylinux2014_x86_64, manylinux2014_i686, manylinux2014_aarch64 ]
-#    steps:
-#    - uses: actions/checkout@v2
-#
-#    - name: Set up Python 3.8
-#      uses: actions/setup-python@v2
-#      with:
-#        python-version: '3.8.x'
-#        architecture: 'x64'
-#
-#    - name: Install dependencies
-#      run: pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
-#
-#    - name: Build wheel
-#      #      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-#      uses: RalfG/python-wheels-manylinux-build@v0.3.1-${{ matrix.arch }}
-#      with:
-#       python-versions: 'cp38-cp38'
-#       system-packages: 'libffi libffi-devel openssl-devel blas-devel lapack-devel libxml2-devel libxslt-devel'
-#       package-path: $PACKAGE_FOLDER
-#    - name: Publish package
-##      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-#      uses: pypa/gh-action-pypi-publish@master
-#      with:
-#        user: __token__
-#        password: ${{ secrets.PYPI_PASSWORD }}
-#        verify_metadata: true
-#        skip_existing: true
+  linux-wheels:
+    needs: tests
+#    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    name: ${{ matrix.os }}${{ matrix.arch }} - Python 3.8 - deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        arch: [ manylinux2014_x86_64, manylinux2014_i686, manylinux2014_aarch64 ]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build wheel with manylinux2014_x86_64
+      if: matrix.arch == 'manylinux2014_x86_64'
+      uses: RalfG/python-wheels-manylinux-build@v0.3.1-manylinux2014_x86_64
+      with:
+       python-versions: 'cp38-cp38'
+       system-packages: 'libffi libffi-devel openssl-devel blas-devel lapack-devel libxml2-devel libxslt-devel'
+       package-path: $PACKAGE_FOLDER
+
+    - name: Build wheel with manylinux2014_i686
+      if: matrix.arch == 'manylinux2014_i686'
+      uses: RalfG/python-wheels-manylinux-build@v0.3.1-manylinux2014_i686
+      with:
+        python-versions: 'cp38-cp38'
+        system-packages: 'libffi libffi-devel openssl-devel blas-devel lapack-devel libxml2-devel libxslt-devel'
+        package-path: $PACKAGE_FOLDER
+
+    - name: Build wheel with manylinux2014_aarch64
+      if: matrix.arch == 'manylinux2014_aarch64'
+      uses: RalfG/python-wheels-manylinux-build@v0.3.1-manylinux2014_aarch64
+      with:
+        python-versions: 'cp38-cp38'
+        system-packages: 'libffi libffi-devel openssl-devel blas-devel lapack-devel libxml2-devel libxslt-devel'
+        package-path: $PACKAGE_FOLDER
+
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: ${{ secrets.PYPI_USERNAME }}
+        password: ${{ secrets.PYPI_PASSWORD }}
+        verify_metadata: true
+        skip_existing: true
 
   other-wheels:
     needs: tests
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: ${{ matrix.os }}${{ matrix.arch }} - Python 3.8 - deploy
     runs-on: ${{ matrix.os }}
     strategy:
@@ -135,6 +145,5 @@ jobs:
       run: python setup.py bdist_wheel
 
     - name: Publish package
-      #      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
       run: |
         python -m twine upload --repository-url https://upload.pypi.org/legacy/ -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} --skip-existing dist/*
