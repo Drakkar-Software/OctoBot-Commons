@@ -1,0 +1,132 @@
+name: Github-Action-CI
+on: push
+
+env:
+  PACKAGE_FOLDER: octobot_commons
+
+jobs:
+  lint:
+    name: ubuntu latest - Python 3.8 - lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8.x'
+        architecture: 'x64'
+
+    - name: Install dependencies
+      run: pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
+
+    - name: Black lint
+      run: black $PACKAGE_FOLDER --diff --check
+
+    - name: Pylint
+      run: |
+        pylint --rcfile=standard.rc $PACKAGE_FOLDER
+        if [ $? -ne 1 ]; then exit 0; fi
+
+  tests:
+    needs: lint
+    name: ${{ matrix.os }} - Python 3.8 - ${{ matrix.type }} - tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        type: [sources, cython]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8.x'
+        architecture: 'x64'
+
+    - name: Install dependencies
+      run: pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
+
+    - name: Compile project
+      if: matrix.type == 'cython'
+      env:
+        CYTHON_IGNORE: true
+      run: |
+        python setup.py install
+
+    - name: Pytests
+      run: pytest --cov=. --cov-config=.coveragerc --durations=0 -rw tests
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+    - name: Publish coverage
+      if: matrix.type == 'sources'
+      run: coveralls
+
+#  linux-wheels:
+#    needs: tests
+#    name: ubuntu latest - Python 3.8 - deploy
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        arch: [ manylinux2014_x86_64, manylinux2014_i686, manylinux2014_aarch64 ]
+#    steps:
+#    - uses: actions/checkout@v2
+#
+#    - name: Set up Python 3.8
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '3.8.x'
+#        architecture: 'x64'
+#
+#    - name: Install dependencies
+#      run: pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
+#
+#    - name: Build wheel
+#      #      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+#      uses: RalfG/python-wheels-manylinux-build@v0.3.1-${{ matrix.arch }}
+#      with:
+#       python-versions: 'cp38-cp38'
+#       system-packages: 'libffi libffi-devel openssl-devel blas-devel lapack-devel libxml2-devel libxslt-devel'
+#       package-path: $PACKAGE_FOLDER
+#    - name: Publish package
+##      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+#      uses: pypa/gh-action-pypi-publish@master
+#      with:
+#        user: __token__
+#        password: ${{ secrets.PYPI_PASSWORD }}
+#        verify_metadata: true
+#        skip_existing: true
+
+  other-wheels:
+    needs: tests
+    name: ${{ matrix.os }} - Python 3.8 - deploy
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest ]
+        arch: [ x64, x86 ]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8.x'
+        architecture: ${{ matrix.arch }}
+
+    - name: Install dependencies
+      run: pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
+
+    - name: Build wheel
+      run: python setup.py bdist_wheel
+
+    - name: Publish package
+      #      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_PASSWORD }}
+        verify_metadata: true
+        skip_existing: true
