@@ -70,14 +70,13 @@ jobs:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
   linux-wheels:
-    needs: tests
+#    needs: tests
 #    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: ${{ matrix.os }}-${{ matrix.arch }} - Python 3.8 - deploy
     runs-on: ubuntu-latest
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        arch: [ manylinux2014_x86_64, manylinux2014_i686 ] # manylinux2014_aarch64
     steps:
     - uses: actions/checkout@v2
 
@@ -88,29 +87,24 @@ jobs:
         architecture: ${{ matrix.arch }}
 
     - name: Install cibuildwheel
-      run: |
-        pip install cibuildwheel
-
-    - name: Install Visual C++ for Python3.8
-      if: runner.os == 'Windows'
-      run: |
-        choco install vcpython38 -f -y
+      run: pip install cibuildwheel twine
 
     - name: Build wheels
       run: |
         python -m cibuildwheel --output-dir wheelhouse
-
-    - uses: actions/upload-artifact@v2
-      with:
-        path: ./wheelhouse/*.whl
+      env:
+        # build for python 3.8
+        CIBW_BUILD: cp38-*
+        CIBW_BUILD_VERBOSITY_LINUX: 0
+        CIBW_BEFORE_BUILD_LINUX: >
+          python -m pip install --upgrade pip
+          pip install --extra-index-url ${{ secrets.OCTOBOT_PYPI_URL }} --prefer-binary auditwheel -r dev_requirements.txt -r requirements.txt
+        CIBW_BEFORE_ALL_LINUX: >
+          yum install -y libffi libffi-devel openssl-devel wget unzip blas-devel lapack-devel libxml2-devel libxslt-devel
 
     - name: Publish package
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: ${{ secrets.PYPI_USERNAME }}
-        password: ${{ secrets.PYPI_PASSWORD }}
-        verify_metadata: true
-        skip_existing: true
+      run: |
+        python -m twine upload --repository-url ${{ secrets.PYPI_OFFICIAL_UPLOAD_URL }} -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} --skip-existing wheelhouse/*
 
   other-wheels:
     needs: tests
@@ -142,4 +136,27 @@ jobs:
 
     - name: Publish package
       run: |
-        python -m twine upload --repository-url https://upload.pypi.org/legacy/ -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} --skip-existing dist/*
+        python -m twine upload --repository-url ${{ secrets.PYPI_OFFICIAL_UPLOAD_URL }} -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} --skip-existing dist/*
+
+  build_sdist:
+    needs: tests
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    name: Source distribution - Python 3.8 - deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.x'
+
+      - name: Install dependencies
+        run: pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
+
+      - name: Build sdist
+        run: python setup.py sdist
+
+      - name: Publish package
+        run: |
+          python -m twine upload --repository-url ${{ secrets.PYPI_OFFICIAL_UPLOAD_URL }} -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} --skip-existing dist/*
