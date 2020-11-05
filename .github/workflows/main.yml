@@ -69,14 +69,20 @@ jobs:
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
-  linux-wheels:
+  build_wheels:
     needs: tests
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: ${{ matrix.os }}-${{ matrix.arch }} - Python 3.8 - deploy
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        arch: [ x64, x86 ]
+        exclude:
+          - os: macos-latest # currently not supported
+            arch: x86
+          - os: ubuntu-latest # currently not supported
+            arch: x86
     steps:
     - uses: actions/checkout@v2
 
@@ -86,10 +92,20 @@ jobs:
         python-version: '3.8.x'
         architecture: ${{ matrix.arch }}
 
+    - name: Install dependencies
+      if: matrix.os != 'ubuntu-latest'
+      run: pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
+
+    - name: Build wheel
+      if: matrix.os != 'ubuntu-latest'
+      run: python setup.py bdist_wheel
+
     - name: Install cibuildwheel
+      if: matrix.os == 'ubuntu-latest'
       run: pip install cibuildwheel twine
 
     - name: Build wheels
+      if: matrix.os == 'ubuntu-latest'
       run: |
         python -m cibuildwheel --output-dir wheelhouse
       env:
@@ -105,38 +121,12 @@ jobs:
           yum install -y libffi libffi-devel openssl-devel wget unzip blas-devel lapack-devel libxml2-devel libxslt-devel
 
     - name: Publish package
+      if: matrix.os == 'ubuntu-latest'
       run: |
         python -m twine upload --repository-url ${{ secrets.PYPI_OFFICIAL_UPLOAD_URL }} -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} --skip-existing wheelhouse/*
 
-  other-wheels:
-    needs: tests
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-    name: ${{ matrix.os }}${{ matrix.arch }} - Python 3.8 - deploy
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ macos-latest, windows-latest ]
-        arch: [ x64, x86 ]
-        exclude:
-          - os: macos-latest # currently not supported
-            arch: x86
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8.x'
-        architecture: ${{ matrix.arch }}
-
-    - name: Install dependencies
-      run: pip install --prefer-binary -r dev_requirements.txt -r requirements.txt
-
-    - name: Build wheel
-      run: python setup.py bdist_wheel
-
     - name: Publish package
+      if: matrix.os != 'ubuntu-latest'
       run: |
         python -m twine upload --repository-url ${{ secrets.PYPI_OFFICIAL_UPLOAD_URL }} -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} --skip-existing dist/*
 
