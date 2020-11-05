@@ -17,3 +17,29 @@ steps:
     - pip install --extra-index-url $OCTOBOT_PYPI_URL --prefer-binary -r dev_requirements.txt -r requirements.txt
     - python3 setup.py install
     - pytest --cov=. --cov-config=.coveragerc --durations=0 -rw tests
+
+---
+kind: pipeline
+name: deploy-python-3.8-arm64
+
+workspace:
+  base: /project
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: pypi_publish
+  pull: always
+  image: drakkarsoftware/pypi-builder:python-3.8-manylinux-aarch64
+  environment:
+    PYPI_USERNAME:
+      from_secret: pypi_username
+    PYPI_PASSWORD:
+      from_secret: pypi_password
+  when:
+    event:
+      - tag
+    repo:
+      - Drakkar-Software/OctoBot-Commons
