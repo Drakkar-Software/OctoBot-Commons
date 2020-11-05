@@ -3,7 +3,7 @@ on: push
 
 jobs:
   lint:
-    name: ubuntu latest - Python 3.8 - lint
+    name: ubuntu-latest - Python 3.8 - lint
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
