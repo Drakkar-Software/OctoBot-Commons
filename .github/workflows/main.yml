@@ -81,29 +81,28 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Build wheel with manylinux2014_x86_64
-      if: matrix.arch == 'manylinux2014_x86_64'
-      uses: RalfG/python-wheels-manylinux-build@v0.3.1-manylinux2014_x86_64
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
       with:
-       python-versions: 'cp38-cp38'
-       system-packages: 'libffi libffi-devel openssl-devel blas-devel lapack-devel libxml2-devel libxslt-devel'
-       package-path: ${{ secrets.PACKAGE_FOLDER }}
+        python-version: '3.8.x'
+        architecture: ${{ matrix.arch }}
 
-    - name: Build wheel with manylinux2014_i686
-      if: matrix.arch == 'manylinux2014_i686'
-      uses: RalfG/python-wheels-manylinux-build@v0.3.1-manylinux2014_i686
-      with:
-        python-versions: 'cp38-cp38'
-        system-packages: 'libffi libffi-devel openssl-devel blas-devel lapack-devel libxml2-devel libxslt-devel'
-        package-path: ${{ secrets.PACKAGE_FOLDER }}
+    - name: Install cibuildwheel
+      run: |
+        pip install cibuildwheel
 
-    - name: Build wheel with manylinux2014_aarch64
-      if: matrix.arch == 'manylinux2014_aarch64'
-      uses: RalfG/python-wheels-manylinux-build@v0.3.1-manylinux2014_aarch64
+    - name: Install Visual C++ for Python3.8
+      if: runner.os == 'Windows'
+      run: |
+        choco install vcpython38 -f -y
+
+    - name: Build wheels
+      run: |
+        python -m cibuildwheel --output-dir wheelhouse
+
+    - uses: actions/upload-artifact@v2
       with:
-        python-versions: 'cp38-cp38'
-        system-packages: 'libffi libffi-devel openssl-devel blas-devel lapack-devel libxml2-devel libxslt-devel'
-        package-path: ${{ secrets.PACKAGE_FOLDER }}
+        path: ./wheelhouse/*.whl
 
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@master
