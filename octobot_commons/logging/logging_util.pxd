@@ -23,7 +23,7 @@ cdef class BotLogger:
     cpdef void info(self, str message)
     cpdef void warning(self, str message)
     cpdef void error(self, str message)
-    cpdef exception(self, object exception, bint publish_error_if_necessary=*, object error_message=*)
+    cpdef exception(self, object exception, bint publish_error_if_necessary=*, object error_message=*, bint include_exception_name=*)
     cpdef void critical(self, str message)
     cpdef void fatal(self, str message)
     cpdef void disable(self, bint disabled)
