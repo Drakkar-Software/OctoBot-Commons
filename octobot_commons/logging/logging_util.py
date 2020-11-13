@@ -173,19 +173,26 @@ class BotLogger:
         self._publish_log_if_necessary(message, logging.ERROR)
 
     def exception(
-        self, exception, publish_error_if_necessary=True, error_message=None
+        self,
+        exception,
+        publish_error_if_necessary=True,
+        error_message=None,
+        include_exception_name=True,
     ) -> None:
         """
         Called for an exception log
         :param exception: the log exception
         :param publish_error_if_necessary: if the error should be published
         :param error_message: the log message
+        :param include_exception_name: when True adds the __class__.__name__ of the exception at the end of the message
         """
         self.logger.exception(exception)
         if publish_error_if_necessary:
             message = error_message
             if message is None:
                 message = exception if str(exception) else exception.__class__.__name__
+            elif include_exception_name:
+                message = f"{message} ({exception.__class__.__name__})"
             self.error(message)
 
     def critical(self, message) -> None:
