@@ -66,6 +66,9 @@ TENTACLE_DEFAULT_CONFIG = "default_config"
 # terms of service
 CONFIG_ACCEPTED_TERMS = "accepted_terms"
 
+# community
+CONFIG_COMMUNITY_TOKEN = "community-token"
+
 # metrics
 CONFIG_METRICS = "metrics"
 CONFIG_METRICS_BOT_ID = "metrics-bot-id"
