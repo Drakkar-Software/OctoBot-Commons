@@ -100,7 +100,7 @@ async def test_run_stop_run():
             assert mocked_test_job_callback.call_count == 2
 
             await asyncio.sleep(0.5)
-            assert mocked_test_job_callback.call_count == 3
+            assert mocked_test_job_callback.call_count in (3, 4)    # can be 3 or 4 depending on the current computer
             job.stop()
 
 
@@ -143,6 +143,6 @@ async def test_run():
 
             await asyncio.sleep(0.7)
             # periodic auto trigger
-            assert mocked_test_job_callback.call_count == 5
+            assert mocked_test_job_callback.call_count in (5, 6)    # can be 5 or 6 depending on the current computer
 
     job.stop()
