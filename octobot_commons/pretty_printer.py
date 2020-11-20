@@ -211,8 +211,10 @@ def get_min_string_from_number(number, max_digits=8) -> str:
         return "0"
     if number % 1 != 0:
         number_str = number_util.round_into_str_with_max_digits(number, max_digits)
+        # remove post comma trailing 0
         if "." in number_str:
-            number_str = number_str.rstrip("0.")
+            # remove "0" first and only the "." to avoid removing 2x"0" in 10.0 and returning 1 for example.
+            number_str = number_str.rstrip("0").rstrip(".")
         return number_str
     return "{:f}".format(number).split(".")[0]
 
