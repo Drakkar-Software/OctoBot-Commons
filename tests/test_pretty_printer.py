@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import os
 import mock
 import octobot_commons.pretty_printer as pretty_printer
 
@@ -41,9 +42,10 @@ def test_round_with_decimal_count():
     assert pretty_printer.round_with_decimal_count(1) == 1
     assert pretty_printer.round_with_decimal_count(-1) == -1
     assert pretty_printer.round_with_decimal_count(1.000000000001, max_digits=1) == 1
-    with mock.patch.object(pretty_printer, "get_min_string_from_number", mock.Mock(return_value="1")) \
-            as get_min_string_from_number_mock:
-        pretty_printer.round_with_decimal_count(None, max_digits=4)
-        get_min_string_from_number_mock.assert_not_called()
-        pretty_printer.round_with_decimal_count(1.011, max_digits=4)
-        get_min_string_from_number_mock.assert_called_once_with(1.011, 4)
+    if not os.getenv('CYTHON_IGNORE'):
+        with mock.patch.object(pretty_printer, "get_min_string_from_number", mock.Mock(return_value="1")) \
+                as get_min_string_from_number_mock:
+            pretty_printer.round_with_decimal_count(None, max_digits=4)
+            get_min_string_from_number_mock.assert_not_called()
+            pretty_printer.round_with_decimal_count(1.011, max_digits=4)
+            get_min_string_from_number_mock.assert_called_once_with(1.011, 4)
