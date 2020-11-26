@@ -1,4 +1,3 @@
-# pylint: disable=W0511
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -15,10 +14,18 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.4.11"  # major.minor.revision
+import concurrent.futures as futures
+import time
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
+import octobot_commons.thread_util as thread_util
 
-OCTOBOT_KEY = b"uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0="  # TODO temp
+
+def test_method():
+    time.sleep(100000000)
+
+
+def test_stop_thread_pool_executor_non_gracefully():
+    executor = futures.ThreadPoolExecutor(max_workers=2)
+    for _ in range(2):
+        executor.submit(test_method)
+    thread_util.stop_thread_pool_executor_non_gracefully(executor)

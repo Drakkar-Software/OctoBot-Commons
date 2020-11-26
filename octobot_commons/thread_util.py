@@ -1,4 +1,3 @@
-# pylint: disable=W0511
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -15,10 +14,16 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.4.11"  # major.minor.revision
+import concurrent.futures as futures
 
-MARKET_SEPARATOR = "/"
-DICT_BULLET_TOKEN_STR = "\n "
 
-OCTOBOT_KEY = b"uVEw_JJe7uiXepaU_DR4T-ThkjZlDn8Pzl8hYPIv7w0="  # TODO temp
+# pylint: disable=W0212
+def stop_thread_pool_executor_non_gracefully(executor: futures.ThreadPoolExecutor):
+    """
+    From https://gist.github.com/clchiou/f2608cbe54403edb0b13
+    Non graceful and non clean but only way to shutdown a ThreadPoolExecutor
+    :param executor: the ThreadPoolExecutor to stop
+    """
+    executor.shutdown(False)
+    executor._threads.clear()
+    futures.thread._threads_queues.clear()
