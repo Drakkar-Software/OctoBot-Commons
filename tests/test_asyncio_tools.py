@@ -31,8 +31,19 @@ async def test_with_error_container():
     error_container = ErrorContainer()
     error_container.print_received_exceptions = False
     asyncio.get_event_loop().set_exception_handler(error_container.exception_handler)
+    # will propagate exception
+    asyncio.get_event_loop().call_soon(_exception_raiser)
+    with pytest.raises(AssertionError):
+        # ensure exception is caught
+        await asyncio.create_task(error_container.check())
+
+
+async def test_with_error_container_2_exceptions():
+    error_container = ErrorContainer()
+    error_container.print_received_exceptions = False
     asyncio.get_event_loop().set_exception_handler(error_container.exception_handler)
     # will propagate exception
+    asyncio.get_event_loop().call_soon(_exception_raiser)
     asyncio.get_event_loop().call_soon(_exception_raiser)
     with pytest.raises(AssertionError):
         # ensure exception is caught

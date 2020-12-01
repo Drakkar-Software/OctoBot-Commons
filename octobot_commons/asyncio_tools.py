@@ -76,7 +76,7 @@ class ErrorContainer:
         :return: None
         """
         if self.errors:
-            raise AssertionError(self.errors)
+            raise AssertionError("\n".join(f"{e}" for e in self.errors))
 
 
 async def wait_asyncio_next_cycle():
