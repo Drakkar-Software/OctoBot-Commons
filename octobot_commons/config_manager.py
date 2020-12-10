@@ -118,19 +118,14 @@ def jsonify_config(config) -> str:
     :return: the jsonified config
     """
     try:
-        from octobot_trading.constants import (
-            CONFIG_EXCHANGES,
-            CONFIG_EXCHANGE_ENCRYPTED_VALUES,
-        )
-
         # check exchange keys encryption
-        for exchange, exchange_config in config[CONFIG_EXCHANGES].items():
+        for exchange, exchange_config in config[constants.CONFIG_EXCHANGES].items():
             try:
-                for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES:
+                for key in constants.CONFIG_EXCHANGE_ENCRYPTED_VALUES:
                     _handle_encrypted_value(key, exchange_config)
             except Exception:
-                config[CONFIG_EXCHANGES][exchange] = {
-                    key: "" for key in CONFIG_EXCHANGE_ENCRYPTED_VALUES
+                config[constants.CONFIG_EXCHANGES][exchange] = {
+                    key: "" for key in constants.CONFIG_EXCHANGE_ENCRYPTED_VALUES
                 }
 
         return dump_json(config)
