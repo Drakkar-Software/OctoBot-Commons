@@ -15,10 +15,11 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import logging
+import hashlib
 import cryptography.fernet as fernet
 
 import octobot_commons
-import octobot_commons.constants as constants
+import octobot_commons.constants as commons_constants
 
 
 def has_invalid_default_config_value(*config_values):
@@ -27,7 +28,9 @@ def has_invalid_default_config_value(*config_values):
     :param config_values: the config values to check
     :return: the check result
     """
-    return any(value in constants.DEFAULT_CONFIG_VALUES for value in config_values)
+    return any(
+        value in commons_constants.DEFAULT_CONFIG_VALUES for value in config_values
+    )
 
 
 def encrypt(data):
@@ -77,3 +80,12 @@ def decrypt_element_if_possible(value_key, config_element, default="") -> str:
     if element and not has_invalid_default_config_value(element):
         return decrypt(element)
     return default
+
+
+def get_password_hash(password):
+    """
+    Returns the password's hex digest
+    :param password: the password to hash
+    :return: the hash digest
+    """
+    return hashlib.sha256(password.encode()).hexdigest()

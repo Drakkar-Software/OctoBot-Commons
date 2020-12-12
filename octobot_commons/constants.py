@@ -52,6 +52,7 @@ CONFIG_NAME = "name"
 CONFIG_DESCRIPTION = "description"
 CONFIG_AVATAR = "avatar"
 PROFILE_CONFIG = "config"
+CONFIG_ID = "id"
 
 # Config currencies
 CONFIG_CRYPTO_CURRENCIES = "crypto-currencies"

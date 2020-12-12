@@ -15,7 +15,7 @@
 #  License along with this library.
 import os
 
-import octobot_commons.config as commons_config
+import octobot_commons.configuration as configuration
 import octobot_commons.constants as constants
 import octobot_commons.enums as enums
 
@@ -42,11 +42,12 @@ def init_config_time_frame_for_tests(config):
     config[constants.CONFIG_TIME_FRAME] = result
 
 
-def load_test_config():
+def load_test_config(dict_only=True):
     """
     Return the complete default test configs
     :return: the complete default test config
     """
-    config = commons_config.load_config(get_test_config())
-    init_config_time_frame_for_tests(config)
-    return config
+    config = configuration.Configuration(get_test_config())
+    config.read()
+    init_config_time_frame_for_tests(config.config)
+    return config.config if dict_only else config
