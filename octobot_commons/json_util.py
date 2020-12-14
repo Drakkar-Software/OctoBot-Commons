@@ -13,33 +13,17 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import json
+import jsonschema
 
 
-class ConfigError(Exception):
+def validate(config, schema_file) -> (bool, object):
     """
-    Config related Exception
+    Validate a config file, raise upon validation error
+    :param config: the config
+    :param schema_file: the config schema
+    :return: None
     """
-
-
-class NoProfileError(Exception):
-    """
-    Profile related Exception: raised when the current profile can't be found and default profile can't be loaded
-    """
-
-
-class ConfigEvaluatorError(Exception):
-    """
-    Evaluator config related Exception
-    """
-
-
-class ConfigTradingError(Exception):
-    """
-    Trading config related Exception
-    """
-
-
-class TentacleNotFound(Exception):
-    """
-    Tentacle not found related Exception
-    """
+    with open(schema_file) as json_schema:
+        loaded_schema = json.load(json_schema)
+    jsonschema.validate(instance=config, schema=loaded_schema)

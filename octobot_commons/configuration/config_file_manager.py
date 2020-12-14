@@ -17,16 +17,16 @@
 import shutil
 import os
 import json
-import jsonschema
 import octobot_commons.logging as logging
 import octobot_commons.constants as commons_constants
 import octobot_commons.configuration.fields_utils as fields_utils
+import octobot_commons.json_util as json_util
 
 
 LOGGER_NAME = "ConfigFileManager"
 
 
-def get_user_config():
+def get_user_config() -> str:
     """
     Return user config path
     :return: user config path
@@ -115,29 +115,9 @@ def check_config(config_file, schema_file) -> None:
     :param schema_file: path to the json schema to validate the updated config
     """
     try:
-        valid, global_exception = validate(
-            load(config_file=config_file), schema_file=schema_file
-        )
-        if not valid:
-            raise global_exception  # pylint: disable=E0702
+        json_util.validate(load(config_file=config_file), schema_file=schema_file)
     except Exception as global_exception:
         raise global_exception
-
-
-def validate(config, schema_file) -> (bool, object):
-    """
-    Validate a config file
-    :param config: the config
-    :param schema_file: the config schema
-    :return: True if valid, the exception if caught
-    """
-    try:
-        with open(schema_file) as json_schema:
-            loaded_schema = json.load(json_schema)
-        jsonschema.validate(instance=config, schema=loaded_schema)
-    except Exception as global_exception:
-        return False, global_exception
-    return True, None
 
 
 def jsonify_config(config) -> str:
