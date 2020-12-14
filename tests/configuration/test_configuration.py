@@ -25,9 +25,13 @@ def get_fake_config_path():
     return os.path.join(test_config.TEST_CONFIG_FOLDER, f"test_{constants.CONFIG_FILE}")
 
 
+def get_profile_path():
+    return test_config.TEST_CONFIG_FOLDER
+
+
 @pytest.fixture()
 def config():
-    return configuration.Configuration(get_fake_config_path())
+    return configuration.Configuration(get_fake_config_path(), get_profile_path())
 
 
 def test_load_config():

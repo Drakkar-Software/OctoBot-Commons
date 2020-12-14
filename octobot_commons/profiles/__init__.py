@@ -15,31 +15,14 @@
 #  License along with this library.
 
 
-class ConfigError(Exception):
-    """
-    Config related Exception
-    """
+from octobot_commons.profiles import profile
 
 
-class NoProfileError(Exception):
-    """
-    Profile related Exception: raised when the current profile can't be found and default profile can't be loaded
-    """
+from octobot_commons.profiles.profile import (
+    Profile,
+)
 
 
-class ConfigEvaluatorError(Exception):
-    """
-    Evaluator config related Exception
-    """
-
-
-class ConfigTradingError(Exception):
-    """
-    Trading config related Exception
-    """
-
-
-class TentacleNotFound(Exception):
-    """
-    Tentacle not found related Exception
-    """
+__all__ = [
+    "Profile",
+]

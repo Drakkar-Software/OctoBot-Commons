@@ -46,13 +46,18 @@ CONFIG_FILE_SCHEMA = f"{CONFIG_FOLDER}/config_{SCHEMA}.json"
 CONFIG_REFRESH_RATE = "refresh_rate_seconds"
 
 # profiles
+PROFILES_FOLDER = "profiles"
+USER_PROFILES_FOLDER = f"{USER_FOLDER}/{PROFILES_FOLDER}"
+PROFILE_CONFIG_FILE = "profile.json"
 CONFIG_PROFILE = "profile"
-DEFAULT_PROFILE = "Default"
+DEFAULT_PROFILE = "default"
+DEFAULT_PROFILE_FILE = f"{CONFIG_PROFILE}.json"
 CONFIG_NAME = "name"
 CONFIG_DESCRIPTION = "description"
 CONFIG_AVATAR = "avatar"
 PROFILE_CONFIG = "config"
 CONFIG_ID = "id"
+PROFILE_FILE_SCHEMA = f"{CONFIG_FOLDER}/profile_{SCHEMA}.json"
 
 # Config currencies
 CONFIG_CRYPTO_CURRENCIES = "crypto-currencies"
@@ -106,6 +111,7 @@ START_PENDING_EVAL_NOTE = "0"
 
 # tentacles
 TENTACLE_DEFAULT_CONFIG = "default_config"
+CONFIG_TENTACLES_FILE = "tentacles_config.json"
 
 # terms of service
 CONFIG_ACCEPTED_TERMS = "accepted_terms"
@@ -128,10 +134,13 @@ COMMUNITY_TOPS_COUNT = 1000
 PLATFORM_DATA_SEPARATOR = ":"
 
 # default values in config files and interfaces
+DEFAULT_API_KEY = "your-api-key-here"
+DEFAULT_API_SECRET = "your-api-secret-here"
+DEFAULT_API_PASSWORD = "your-api-password-here"
 DEFAULT_CONFIG_VALUES = {
-    "your-api-key-here",
-    "your-api-secret-here",
-    "your-api-password-here",
+    DEFAULT_API_KEY,
+    DEFAULT_API_SECRET,
+    DEFAULT_API_PASSWORD,
     "NOKEY",
     "NO KEY",
     "Empty",
