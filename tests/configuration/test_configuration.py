@@ -15,10 +15,17 @@
 #  License along with this library.
 import os
 import shutil
+import json
 import pytest
+import mock
+import octobot_commons.errors as errors
+import octobot_commons.json_util
 import octobot_commons.configuration as configuration
+import octobot_commons.profiles as profiles
 import octobot_commons.constants as constants
 import octobot_commons.tests.test_config as test_config
+
+DEFAULT_CONFIG = os.path.join(test_config.TEST_CONFIG_FOLDER, f"default_{constants.CONFIG_FILE}")
 
 
 def get_fake_config_path():
@@ -34,8 +41,84 @@ def config():
     return configuration.Configuration(get_fake_config_path(), get_profile_path())
 
 
+@pytest.fixture()
+def default_config():
+    return configuration.Configuration(DEFAULT_CONFIG, get_profile_path())
+
+
 def test_load_config():
     assert test_config.load_test_config()
+
+
+def test_validate(config):
+    config._profile = profiles.Profile(config.profiles_path)
+    config._read_config = {}
+    with mock.patch.object(octobot_commons.json_util, "validate", mock.Mock()) as validate_mock:
+        config.validate()
+        assert validate_mock.mock_calls[0].args == (config._read_config, config.config_schema_path)
+        assert validate_mock.mock_calls[1].args == (config._profile.as_dict(), config._profile.schema_path)
+
+
+def test_read(default_config):
+    with mock.patch.object(default_config, "_load_profiles", mock.Mock()) as _load_profiles_mock, \
+            mock.patch.object(default_config, "_get_selected_profile", mock.Mock()) as _select_mock, \
+            mock.patch.object(default_config, "_generate_config_from_user_config_and_profile",
+                              mock.Mock()) as _gen_mock:
+        default_config.read()
+        assert isinstance(default_config._read_config, dict)
+        _load_profiles_mock.assert_called_once()
+        _select_mock.assert_called_once()
+        _gen_mock.assert_called_once()
+
+
+def test_generate_config_from_user_config_and_profile(config):
+    with open(DEFAULT_CONFIG) as config_file:
+        config._read_config = json.load(config_file)
+    config._profile = profiles.Profile(get_profile_path(), config.profile_schema_path)
+    config._profile.read_config()
+    for key in config._profile.FULLY_MANAGED_ELEMENTS:
+        assert key not in config._read_config
+    for key in config._profile.PARTIALLY_MANAGED_ELEMENTS:
+        assert key in config._read_config
+    assert config.config is None
+    config._generate_config_from_user_config_and_profile()
+    for key in config._profile.FULLY_MANAGED_ELEMENTS:
+        assert key in config.config
+    for key in config._profile.PARTIALLY_MANAGED_ELEMENTS:
+        assert key in config.config
+    assert config.config is not config._read_config
+
+
+def test_save(config):
+    save_file = "saved_config.json"
+    config.config_path = save_file
+    if os.path.isfile(save_file):
+        os.remove(save_file)
+    # used as a restore file
+    shutil.copy(DEFAULT_CONFIG, save_file)
+    try:
+        with open(DEFAULT_CONFIG) as config_file:
+            config._read_config = json.load(config_file)
+        # add profile data
+        config._profile = profiles.Profile(get_profile_path(), config.profile_schema_path)
+        config._profile.read_config()
+        with mock.patch.object(config, "_get_config_without_profile_elements",
+                               mock.Mock(return_value=config._read_config)) as _filter_mock, \
+                mock.patch.object(config._profile, "save_config", mock.Mock()) as _save_profile_mock:
+            config.save()
+            assert os.path.isfile(save_file)
+        with open(save_file) as config_file:
+            saved_config = json.load(config_file)
+        assert saved_config == config._read_config
+    finally:
+        if os.path.isfile(save_file):
+            os.remove(save_file)
+
+
+def test_is_loaded(config):
+    assert not config.is_loaded()
+    config.config = ""
+    assert config.is_loaded()
 
 
 def test_is_config_empty_or_missing(config):
@@ -48,3 +131,173 @@ def test_is_config_empty_or_missing(config):
 
     if os.path.isfile(get_fake_config_path()):
         os.remove(get_fake_config_path())
+
+
+def test_get_tentacles_config_path(config):
+    config._profile = profiles.Profile(get_profile_path(), config.profile_schema_path)
+    assert config.get_tentacles_config_path() == os.path.join(test_config.TEST_CONFIG_FOLDER,
+                                                              constants.CONFIG_TENTACLES_FILE)
+
+
+def test_get_metrics_enabled(config):
+    config.config = {}
+    assert config.get_metrics_enabled() is True
+    config.config = {
+        constants.CONFIG_METRICS: {}
+    }
+    assert config.get_metrics_enabled() is True
+    config.config = {
+        constants.CONFIG_METRICS: {
+            constants.CONFIG_ENABLED_OPTION: True
+        }
+    }
+    assert config.get_metrics_enabled() is True
+    config.config = {
+        constants.CONFIG_METRICS: {
+            constants.CONFIG_ENABLED_OPTION: False
+        }
+    }
+    assert config.get_metrics_enabled() is False
+
+
+def test_accepted_terms(config):
+    config.config = {}
+    assert config.accepted_terms() is False
+    config.config = {
+        constants.CONFIG_ACCEPTED_TERMS: False
+    }
+    assert config.accepted_terms() is False
+    config.config = {
+        constants.CONFIG_ACCEPTED_TERMS: True
+    }
+    assert config.accepted_terms() is True
+
+
+def test_update_config_fields(config):
+    config.config = {}
+    separator = "_"
+    with mock.patch.object(config, "save", mock.Mock()) as save_mock:
+        to_update_fields = {'crypto-currencies_01coin_pairs': ['dqd/dd']}
+        config.update_config_fields(to_update_fields, False, separator)
+        assert config.config == {
+            "crypto-currencies": {
+                "01coin": {
+                    "pairs": ["dqd/dd"]
+                }
+            }
+        }
+        save_mock.assert_called_once()
+        save_mock.reset_mock()
+        to_update_fields = {
+            'crypto-currencies_plop_p': ['dqd/dd', '111'],
+            'rfzr_r_r': True
+        }
+        # no crypto-currencies update since in_backtesting = True
+        config.update_config_fields(to_update_fields, True, separator)
+        assert config.config == {
+            "crypto-currencies": {
+                "01coin": {
+                    "pairs": ["dqd/dd"]
+                }
+            },
+            "rfzr": {
+                "r": {
+                    "r": True
+                }
+            }
+        }
+        save_mock.assert_called_once()
+        save_mock.reset_mock()
+        to_update_fields = {
+            'crypto-currencies_plop_p': ['dqd/dd', '111']
+        }
+        # change separator
+        config.update_config_fields(to_update_fields, False, "-")
+        assert config.config == {
+            "crypto-currencies": {
+                "01coin": {
+                    "pairs": ["dqd/dd"]
+                }
+            },
+            "crypto": {
+                "currencies_plop_p": ['dqd/dd', '111']
+            },
+            "rfzr": {
+                "r": {
+                    "r": True
+                }
+            }
+        }
+        save_mock.assert_called_once()
+        save_mock.reset_mock()
+        # delete
+        config.update_config_fields(to_update_fields, False, "-", delete=True)
+        assert config.config == {
+            "crypto-currencies": {
+                "01coin": {
+                    "pairs": ["dqd/dd"]
+                }
+            },
+            "crypto": {},
+            "rfzr": {
+                "r": {
+                    "r": True
+                }
+            }
+        }
+        save_mock.assert_called_once()
+
+
+def test_get_selected_profile(config):
+    config._profile_by_id = {
+        "55": "123",
+        "default": "456",
+    }
+    config._read_config = {}
+    # missing profile key
+    assert config._get_selected_profile() is config._profile_by_id["default"]
+    # normal case
+    config._read_config[constants.CONFIG_PROFILE] = "55"
+    assert config._get_selected_profile() is config._profile_by_id["55"]
+    # missing profile
+    config._read_config[constants.CONFIG_PROFILE] = "66"
+    assert config._get_selected_profile() is config._profile_by_id["default"]
+    # no default
+    config._profile_by_id.pop("default")
+    config._read_config[constants.CONFIG_PROFILE] = "66"
+    with pytest.raises(errors.NoProfileError):
+        assert config._get_selected_profile() is config._profile_by_id["default"]
+    config._read_config.pop(constants.CONFIG_PROFILE)
+    with pytest.raises(errors.NoProfileError):
+        assert config._get_selected_profile() is config._profile_by_id["default"]
+
+
+def test_load_profiles(config):
+    config.profiles_path = test_config.TEST_CONFIG_FOLDER
+    with mock.patch.object(config, "load_profile", mock.Mock()) as load_profile_mock:
+        nb_files = len(os.listdir(config.profiles_path))
+        assert nb_files > 1
+        config._load_profiles()
+        assert load_profile_mock.call_count == nb_files
+
+
+def test_get_config_without_profile_elements(config):
+    config._profile = profiles.Profile(config.profiles_path)
+    config.config = {
+        "plop": 1,
+        "plip": True,
+        profiles.Profile.FULLY_MANAGED_ELEMENTS[0]: "dd",
+        next(iter(profiles.Profile.PARTIALLY_MANAGED_ELEMENTS)): "tt"
+    }
+    assert config._get_config_without_profile_elements() == {
+        "plop": 1,
+        "plip": True,
+        next(iter(profiles.Profile.PARTIALLY_MANAGED_ELEMENTS)): "tt"
+    }
+
+
+def test_load_profile(config):
+    with mock.patch.object(profiles.Profile, "read_config", mock.Mock()) as read_config_mock:
+        config.load_profile(get_profile_path())
+        assert config._profile_by_id[None].path == get_profile_path()
+        read_config_mock.assert_called_once()
