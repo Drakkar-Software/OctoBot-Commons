@@ -105,7 +105,7 @@ class Profile:
         Validate this profile configuration against self.schema_path
         :return:
         """
-        json_util.validate(self.as_dict(), schema_file=self.schema_path)
+        json_util.validate(self.as_dict(), self.schema_path)
 
     def _validate_and_save_config(self):
         self.validate()
@@ -126,6 +126,12 @@ class Profile:
             constants.PROFILE_CONFIG: self.config,
         }
 
+    def config_file(self):
+        """
+        :return: the path to this profile config file
+        """
+        return os.path.join(self.path, constants.PROFILE_CONFIG_FILE)
+
     def merge_partially_managed_element_into_config(self, config: dict, element: str):
         """
         Merge this profile configuration's partially managed element into the given config
@@ -136,12 +142,6 @@ class Profile:
         Profile._merge_partially_managed_element(
             config, self.config, element, Profile.PARTIALLY_MANAGED_ELEMENTS[element]
         )
-
-    def config_file(self):
-        """
-        :return: the path to this profile config file
-        """
-        return os.path.join(self.path, constants.PROFILE_CONFIG_FILE)
 
     @staticmethod
     def _merge_partially_managed_element(
@@ -170,9 +170,10 @@ class Profile:
                         config[element][key] = val
         else:
             # use profile value for element
-            config[element] = Profile._get_element_from_template(
-                template, profile_config[element]
-            )
+            config[element] = {
+                key: Profile._get_element_from_template(template, val)
+                for key, val in profile_config[element].items()
+            }
 
     @staticmethod
     def _get_element_from_template(template: dict, profile_values: dict) -> dict:

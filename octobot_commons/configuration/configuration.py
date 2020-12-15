@@ -178,12 +178,7 @@ class Configuration:
         :param config_separator: the config separator
         :param delete: if the data should be removed
         """
-        new_current_config = copy.copy(self.config)
-
         config_operations.filter_to_update_data(to_update_fields, in_backtesting)
-
-        # now can make a deep copy
-        new_current_config = copy.deepcopy(new_current_config)
 
         if delete:
             removed_configs = [
@@ -192,10 +187,6 @@ class Configuration:
                 )
                 for data_key in to_update_fields
             ]
-            functools.reduce(
-                config_operations.clear_dictionaries_by_keys,
-                [new_current_config] + removed_configs,
-            )
             functools.reduce(
                 config_operations.clear_dictionaries_by_keys,
                 [self.config] + removed_configs,
@@ -208,10 +199,6 @@ class Configuration:
                 for data_key, data_value in to_update_fields.items()
             ]
             # merge configs
-            functools.reduce(
-                config_operations.merge_dictionaries_by_appending_keys,
-                [new_current_config] + updated_configs,
-            )
             functools.reduce(
                 config_operations.merge_dictionaries_by_appending_keys,
                 [self.config] + updated_configs,
