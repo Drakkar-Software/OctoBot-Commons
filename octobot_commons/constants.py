@@ -58,6 +58,8 @@ CONFIG_AVATAR = "avatar"
 PROFILE_CONFIG = "config"
 CONFIG_ID = "id"
 PROFILE_FILE_SCHEMA = f"{CONFIG_FOLDER}/profile_{SCHEMA}.json"
+PROFILE_EXPORT_FORMAT = "zip"
+IMPORTED_PROFILE_PREFIX = "imported"
 
 # Config currencies
 CONFIG_CRYPTO_CURRENCIES = "crypto-currencies"

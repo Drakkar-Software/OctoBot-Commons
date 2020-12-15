@@ -13,3 +13,15 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import pytest
+import octobot_commons.profiles as profiles
+import octobot_commons.tests.test_config as test_config
+
+
+def get_profile_path():
+    return test_config.TEST_CONFIG_FOLDER
+
+
+@pytest.fixture()
+def profile():
+    return profiles.Profile(get_profile_path())
