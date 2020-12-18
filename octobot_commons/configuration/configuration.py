@@ -50,8 +50,8 @@ class Configuration:
         )
 
         self._read_config: dict = None
-        self._profile: profiles.Profile = None
-        self._profile_by_id: dict = {}
+        self.profile: profiles.Profile = None
+        self.profile_by_id: dict = {}
 
     def validate(self) -> None:
         """
@@ -59,7 +59,7 @@ class Configuration:
         :return: None
         """
         json_util.validate(self._read_config, self.config_schema_path)
-        self._profile.validate()
+        self.profile.validate()
 
     def read(self, should_raise=True, fill_missing_fields=False) -> None:
         """
@@ -76,18 +76,28 @@ class Configuration:
             fill_missing_fields=fill_missing_fields,
         )
         self._load_profiles()
-        self._profile = self._get_selected_profile()
-        self.logger.info(f"Using {self._profile.name} profile.")
+        selected_profile_id = self._get_selected_profile()
+        self.config = copy.deepcopy(self._read_config)
+        self.select_profile(selected_profile_id)
+
+    def select_profile(self, profile_id):
+        """
+        Sets self.profile using its profile_id
+        :param profile_id: id of the profile to select
+        :return: None
+        """
+        self.config[commons_constants.CONFIG_PROFILE] = profile_id
+        self.profile = self.profile_by_id[profile_id]
+        self.logger.info(f"Using {self.profile.name} profile.")
         self._generate_config_from_user_config_and_profile()
 
     def _generate_config_from_user_config_and_profile(self):
-        self.config = copy.deepcopy(self._read_config)
-        for profile_managed_element in self._profile.FULLY_MANAGED_ELEMENTS:
+        for profile_managed_element in self.profile.FULLY_MANAGED_ELEMENTS:
             self.config[profile_managed_element] = copy.deepcopy(
-                self._profile.config[profile_managed_element]
+                self.profile.config[profile_managed_element]
             )
-        for partially_managed_element in self._profile.PARTIALLY_MANAGED_ELEMENTS:
-            self._profile.merge_partially_managed_element_into_config(
+        for partially_managed_element in self.profile.PARTIALLY_MANAGED_ELEMENTS:
+            self.profile.merge_partially_managed_element_into_config(
                 self.config, partially_managed_element
             )
 
@@ -109,7 +119,7 @@ class Configuration:
             temp_restore_config_file=temp_restore_config_file,
             schema_file=schema_file,
         )
-        self._profile.save_config(self.config)
+        self.profile.save_config(self.config)
 
     def is_loaded(self):
         """
@@ -131,7 +141,7 @@ class Configuration:
         """
         :return: The tentacles configurations associated to the activated profile
         """
-        return os.path.join(self._profile.path, commons_constants.CONFIG_TENTACLES_FILE)
+        return os.path.join(self.profile.path, commons_constants.CONFIG_TENTACLES_FILE)
 
     def get_metrics_enabled(self) -> bool:
         """
@@ -211,15 +221,14 @@ class Configuration:
         selected_profile_id = self._read_config.get(
             commons_constants.CONFIG_PROFILE, commons_constants.DEFAULT_PROFILE
         )
-        try:
-            return self._profile_by_id[selected_profile_id]
-        except KeyError as err:
-            if (
-                selected_profile_id != commons_constants.DEFAULT_PROFILE
-                and commons_constants.DEFAULT_PROFILE in self._profile_by_id
-            ):
-                return self._profile_by_id[commons_constants.DEFAULT_PROFILE]
-            raise errors.NoProfileError from err
+        if selected_profile_id in self.profile_by_id:
+            return selected_profile_id
+        if (
+            selected_profile_id != commons_constants.DEFAULT_PROFILE
+            and commons_constants.DEFAULT_PROFILE in self.profile_by_id
+        ):
+            return commons_constants.DEFAULT_PROFILE
+        raise errors.NoProfileError
 
     def _load_profiles(self):
         for profile_entry in os.scandir(self.profiles_path):
@@ -228,7 +237,7 @@ class Configuration:
     def _get_config_without_profile_elements(self) -> dict:
         filtered_config = copy.deepcopy(self.config)
         # do not include profile fully managed elements into filtered config
-        for profile_managed_element in self._profile.FULLY_MANAGED_ELEMENTS:
+        for profile_managed_element in self.profile.FULLY_MANAGED_ELEMENTS:
             filtered_config.pop(profile_managed_element, None)
         return filtered_config
 
@@ -242,7 +251,7 @@ class Configuration:
         try:
             if os.path.isfile(profile.config_file()):
                 profile.read_config()
-                self._profile_by_id[profile.profile_id] = profile
+                self.profile_by_id[profile.profile_id] = profile
             else:
                 self.logger.debug(
                     f"Ignored {profile_path} as it does not contain a profile configuration"
