@@ -16,6 +16,7 @@
 import os
 import shutil
 import json
+import copy
 import pytest
 import mock
 import octobot_commons.errors as errors
@@ -51,40 +52,55 @@ def test_load_config():
 
 
 def test_validate(config):
-    config._profile = profiles.Profile(config.profiles_path)
+    config.profile = profiles.Profile(config.profiles_path)
     config._read_config = {}
     with mock.patch.object(octobot_commons.json_util, "validate", mock.Mock()) as validate_mock:
         config.validate()
         assert validate_mock.mock_calls[0].args == (config._read_config, config.config_schema_path)
-        assert validate_mock.mock_calls[1].args == (config._profile.as_dict(), config._profile.schema_path)
+        assert validate_mock.mock_calls[1].args == (config.profile.as_dict(), config.profile.schema_path)
 
 
 def test_read(default_config):
     with mock.patch.object(default_config, "_load_profiles", mock.Mock()) as _load_profiles_mock, \
             mock.patch.object(default_config, "_get_selected_profile", mock.Mock()) as _select_mock, \
-            mock.patch.object(default_config, "_generate_config_from_user_config_and_profile",
-                              mock.Mock()) as _gen_mock:
+            mock.patch.object(default_config, "select_profile",
+                              mock.Mock()) as select_profile_mock:
         default_config.read()
         assert isinstance(default_config._read_config, dict)
+        assert isinstance(default_config.config, dict)
         _load_profiles_mock.assert_called_once()
         _select_mock.assert_called_once()
-        _gen_mock.assert_called_once()
+        select_profile_mock.assert_called_once()
+
+
+def test_select_profile(config):
+    with mock.patch.object(config, "_generate_config_from_user_config_and_profile",
+                              mock.Mock()) as _generate_config_from_user_config_and_profile_mock:
+        config.profile_by_id = {
+            "1": profiles.Profile("plop"),
+            "hoo": profiles.Profile("ah")
+        }
+        config.profile_by_id["1"].name = "ploup"
+        config.config = {}
+        config.select_profile("1")
+        assert config.config[constants.CONFIG_PROFILE] == "1"
+        assert config.profile is config.profile_by_id["1"]
 
 
 def test_generate_config_from_user_config_and_profile(config):
     with open(DEFAULT_CONFIG) as config_file:
         config._read_config = json.load(config_file)
-    config._profile = profiles.Profile(get_profile_path(), config.profile_schema_path)
-    config._profile.read_config()
-    for key in config._profile.FULLY_MANAGED_ELEMENTS:
+    config.profile = profiles.Profile(get_profile_path(), config.profile_schema_path)
+    config.profile.read_config()
+    for key in config.profile.FULLY_MANAGED_ELEMENTS:
         assert key not in config._read_config
-    for key in config._profile.PARTIALLY_MANAGED_ELEMENTS:
+    for key in config.profile.PARTIALLY_MANAGED_ELEMENTS:
         assert key in config._read_config
-    assert config.config is None
+    config.config = copy.deepcopy(config._read_config)
     config._generate_config_from_user_config_and_profile()
-    for key in config._profile.FULLY_MANAGED_ELEMENTS:
+    for key in config.profile.FULLY_MANAGED_ELEMENTS:
         assert key in config.config
-    for key in config._profile.PARTIALLY_MANAGED_ELEMENTS:
+    for key in config.profile.PARTIALLY_MANAGED_ELEMENTS:
         assert key in config.config
     assert config.config is not config._read_config
 
@@ -100,11 +116,11 @@ def test_save(config):
         with open(DEFAULT_CONFIG) as config_file:
             config._read_config = json.load(config_file)
         # add profile data
-        config._profile = profiles.Profile(get_profile_path(), config.profile_schema_path)
-        config._profile.read_config()
+        config.profile = profiles.Profile(get_profile_path(), config.profile_schema_path)
+        config.profile.read_config()
         with mock.patch.object(config, "_get_config_without_profile_elements",
                                mock.Mock(return_value=config._read_config)) as _filter_mock, \
-                mock.patch.object(config._profile, "save_config", mock.Mock()) as _save_profile_mock:
+                mock.patch.object(config.profile, "save_config", mock.Mock()) as _save_profile_mock:
             config.save()
             assert os.path.isfile(save_file)
         with open(save_file) as config_file:
@@ -134,7 +150,7 @@ def test_is_config_empty_or_missing(config):
 
 
 def test_get_tentacles_config_path(config):
-    config._profile = profiles.Profile(get_profile_path(), config.profile_schema_path)
+    config.profile = profiles.Profile(get_profile_path(), config.profile_schema_path)
     assert config.get_tentacles_config_path() == os.path.join(test_config.TEST_CONFIG_FOLDER,
                                                               constants.CONFIG_TENTACLES_FILE)
 
@@ -249,27 +265,27 @@ def test_update_config_fields(config):
 
 
 def test_get_selected_profile(config):
-    config._profile_by_id = {
+    config.profile_by_id = {
         "55": "123",
         "default": "456",
     }
     config._read_config = {}
     # missing profile key
-    assert config._get_selected_profile() is config._profile_by_id["default"]
+    assert config._get_selected_profile() == "default"
     # normal case
     config._read_config[constants.CONFIG_PROFILE] = "55"
-    assert config._get_selected_profile() is config._profile_by_id["55"]
+    assert config._get_selected_profile() == "55"
     # missing profile
     config._read_config[constants.CONFIG_PROFILE] = "66"
-    assert config._get_selected_profile() is config._profile_by_id["default"]
+    assert config._get_selected_profile() == "default"
     # no default
-    config._profile_by_id.pop("default")
+    config.profile_by_id.pop("default")
     config._read_config[constants.CONFIG_PROFILE] = "66"
     with pytest.raises(errors.NoProfileError):
-        assert config._get_selected_profile() is config._profile_by_id["default"]
+        assert config._get_selected_profile() == "default"
     config._read_config.pop(constants.CONFIG_PROFILE)
     with pytest.raises(errors.NoProfileError):
-        assert config._get_selected_profile() is config._profile_by_id["default"]
+        assert config._get_selected_profile() == "default"
 
 
 def test_load_profiles(config):
@@ -282,7 +298,7 @@ def test_load_profiles(config):
 
 
 def test_get_config_without_profile_elements(config):
-    config._profile = profiles.Profile(config.profiles_path)
+    config.profile = profiles.Profile(config.profiles_path)
     config.config = {
         "plop": 1,
         "plip": True,
@@ -299,5 +315,5 @@ def test_get_config_without_profile_elements(config):
 def test_load_profile(config):
     with mock.patch.object(profiles.Profile, "read_config", mock.Mock()) as read_config_mock:
         config.load_profile(get_profile_path())
-        assert config._profile_by_id[None].path == get_profile_path()
+        assert config.profile_by_id[None].path == get_profile_path()
         read_config_mock.assert_called_once()
