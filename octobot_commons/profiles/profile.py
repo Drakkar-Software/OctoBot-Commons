@@ -17,6 +17,8 @@
 import json
 import copy
 import os
+import shutil
+import uuid
 import octobot_commons.constants as constants
 import octobot_commons.json_util as json_util
 
@@ -109,8 +111,31 @@ class Profile:
 
     def _validate_and_save_config(self):
         self.validate()
+        self.save()
+
+    def save(self) -> None:
+        """
+        Saves the current profile configuration file
+        :return: None
+        """
         with open(self.config_file(), "w") as profile_file:
             json.dump(self.as_dict(), profile_file, indent=4, sort_keys=True)
+
+    def duplicate(self, name: str = None, description: str = None):
+        """
+        Duplicates the current profile and associates it with a new profile_id
+        :param name: name of the profile to create, uses the original's one by default
+        :param description: description of the profile to create, uses the original's one by default
+        :return: the created profile
+        """
+        clone = copy.deepcopy(self)
+        clone.name = name or clone.name
+        clone.description = description or clone.description
+        clone.profile_id = str(uuid.uuid4())
+        clone.path = os.path.join(os.path.split(self.path)[0], clone.profile_id)
+        shutil.copytree(self.path, clone.path)
+        clone.save()
+        return clone
 
     def as_dict(self) -> dict:
         """

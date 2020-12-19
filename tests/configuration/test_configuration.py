@@ -61,14 +61,14 @@ def test_validate(config):
 
 
 def test_read(default_config):
-    with mock.patch.object(default_config, "_load_profiles", mock.Mock()) as _load_profiles_mock, \
+    with mock.patch.object(default_config, "load_profiles", mock.Mock()) as load_profiles_mock, \
             mock.patch.object(default_config, "_get_selected_profile", mock.Mock()) as _select_mock, \
             mock.patch.object(default_config, "select_profile",
                               mock.Mock()) as select_profile_mock:
         default_config.read()
         assert isinstance(default_config._read_config, dict)
         assert isinstance(default_config.config, dict)
-        _load_profiles_mock.assert_called_once()
+        load_profiles_mock.assert_called_once()
         _select_mock.assert_called_once()
         select_profile_mock.assert_called_once()
 
@@ -293,7 +293,7 @@ def test_load_profiles(config):
     with mock.patch.object(config, "load_profile", mock.Mock()) as load_profile_mock:
         nb_files = len(os.listdir(config.profiles_path))
         assert nb_files > 1
-        config._load_profiles()
+        config.load_profiles()
         assert load_profile_mock.call_count == nb_files
 
 
@@ -316,4 +316,8 @@ def test_load_profile(config):
     with mock.patch.object(profiles.Profile, "read_config", mock.Mock()) as read_config_mock:
         config.load_profile(get_profile_path())
         assert config.profile_by_id[None].path == get_profile_path()
+        profile = config.profile_by_id[None]
         read_config_mock.assert_called_once()
+        # reload profile, keep loaded ones
+        config.load_profile(get_profile_path())
+        assert config.profile_by_id[None] is profile

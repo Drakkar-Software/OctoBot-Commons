@@ -16,6 +16,7 @@
 import os
 import copy
 import json
+import shutil
 import pytest
 import mock
 import octobot_commons.json_util
@@ -101,20 +102,48 @@ def test_validate(profile):
 
 def test_validate_and_save_config(profile):
     save_file = "profile_config.json"
+    with mock.patch.object(profile, "validate", mock.Mock()) as validate_mock, \
+            mock.patch.object(profile, "config_file", mock.Mock(return_value=save_file)), \
+            mock.patch.object(profile, "save", mock.Mock()) as save_mock:
+        profile._validate_and_save_config()
+        validate_mock.assert_called_once()
+        save_mock.assert_called_once()
+
+
+def test_save(profile):
+    save_file = "profile_config.json"
     if os.path.isfile(save_file):
         os.remove(save_file)
     try:
         profile.read_config()
-        with mock.patch.object(profile, "validate", mock.Mock()) as validate_mock, \
-                mock.patch.object(profile, "config_file", mock.Mock(return_value=save_file)):
-            profile._validate_and_save_config()
+        with mock.patch.object(profile, "config_file", mock.Mock(return_value=save_file)):
+            profile.save()
             with open(save_file) as config_file:
                 saved_profile = json.load(config_file)
             assert saved_profile == profile.as_dict()
-            validate_mock.assert_called_once()
     finally:
         if os.path.isfile(save_file):
             os.remove(save_file)
+
+
+def test_duplicate(profile):
+    with mock.patch.object(shutil, "copytree", mock.Mock()) as copytree_mock, \
+            mock.patch.object(profiles.Profile, "save", mock.Mock()) as save_mock:
+        clone = profile.duplicate()
+        assert clone.name == profile.name
+        assert clone.description == profile.description
+        assert clone.profile_id != profile.description
+        assert clone.path != profile.path
+        assert clone.profile_id in clone.path
+        assert clone.profile_id is not None
+        copytree_mock.assert_called_with(profile.path, clone.path)
+        save_mock.assert_called_once()
+
+        clone = profile.duplicate(name="123", description="456")
+        assert clone.name == "123"
+        assert clone.name != profile.name
+        assert clone.description == "456"
+        assert clone.description != profile.description
 
 
 def test_as_dict(profile):
