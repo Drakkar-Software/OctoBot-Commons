@@ -19,23 +19,29 @@ import shutil
 import octobot_commons.constants as constants
 
 
-def export_profile(profile, export_path: str) -> None:
+def export_profile(profile, export_path: str) -> str:
     """
     Exports the given profile into export_path, appends ".zip" as a file extension
     :param profile: profile to export
     :param export_path: export path ending with filename
     :return: None
     """
+    file_name = f"{export_path}.{constants.PROFILE_EXPORT_FORMAT}"
+    # remove any existing file to prevent any side effect
+    if os.path.isfile(file_name):
+        os.remove(file_name)
     shutil.make_archive(export_path, constants.PROFILE_EXPORT_FORMAT, profile.path)
+    return file_name
 
 
-def import_profile(import_path: str) -> None:
+def import_profile(import_path: str, name: str = None) -> None:
     """
     Imports the given profile export archive into the user's profile directory with the "imported_" prefix
     :param import_path: path to the profile zipped archive
+    :param name: name of the profile folder
     :return: None
     """
-    profile_name = (
+    profile_name = name or (
         f"{constants.IMPORTED_PROFILE_PREFIX}_{os.path.split(import_path)[-1]}"
     )
     profile_name = profile_name.split(f".{constants.PROFILE_EXPORT_FORMAT}")[0]

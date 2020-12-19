@@ -75,7 +75,7 @@ class Configuration:
             should_raise=should_raise,
             fill_missing_fields=fill_missing_fields,
         )
-        self._load_profiles()
+        self.load_profiles()
         selected_profile_id = self._get_selected_profile()
         self.config = copy.deepcopy(self._read_config)
         self.select_profile(selected_profile_id)
@@ -230,7 +230,11 @@ class Configuration:
             return commons_constants.DEFAULT_PROFILE
         raise errors.NoProfileError
 
-    def _load_profiles(self):
+    def load_profiles(self) -> None:
+        """
+        Loads the available profiles
+        :return: None
+        """
         for profile_entry in os.scandir(self.profiles_path):
             self.load_profile(profile_entry.path)
 
@@ -251,7 +255,9 @@ class Configuration:
         try:
             if os.path.isfile(profile.config_file()):
                 profile.read_config()
-                self.profile_by_id[profile.profile_id] = profile
+                # do not override already loaded profiles
+                if profile.profile_id not in self.profile_by_id:
+                    self.profile_by_id[profile.profile_id] = profile
             else:
                 self.logger.debug(
                     f"Ignored {profile_path} as it does not contain a profile configuration"
