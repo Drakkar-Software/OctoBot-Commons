@@ -17,7 +17,7 @@ import json
 import jsonschema
 
 
-def validate(config, schema_file) -> (bool, object):
+def validate(config, schema_file) -> None:
     """
     Validate a config file, raise upon validation error
     :param config: the config

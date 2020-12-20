@@ -121,14 +121,14 @@ class Configuration:
         )
         self.profile.save_config(self.config)
 
-    def is_loaded(self):
+    def is_loaded(self) -> bool:
         """
         Checks if self has been loaded
         :return: True when self has been loaded (read)
         """
         return self.config is not None
 
-    def is_config_file_empty_or_missing(self):
+    def is_config_file_empty_or_missing(self) -> bool:
         """
         Checks if self.config_path existing and not empty
         :return: True when self.config_path is existing and non empty
@@ -137,7 +137,20 @@ class Configuration:
             self.config_path
         ).st_size == 0
 
-    def get_tentacles_config_path(self):
+    def are_profiles_empty_or_missing(self) -> bool:
+        """
+        Checks if self.profiles_path exists and contains the default profile
+        :return: True if the default profile is accessible
+        """
+        return not os.path.isfile(
+            os.path.join(
+                self.profiles_path,
+                commons_constants.DEFAULT_PROFILE,
+                commons_constants.PROFILE_CONFIG_FILE,
+            )
+        )
+
+    def get_tentacles_config_path(self) -> str:
         """
         :return: The tentacles configurations associated to the activated profile
         """
@@ -148,23 +161,18 @@ class Configuration:
         Check if metrics are enabled
         :return: True if metrics are enabled
         """
-        try:
-            return bool(
-                self.config[commons_constants.CONFIG_METRICS].get(
-                    commons_constants.CONFIG_ENABLED_OPTION, True
-                )
+        return bool(
+            self.config.get(commons_constants.CONFIG_METRICS, {}).get(
+                commons_constants.CONFIG_ENABLED_OPTION, True
             )
-        except KeyError:
-            return True
+        )
 
     def accepted_terms(self) -> bool:
         """
         Check if terms has been accepted
         :return: the check result
         """
-        if commons_constants.CONFIG_ACCEPTED_TERMS in self.config:
-            return self.config[commons_constants.CONFIG_ACCEPTED_TERMS]
-        return False
+        return self.config.get(commons_constants.CONFIG_ACCEPTED_TERMS, False)
 
     def accept_terms(self, accepted) -> None:
         """

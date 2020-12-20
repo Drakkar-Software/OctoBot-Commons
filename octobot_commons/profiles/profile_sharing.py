@@ -24,14 +24,14 @@ def export_profile(profile, export_path: str) -> str:
     Exports the given profile into export_path, appends ".zip" as a file extension
     :param profile: profile to export
     :param export_path: export path ending with filename
-    :return: None
+    :return: the exported profile path including file extension
     """
-    file_name = f"{export_path}.{constants.PROFILE_EXPORT_FORMAT}"
+    export_path_with_ext = f"{export_path}.{constants.PROFILE_EXPORT_FORMAT}"
     # remove any existing file to prevent any side effect
-    if os.path.isfile(file_name):
-        os.remove(file_name)
+    if os.path.isfile(export_path_with_ext):
+        os.remove(export_path_with_ext)
     shutil.make_archive(export_path, constants.PROFILE_EXPORT_FORMAT, profile.path)
-    return file_name
+    return export_path_with_ext
 
 
 def import_profile(import_path: str, name: str = None) -> None:

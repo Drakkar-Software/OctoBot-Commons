@@ -82,7 +82,6 @@ def dump(
     :param schema_file: path to the json schema to validate the updated config
     """
     try:
-
         # prepare a restoration config file
         prepare_restore_file(temp_restore_config_file, config_file)
 

@@ -48,15 +48,15 @@ class Profile:
     }
 
     def __init__(self, profile_path: str, schema_path: str = None):
-        self.profile_id = None
-        self.path = profile_path
+        self.profile_id: str = None
+        self.path: str = profile_path
         self.schema_path: str = schema_path or constants.PROFILE_FILE_SCHEMA
-        self.name = None
-        self.description = None
-        self.avatar = None
-        self.avatar_path = None
+        self.name: str = None
+        self.description: str = None
+        self.avatar: str = None
+        self.avatar_path: str = None
 
-        self.config = {}
+        self.config: dict = {}
 
     def read_config(self) -> None:
         """
@@ -65,16 +65,11 @@ class Profile:
         """
         with open(self.config_file()) as profile_file:
             parsed_profile = json.load(profile_file)
-            self.profile_id = parsed_profile[constants.CONFIG_PROFILE][
-                constants.CONFIG_ID
-            ]
-            self.name = parsed_profile[constants.CONFIG_PROFILE][constants.CONFIG_NAME]
-            self.description = parsed_profile[constants.CONFIG_PROFILE][
-                constants.CONFIG_DESCRIPTION
-            ]
-            self.avatar = parsed_profile[constants.CONFIG_PROFILE][
-                constants.CONFIG_AVATAR
-            ]
+            profile_config = parsed_profile.get(constants.CONFIG_PROFILE, {})
+            self.profile_id = profile_config.get(constants.CONFIG_ID, str(uuid.uuid4()))
+            self.name = profile_config.get(constants.CONFIG_NAME, "")
+            self.description = profile_config.get(constants.CONFIG_DESCRIPTION, "")
+            self.avatar = profile_config.get(constants.CONFIG_AVATAR, "")
             self.config = parsed_profile[constants.PROFILE_CONFIG]
 
         if self.avatar:
