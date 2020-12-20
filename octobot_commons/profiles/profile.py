@@ -55,6 +55,7 @@ class Profile:
         self.description: str = None
         self.avatar: str = None
         self.avatar_path: str = None
+        self.read_only: bool = False
 
         self.config: dict = {}
 
@@ -70,6 +71,7 @@ class Profile:
             self.name = profile_config.get(constants.CONFIG_NAME, "")
             self.description = profile_config.get(constants.CONFIG_DESCRIPTION, "")
             self.avatar = profile_config.get(constants.CONFIG_AVATAR, "")
+            self.read_only = profile_config.get(constants.CONFIG_READ_ONLY, False)
             self.config = parsed_profile[constants.PROFILE_CONFIG]
 
         if self.avatar:
@@ -128,6 +130,7 @@ class Profile:
         clone.description = description or clone.description
         clone.profile_id = str(uuid.uuid4())
         clone.path = os.path.join(os.path.split(self.path)[0], clone.profile_id)
+        clone.read_only = False
         shutil.copytree(self.path, clone.path)
         clone.save()
         return clone
@@ -142,6 +145,7 @@ class Profile:
                 constants.CONFIG_NAME: self.name,
                 constants.CONFIG_DESCRIPTION: self.description,
                 constants.CONFIG_AVATAR: self.avatar,
+                constants.CONFIG_READ_ONLY: self.read_only,
             },
             constants.PROFILE_CONFIG: self.config,
         }
