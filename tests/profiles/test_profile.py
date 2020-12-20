@@ -129,6 +129,7 @@ def test_save(profile):
 def test_duplicate(profile):
     with mock.patch.object(shutil, "copytree", mock.Mock()) as copytree_mock, \
             mock.patch.object(profiles.Profile, "save", mock.Mock()) as save_mock:
+        profile.read_only = True
         clone = profile.duplicate()
         assert clone.name == profile.name
         assert clone.description == profile.description
@@ -136,6 +137,8 @@ def test_duplicate(profile):
         assert clone.path != profile.path
         assert clone.profile_id in clone.path
         assert clone.profile_id is not None
+        # duplicates are not read_only
+        assert clone.read_only is False
         copytree_mock.assert_called_with(profile.path, clone.path)
         save_mock.assert_called_once()
 
@@ -153,6 +156,7 @@ def test_as_dict(profile):
             constants.CONFIG_NAME: None,
             constants.CONFIG_DESCRIPTION: None,
             constants.CONFIG_AVATAR: None,
+            constants.CONFIG_READ_ONLY: False,
         },
         constants.PROFILE_CONFIG: {},
     }
@@ -165,6 +169,7 @@ def test_as_dict(profile):
             constants.CONFIG_NAME: "default",
             constants.CONFIG_DESCRIPTION: "OctoBot default profile.",
             constants.CONFIG_AVATAR: "default_profile.png",
+            constants.CONFIG_READ_ONLY: False,
         },
         constants.PROFILE_CONFIG: {
             "a": 1
