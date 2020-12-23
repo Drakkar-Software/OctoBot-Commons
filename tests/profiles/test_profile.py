@@ -43,17 +43,17 @@ def test_read_config(profile):
 
 
 def test_save_config(profile):
-    with mock.patch.object(profile, "_validate_and_save_config", mock.Mock()) as _validate_and_save_config_mock, \
+    with mock.patch.object(profile, "validate_and_save_config", mock.Mock()) as validate_and_save_config_mock, \
             mock.patch.object(profile, "_filter_fill_elements", mock.Mock()) as _filter_fill_elements_mock:
         profile.config = {}
         # nothing to operate on
         global_config = {}
         profile.save_config(global_config)
         assert profile.config == {}
-        _validate_and_save_config_mock.assert_called_once()
+        validate_and_save_config_mock.assert_called_once()
         _filter_fill_elements_mock.assert_not_called()
 
-        _validate_and_save_config_mock.reset_mock()
+        validate_and_save_config_mock.reset_mock()
         _filter_fill_elements_mock.reset_mock()
         profile.config = {}
         # things in config
@@ -67,10 +67,10 @@ def test_save_config(profile):
             profile.FULLY_MANAGED_ELEMENTS[0]: "plop",
             profile.FULLY_MANAGED_ELEMENTS[1]: "plip"
         }
-        _validate_and_save_config_mock.assert_called_once()
+        validate_and_save_config_mock.assert_called_once()
         _filter_fill_elements_mock.assert_not_called()
 
-        _validate_and_save_config_mock.reset_mock()
+        validate_and_save_config_mock.reset_mock()
         _filter_fill_elements_mock.reset_mock()
         profile.config = {}
         # things in config
@@ -85,7 +85,7 @@ def test_save_config(profile):
             profile.FULLY_MANAGED_ELEMENTS[0]: "plop",
             profile.FULLY_MANAGED_ELEMENTS[1]: "plip",
         }
-        _validate_and_save_config_mock.assert_called_once()
+        validate_and_save_config_mock.assert_called_once()
         _filter_fill_elements_mock.assert_called_once_with(global_config,
                                                            profile.config,
                                                            next(iter(profile.PARTIALLY_MANAGED_ELEMENTS)),
@@ -105,7 +105,7 @@ def test_validate_and_save_config(profile):
     with mock.patch.object(profile, "validate", mock.Mock()) as validate_mock, \
             mock.patch.object(profile, "config_file", mock.Mock(return_value=save_file)), \
             mock.patch.object(profile, "save", mock.Mock()) as save_mock:
-        profile._validate_and_save_config()
+        profile.validate_and_save_config()
         validate_mock.assert_called_once()
         save_mock.assert_called_once()
 

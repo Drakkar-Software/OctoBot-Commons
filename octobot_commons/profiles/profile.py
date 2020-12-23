@@ -97,7 +97,7 @@ class Profile:
                     self._filter_fill_elements(
                         global_config, self.config, element, allowed_keys
                     )
-        self._validate_and_save_config()
+        self.validate_and_save_config()
 
     def validate(self):
         """
@@ -106,7 +106,11 @@ class Profile:
         """
         json_util.validate(self.as_dict(), self.schema_path)
 
-    def _validate_and_save_config(self):
+    def validate_and_save_config(self) -> None:
+        """
+        JSON validates this profile and then saves its configuration file
+        :return: None
+        """
         self.validate()
         self.save()
 
@@ -134,6 +138,12 @@ class Profile:
         shutil.copytree(self.path, clone.path)
         clone.save()
         return clone
+
+    def get_tentacles_config_path(self) -> str:
+        """
+        :return: The tentacles configurations path
+        """
+        return os.path.join(self.path, constants.CONFIG_TENTACLES_FILE)
 
     def as_dict(self) -> dict:
         """

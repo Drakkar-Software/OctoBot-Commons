@@ -17,6 +17,7 @@
 import os
 import functools
 import copy
+import shutil
 import octobot_commons.logging as logging
 import octobot_commons.errors as errors
 import octobot_commons.constants as commons_constants
@@ -91,6 +92,21 @@ class Configuration:
         self.logger.info(f"Using {self.profile.name} profile.")
         self._generate_config_from_user_config_and_profile()
 
+    def remove_profile(self, profile_id: str) -> None:
+        """
+        Removes the given profile and deletes its folder on disk
+        :param profile_id: the id of the profile to remove
+        :return: None
+        """
+        profile = self.profile_by_id[profile_id]
+        if profile.read_only:
+            raise errors.ProfileRemovalError(f"{profile.name} profile can't be removed")
+        try:
+            shutil.rmtree(profile.path)
+            self.profile_by_id.pop(profile_id, None)
+        except Exception as err:
+            raise errors.ProfileRemovalError() from err
+
     def _generate_config_from_user_config_and_profile(self):
         for profile_managed_element in self.profile.FULLY_MANAGED_ELEMENTS:
             self.config[profile_managed_element] = copy.deepcopy(
@@ -154,7 +170,7 @@ class Configuration:
         """
         :return: The tentacles configurations associated to the activated profile
         """
-        return os.path.join(self.profile.path, commons_constants.CONFIG_TENTACLES_FILE)
+        return self.profile.get_tentacles_config_path()
 
     def get_metrics_enabled(self) -> bool:
         """
