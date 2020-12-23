@@ -87,6 +87,28 @@ def test_select_profile(config):
         assert config.profile is config.profile_by_id["1"]
 
 
+def test_remove_profile(config):
+    config.profile = profiles.Profile(get_profile_path(), config.profile_schema_path)
+    config.profile.read_config()
+    config.profile.read_only = True
+    config.profile_by_id[config.profile.profile_id] = config.profile
+    # id not in loaded profiles
+    with pytest.raises(KeyError):
+        config.remove_profile("random_id")
+    # read only profile
+    with pytest.raises(errors.ProfileRemovalError):
+        config.remove_profile("default")
+        assert os.path.isdir(config.profile.path)
+    # valid profile removal
+    other_profile = profiles.Profile("path", config.profile_schema_path)
+    other_profile.profile_id = "profile_id"
+    config.profile_by_id[other_profile.profile_id] = other_profile
+    with mock.patch.object(shutil, "rmtree", mock.Mock()) as rmtree_mock:
+        config.remove_profile("profile_id")
+        rmtree_mock.assert_called_once_with("path")
+        assert "profile_id" not in config.profile_by_id
+
+
 def test_generate_config_from_user_config_and_profile(config):
     with open(DEFAULT_CONFIG) as config_file:
         config._read_config = json.load(config_file)

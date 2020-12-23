@@ -27,6 +27,12 @@ class NoProfileError(Exception):
     """
 
 
+class ProfileRemovalError(Exception):
+    """
+    Profile related Exception: raised when the current profile can't be can't be removed
+    """
+
+
 class ConfigEvaluatorError(Exception):
     """
     Evaluator config related Exception
