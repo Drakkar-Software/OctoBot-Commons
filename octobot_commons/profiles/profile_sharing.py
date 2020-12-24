@@ -34,21 +34,29 @@ def export_profile(profile, export_path: str) -> str:
     return export_path_with_ext
 
 
-def import_profile(import_path: str, name: str = None) -> None:
+def import_profile(
+    import_path: str, name: str = None, bot_install_path: str = "."
+) -> None:
     """
     Imports the given profile export archive into the user's profile directory with the "imported_" prefix
     :param import_path: path to the profile zipped archive
     :param name: name of the profile folder
+    :param bot_install_path: path to the octobot installation
     :return: None
     """
     profile_name = name or (
         f"{constants.IMPORTED_PROFILE_PREFIX}_{os.path.split(import_path)[-1]}"
     )
     profile_name = profile_name.split(f".{constants.PROFILE_EXPORT_FORMAT}")[0]
-    target_import_path = os.path.join(constants.USER_PROFILES_FOLDER, profile_name)
+    target_import_path = os.path.join(
+        bot_install_path, constants.USER_PROFILES_FOLDER, profile_name
+    )
     target_import_path = _get_unique_profile_folder(target_import_path)
-    with zipfile.ZipFile(import_path) as zipped:
-        zipped.extractall(target_import_path)
+    if zipfile.is_zipfile(import_path):
+        with zipfile.ZipFile(import_path) as zipped:
+            zipped.extractall(target_import_path)
+    else:
+        shutil.copytree(import_path, target_import_path)
 
 
 def _get_unique_profile_folder(target_import_path):
