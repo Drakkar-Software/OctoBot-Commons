@@ -37,12 +37,12 @@ def get_profile_path():
     return test_config.TEST_CONFIG_FOLDER
 
 
-@pytest.fixture()
+@pytest.fixture
 def config():
     return configuration.Configuration(get_fake_config_path(), get_profile_path())
 
 
-@pytest.fixture()
+@pytest.fixture
 def default_config():
     return configuration.Configuration(DEFAULT_CONFIG, get_profile_path())
 
