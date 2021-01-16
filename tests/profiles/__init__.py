@@ -22,6 +22,6 @@ def get_profile_path():
     return test_config.TEST_CONFIG_FOLDER
 
 
-@pytest.fixture()
+@pytest.fixture
 def profile():
     return profiles.Profile(get_profile_path())
