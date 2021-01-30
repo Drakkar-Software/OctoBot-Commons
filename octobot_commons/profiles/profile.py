@@ -133,9 +133,16 @@ class Profile:
         clone.name = name or clone.name
         clone.description = description or clone.description
         clone.profile_id = str(uuid.uuid4())
-        clone.path = os.path.join(os.path.split(self.path)[0], clone.profile_id)
         clone.read_only = False
-        shutil.copytree(self.path, clone.path)
+        try:
+            clone.path = os.path.join(
+                os.path.split(self.path)[0], f"{clone.name}_{clone.profile_id}"
+            )
+            shutil.copytree(self.path, clone.path)
+        except OSError:
+            # invalid profile name for a filename
+            clone.path = os.path.join(os.path.split(self.path)[0], clone.profile_id)
+            shutil.copytree(self.path, clone.path)
         clone.save()
         return clone
 
