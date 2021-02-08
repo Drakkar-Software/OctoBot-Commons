@@ -1,6 +1,6 @@
 # Setup requirements
 cython==0.29.21
-numpy==1.20.0
+numpy==1.20.1
 
 # Commons requirements
 jsonschema==3.2.0
