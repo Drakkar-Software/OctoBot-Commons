@@ -259,8 +259,11 @@ class Configuration:
         Loads the available profiles
         :return: None
         """
-        for profile_entry in os.scandir(self.profiles_path):
-            self.load_profile(profile_entry.path)
+        for profile in profiles.Profile.get_all_profiles(
+            self.profiles_path, schema_path=self.profile_schema_path
+        ):
+            if profile.profile_id not in self.profile_by_id:
+                self.profile_by_id[profile.profile_id] = profile
 
     def _get_config_without_profile_elements(self) -> dict:
         filtered_config = copy.deepcopy(self.config)
@@ -268,25 +271,3 @@ class Configuration:
         for profile_managed_element in self.profile.FULLY_MANAGED_ELEMENTS:
             filtered_config.pop(profile_managed_element, None)
         return filtered_config
-
-    def load_profile(self, profile_path):
-        """
-        Loads a profile identified by its path if profile_path is actually a profile
-        :param profile_path: path to the profile to load
-        :return: None
-        """
-        profile = profiles.Profile(profile_path, self.profile_schema_path)
-        try:
-            if os.path.isfile(profile.config_file()):
-                profile.read_config()
-                # do not override already loaded profiles
-                if profile.profile_id not in self.profile_by_id:
-                    self.profile_by_id[profile.profile_id] = profile
-            else:
-                self.logger.debug(
-                    f"Ignored {profile_path} as it does not contain a profile configuration"
-                )
-        except Exception as err:
-            self.logger.exception(
-                err, True, f"Error when reading profile at '{profile_path}': {err}"
-            )

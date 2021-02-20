@@ -16,7 +16,12 @@
 import os
 import zipfile
 import shutil
+import pathlib
+import uuid
 import octobot_commons.constants as constants
+
+# avoid cyclic import
+from octobot_commons.profiles.profile import Profile
 
 
 def export_profile(profile, export_path: str) -> str:
@@ -57,12 +62,26 @@ def import_profile(
             zipped.extractall(target_import_path)
     else:
         shutil.copytree(import_path, target_import_path)
+    _ensure_unique_profile_id(target_import_path)
 
 
 def _get_unique_profile_folder(target_import_path):
-    i = 1
+    iteration = 1
     candidate = target_import_path
-    while os.path.isfile(candidate):
-        i += 1
-        candidate = f"{target_import_path}_{i}"
+    while os.path.exists(candidate) and iteration < 100:
+        iteration += 1
+        candidate = f"{target_import_path}_{iteration}"
     return candidate
+
+
+def _ensure_unique_profile_id(profile_path):
+    ids = Profile.get_all_profiles_ids(
+        pathlib.Path(profile_path).parent, ignore=profile_path
+    )
+    profile = Profile(profile_path)
+    profile.read_config()
+    iteration = 1
+    while profile.profile_id in ids and iteration < 100:
+        profile.profile_id = str(uuid.uuid4())
+        iteration += 1
+    profile.save()

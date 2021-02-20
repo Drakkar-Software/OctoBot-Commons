@@ -24,7 +24,7 @@ import octobot_commons.profiles as profiles
 import octobot_commons.constants as constants
 import octobot_commons.tests.test_config as test_config
 
-from tests.profiles import profile, get_profile_path
+from tests.profiles import profile, get_profile_path, get_profiles_path
 
 
 def test_read_config(profile):
@@ -308,3 +308,25 @@ def test_filter_fill_elements(profile):
             constants.CONFIG_ENABLED_OPTION: True
         }
     }
+
+
+def test_get_all_profiles():
+    with mock.patch.object(profiles.Profile, "_load_profile", mock.Mock()) as _load_profile_mock:
+        nb_files = len(os.listdir(get_profiles_path()))
+        assert nb_files > 1
+        profiles.Profile.get_all_profiles(get_profiles_path())
+        assert _load_profile_mock.call_count == nb_files
+
+
+def test_load_profile():
+    schema_path = "schema_path"
+    with mock.patch.object(profiles.Profile, "read_config", mock.Mock()) as read_config_mock:
+        profile = profiles.Profile._load_profile(test_config.TEST_CONFIG_FOLDER, schema_path)
+        assert profile.path == test_config.TEST_CONFIG_FOLDER
+        assert profile.schema_path == schema_path
+        read_config_mock.assert_called_once()
+
+
+def test_get_existing_profiles_ids(profile):
+    assert profiles.Profile.get_all_profiles_ids(get_profiles_path()) == ["default"]
+    assert profiles.Profile.get_all_profiles_ids(get_profiles_path(), ignore=profile.path) == []
