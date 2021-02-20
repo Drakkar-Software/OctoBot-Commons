@@ -1,4 +1,4 @@
-# pylint: disable=R0902
+# pylint: disable=R0902, W0703
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -20,6 +20,7 @@ import os
 import shutil
 import uuid
 import octobot_commons.constants as constants
+import octobot_commons.logging as commons_logging
 import octobot_commons.json_util as json_util
 
 
@@ -239,3 +240,56 @@ class Profile:
                     # save allowed keys
                     if key in allowed_keys:
                         profile_config[element][key] = value
+
+    @staticmethod
+    def get_all_profiles(profiles_path, ignore: str = None, schema_path: str = None):
+        """
+        Loads profiles found in the given directory
+        :param profiles_path: Path to a directory containing profiles
+        :param ignore: A profile path to ignore
+        :param schema_path: Path to the json schema to pass to the created profile instances
+        :return: the profile instances list
+        """
+        profiles = []
+        ignored_path = None if ignore is None else os.path.normpath(ignore)
+        for profile_entry in os.scandir(profiles_path):
+            if (
+                ignored_path is None
+                or os.path.normpath(profile_entry.path) != ignored_path
+            ):
+                profile = Profile._load_profile(profile_entry.path, schema_path)
+                if profile is not None:
+                    profiles.append(profile)
+        return profiles
+
+    @staticmethod
+    def _load_profile(profile_path: str, schema_path: str):
+        logger = commons_logging.get_logger("ProfileExplorer")
+        profile = Profile(profile_path, schema_path)
+        try:
+            if os.path.isfile(profile.config_file()):
+                profile.read_config()
+                return profile
+            logger.debug(
+                f"Ignored {profile_path} as it does not contain a profile configuration"
+            )
+        except Exception as err:
+            logger.exception(
+                err,
+                True,
+                f"Error when reading profile at '{profile_path}': {err}",
+            )
+        return None
+
+    @staticmethod
+    def get_all_profiles_ids(profiles_path, ignore: str = None):
+        """
+        Get ids of profiles found in the given directory
+        :param profiles_path: Path to a directory containing profiles
+        :param ignore: A profile path to ignore in ids listing
+        :return: the profile ids list
+        """
+        return [
+            profile.profile_id
+            for profile in Profile.get_all_profiles(profiles_path, ignore)
+        ]

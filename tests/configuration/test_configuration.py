@@ -25,6 +25,7 @@ import octobot_commons.configuration as configuration
 import octobot_commons.profiles as profiles
 import octobot_commons.constants as constants
 import octobot_commons.tests.test_config as test_config
+from tests.profiles import get_profiles_path
 
 DEFAULT_CONFIG = os.path.join(test_config.TEST_CONFIG_FOLDER, f"default_{constants.CONFIG_FILE}")
 
@@ -311,12 +312,14 @@ def test_get_selected_profile(config):
 
 
 def test_load_profiles(config):
-    config.profiles_path = test_config.TEST_CONFIG_FOLDER
-    with mock.patch.object(config, "load_profile", mock.Mock()) as load_profile_mock:
-        nb_files = len(os.listdir(config.profiles_path))
-        assert nb_files > 1
-        config.load_profiles()
-        assert load_profile_mock.call_count == nb_files
+    config.profiles_path = get_profiles_path()
+    nb_profiles = 1
+    config.load_profiles()
+    assert len(config.profile_by_id) == nb_profiles
+    loaded_profile = config.profile_by_id["default"]
+    # reload profile, keep loaded ones
+    config.load_profiles()
+    assert config.profile_by_id["default"] is loaded_profile
 
 
 def test_get_config_without_profile_elements(config):
@@ -332,14 +335,3 @@ def test_get_config_without_profile_elements(config):
         "plip": True,
         next(iter(profiles.Profile.PARTIALLY_MANAGED_ELEMENTS)): "tt"
     }
-
-
-def test_load_profile(config):
-    with mock.patch.object(profiles.Profile, "read_config", mock.Mock()) as read_config_mock:
-        config.load_profile(get_profile_path())
-        assert config.profile_by_id[None].path == get_profile_path()
-        profile = config.profile_by_id[None]
-        read_config_mock.assert_called_once()
-        # reload profile, keep loaded ones
-        config.load_profile(get_profile_path())
-        assert config.profile_by_id[None] is profile

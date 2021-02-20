@@ -18,9 +18,11 @@ import shutil
 import zipfile
 import contextlib
 import mock
+import pathlib
 import octobot_commons.constants as constants
 import octobot_commons.profiles as profiles
-from octobot_commons.profiles.profile_sharing import _get_unique_profile_folder
+import octobot_commons.profiles.profile_sharing as profile_sharing
+from octobot_commons.profiles.profile_sharing import _get_unique_profile_folder, _ensure_unique_profile_id
 import octobot_commons.tests.test_config as test_config
 
 from tests.profiles import profile, get_profile_path
@@ -108,8 +110,12 @@ def test_import_profile(profile):
         shutil.copy(profile.config_file(), os.path.join(spec_tentacles_config, "t1.json"))
         shutil.copy(profile.config_file(), os.path.join(spec_tentacles_config, "t2.json"))
         profiles.export_profile(profile, export_path)
-        profiles.import_profile(exported_file)
-        assert os.path.isdir(os.path.join(constants.USER_PROFILES_FOLDER, "imported_super_profile"))
+        imported_profile_path = os.path.join(constants.USER_PROFILES_FOLDER, "imported_super_profile")
+        with mock.patch.object(profile_sharing, "_ensure_unique_profile_id", mock.Mock()) \
+                as _ensure_unique_profile_id_mock:
+            profiles.import_profile(exported_file)
+            _ensure_unique_profile_id_mock.assert_called_once()
+        assert os.path.isdir(imported_profile_path)
         # ensure all files got imported
         for root, dirs, files in os.walk(profile.path):
             dir_path = os.path.join(other_profile, "specific_config") if "specific_config" in root else other_profile
@@ -131,6 +137,19 @@ def test_get_unique_profile_folder(profile):
         assert _get_unique_profile_folder(profile.config_file()) == f"{profile.config_file()}_4"
         shutil.copy(profile.config_file(), other_file_3)
         assert _get_unique_profile_folder(profile.config_file()) == f"{profile.config_file()}_4"
+
+
+def test_ensure_unique_profile_id(profile):
+    other_profile = "second_profile"
+    profiles_path = pathlib.Path(profile.path).parent
+    other_profile_path = profiles_path.joinpath(other_profile)
+    with _cleaned_tentacles(dir1=other_profile_path):
+        shutil.copytree(profile.path, other_profile_path)
+        _ensure_unique_profile_id(other_profile_path)
+        ids = profiles.Profile.get_all_profiles_ids(profiles_path)
+        assert len(ids) == 2
+        # changed new profile id
+        assert ids[0] != ids[1]
 
 
 @contextlib.contextmanager
