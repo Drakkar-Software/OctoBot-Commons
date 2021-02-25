@@ -64,6 +64,7 @@ def open_order_pretty_printer(exchange_name, dict_order, markdown=False) -> str:
         LOGGER.error(
             "open_order_pretty_printer requires OctoBot-Trading package installed"
         )
+    return ""
 
 
 def trade_pretty_printer(exchange_name, trade, markdown=False) -> str:
@@ -100,6 +101,7 @@ def trade_pretty_printer(exchange_name, trade, markdown=False) -> str:
         LOGGER.error(
             "open_order_pretty_printer requires OctoBot-Trading package installed"
         )
+    return ""
 
 
 def cryptocurrency_alert(result, final_eval) -> (str, str):
@@ -122,6 +124,7 @@ def cryptocurrency_alert(result, final_eval) -> (str, str):
         return alert, alert_markdown
     except ImportError:
         LOGGER.error("cryptocurrency_alert requires Telegram package installed")
+    return "", ""
 
 
 def global_portfolio_pretty_print(
