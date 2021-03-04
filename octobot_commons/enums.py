@@ -72,6 +72,19 @@ class PriceIndexes(enum.Enum):
     IND_PRICE_VOL = 5
 
 
+class PriceStrings(enum.Enum):
+    """
+    Default candle price str
+    """
+
+    STR_PRICE_TIME = "time"
+    STR_PRICE_CLOSE = "close"
+    STR_PRICE_OPEN = "open"
+    STR_PRICE_HIGH = "high"
+    STR_PRICE_LOW = "low"
+    STR_PRICE_VOL = "vol"
+
+
 class PlatformsName(enum.Enum):
     """
     OctoBot supported platforms name
