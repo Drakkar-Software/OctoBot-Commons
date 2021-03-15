@@ -24,6 +24,14 @@ class OctoBotChannelsName(enum.Enum):
     OCTOBOT_CHANNEL = "OctoBot"
 
 
+class OctoBotUserChannelsName(enum.Enum):
+    """
+    OctoBot-Backtesting channel names
+    """
+
+    USER_COMMANDS_CHANNEL = "UserCommands"
+
+
 class OctoBotEvaluatorsChannelsName(enum.Enum):
     """
     OctoBot-Evaluators channel names

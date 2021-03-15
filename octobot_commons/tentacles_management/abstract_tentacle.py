@@ -46,3 +46,11 @@ class AbstractTentacle:
             for subclass in copy.deepcopy(subclasses_list):
                 subclasses_list += subclass.get_all_subclasses()
         return subclasses_list
+
+    @classmethod
+    def get_user_commands(cls) -> dict:
+        """
+        Return the dict of user commands for this tentacle
+        :return: the commands dict
+        """
+        return {}
