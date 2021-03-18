@@ -1,5 +1,11 @@
 name: Github-Action-CI
-on: push
+on:
+  push:
+    branches:
+      - 'master'
+    tags:
+      - '*'
+  pull_request:
 
 jobs:
   lint:
