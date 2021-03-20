@@ -59,7 +59,7 @@ class OctoBotTradingChannelsName(enum.Enum):
     MINI_TICKER_CHANNEL = "MiniTicker"
     RECENT_TRADES_CHANNEL = "RecentTrade"
     ORDER_BOOK_CHANNEL = "OrderBook"
-    ORDER_BOOK_TICKER_CHANNEL = "OrderBookTicker"
+    OPEN_INTEREST_CHANNEL = "OpenInterest"
     KLINE_CHANNEL = "Kline"
     TRADES_CHANNEL = "Trades"
     LIQUIDATIONS_CHANNEL = "Liquidations"
