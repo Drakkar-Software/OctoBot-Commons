@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-
+import os
 import octobot_commons.enums as enums
 
 # time
@@ -127,7 +127,9 @@ CONFIG_METRICS = "metrics"
 CONFIG_METRICS_BOT_ID = "metrics-bot-id"
 TIMER_BEFORE_METRICS_REGISTRATION_SECONDS = 600
 TIMER_BETWEEN_METRICS_UPTIME_UPDATE = 3600 * 4
-METRICS_URL = "https://metrics.octobot.online/"
+OCTOBOT_ONLINE = os.getenv(
+    "METRICS_OCTOBOT_ONLINE_URL", "https://metrics.octobot.online"
+)
 METRICS_ROUTE_GEN_BOT_ID = "gen-bot-id"
 METRICS_ROUTE = "metrics"
 METRICS_ROUTE_COMMUNITY = f"{METRICS_ROUTE}/community"
