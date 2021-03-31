@@ -153,5 +153,11 @@ DEFAULT_CONFIG_VALUES = {
 # Async settings
 DEFAULT_FUTURE_TIMEOUT = 120
 
+# Github urls
+GITHUB_RAW_CONTENT_URL = "https://raw.githubusercontent.com"
+GITHUB_API_CONTENT_URL = "https://api.github.com"
+GITHUB_BASE_URL = "https://github.com"
+GITHUB_ORGANISATION = "Drakkar-Software"
+
 # External resources
 EXTERNAL_RESOURCE_URL = "https://raw.githubusercontent.com/Drakkar-Software/OctoBot/assets/external_resources.json"
