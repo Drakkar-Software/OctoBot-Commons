@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
  
+## [1.5.15] - 2021-04-01 
+### Added
+- is_machine_64bit and is_arm_machine to os_util
+ 
 ## [1.5.14] - 2021-03-31 
 ### Added
 - Github constants
