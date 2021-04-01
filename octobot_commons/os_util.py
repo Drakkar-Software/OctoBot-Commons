@@ -94,8 +94,8 @@ def _is_on_docker():
     file_to_check = "/proc/self/cgroup"
     try:
         return os.path.exists("/.dockerenv") or (
-                os.path.isfile(file_to_check)
-                and any("docker" in line for line in open(file_to_check))
+            os.path.isfile(file_to_check)
+            and any("docker" in line for line in open(file_to_check))
         )
     except FileNotFoundError:
         return False
