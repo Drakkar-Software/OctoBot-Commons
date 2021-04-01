@@ -74,7 +74,16 @@ def is_machine_64bit() -> bool:
     From https://stackoverflow.com/questions/2208828/detect-64bit-os-windows-in-python
     :return: True if the machine is 64bit
     """
-    return platform.machine().endswith('64')
+    return platform.machine().endswith("64")
+
+
+def is_arm_machine() -> bool:
+    """
+    Can be armv7l or aarch64 (raspberry, Android smartphone...)
+    From https://raspberrypi.stackexchange.com/questions/5100/detect-that-a-python-program-is-running-on-the-pi
+    :return: True if the machine is 64bit
+    """
+    return platform.machine() in ["armv7l", "aarch64"]
 
 
 def _is_on_docker():
