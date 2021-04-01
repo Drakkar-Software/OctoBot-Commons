@@ -67,6 +67,16 @@ def get_os():
     return enums.PlatformsName(os.name)
 
 
+def is_machine_64bit() -> bool:
+    """
+    Win: AMD64
+    Debian-64: x86_64
+    From https://stackoverflow.com/questions/2208828/detect-64bit-os-windows-in-python
+    :return: True if the machine is 64bit
+    """
+    return platform.machine().endswith('64')
+
+
 def _is_on_docker():
     """
     Check if the current platform is docker
@@ -75,8 +85,8 @@ def _is_on_docker():
     file_to_check = "/proc/self/cgroup"
     try:
         return os.path.exists("/.dockerenv") or (
-            os.path.isfile(file_to_check)
-            and any("docker" in line for line in open(file_to_check))
+                os.path.isfile(file_to_check)
+                and any("docker" in line for line in open(file_to_check))
         )
     except FileNotFoundError:
         return False
