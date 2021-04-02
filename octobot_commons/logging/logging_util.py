@@ -16,11 +16,20 @@
 #  License along with this library.
 
 import logging
+import os
+
+import sentry_sdk
 
 import octobot_commons.timestamp_util as timestamp_util
 
 LOG_DATABASE = "log_db"
 LOG_NEW_ERRORS_COUNT = "log_new_errors_count"
+
+SENTRY_ENABLED = os.getenv("ENABLE_SENTRY", True)
+SENTRY_ENV = os.getenv("SENTRY_ENV", "production")
+SENTRY_URL = os.getenv("SENTRY_URL", "o563811.ingest.sentry.io")
+SENTRY_KEY = os.getenv("SENTRY_KEY", "f6f03e8677274fe29d273af3f4a2195c")
+SENTRY_PROJECT = os.getenv("SENTRY_PROJECT", "5704153")
 
 BACKTESTING_NEW_ERRORS_COUNT: str = "log_backtesting_errors_count"
 
@@ -139,6 +148,14 @@ class BotLogger:
     def __init__(self, logger_name):
         self.logger_name = logger_name
         self.logger = logging.getLogger(logger_name)
+        if SENTRY_ENABLED:
+            sentry_sdk.init(
+                f"https://{SENTRY_KEY}@{SENTRY_URL}/{SENTRY_PROJECT}",
+                # Set traces_sample_rate to 1.0 to capture 100%
+                # of transactions for performance monitoring.
+                # We recommend adjusting this value in production.
+                traces_sample_rate=1.0,
+            )
 
     def debug(self, message) -> None:
         """
