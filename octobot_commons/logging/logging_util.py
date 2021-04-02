@@ -16,11 +16,19 @@
 #  License along with this library.
 
 import logging
+import os
+
+import pybrake
 
 import octobot_commons.timestamp_util as timestamp_util
 
 LOG_DATABASE = "log_db"
 LOG_NEW_ERRORS_COUNT = "log_new_errors_count"
+
+PYBRAKE_ENABLED = os.getenv("ENABLE_PYBRAKE", True)
+PYBRAKE_PROJECT_KEY = os.getenv("PYBRAKE_PROJECT_KEY", "ca68f45bad1a531077793aad94b36731")
+PYBRAKE_PROJECT_ID = os.getenv("PYBRAKE_PROJECT_ID", 328454)
+PYBRAKE_ENV = os.getenv("PYBRAKE_ENV", "production")
 
 BACKTESTING_NEW_ERRORS_COUNT: str = "log_backtesting_errors_count"
 
@@ -139,6 +147,12 @@ class BotLogger:
     def __init__(self, logger_name):
         self.logger_name = logger_name
         self.logger = logging.getLogger(logger_name)
+        if PYBRAKE_ENABLED:
+            self.pybrake_notifier = pybrake.Notifier(
+                project_id=PYBRAKE_PROJECT_ID,
+                project_key=PYBRAKE_PROJECT_KEY,
+                environment=PYBRAKE_ENV,
+            )
 
     def debug(self, message) -> None:
         """
@@ -226,9 +240,19 @@ class BotLogger:
         """
         if STORED_LOG_MIN_LEVEL <= level and get_global_logger_level() <= level:
             self._web_interface_publish_log(message, level)
+            self._pybrake_publish_log(message, level)
             if not ERROR_PUBLICATION_ENABLED and logging.ERROR <= level:
                 global SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED
                 SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED = True
+
+    def _pybrake_publish_log(self, message, level):
+        """
+        Publish to pybrake service
+        :param message: the log message
+        :param level: the log level
+        """
+        if PYBRAKE_ENABLED and ERROR_PUBLICATION_ENABLED and logging.ERROR >= level:
+            self.pybrake_notifier.notify(message)
 
     def _web_interface_publish_log(self, message, level) -> None:
         """

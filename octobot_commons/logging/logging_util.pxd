@@ -18,6 +18,7 @@
 cdef class BotLogger:
     cdef str logger_name
     cdef object logger
+    cdef object pybrake_notifier
 
     cpdef void debug(self, str message)
     cpdef void info(self, str message)
@@ -29,6 +30,7 @@ cdef class BotLogger:
     cpdef void disable(self, bint disabled)
 
     cdef void _publish_log_if_necessary(self, str message, object level)
+    cdef void _pybrake_publish_log(self, str message, object level)
     cdef void _web_interface_publish_log(self, str message, object level)
 
 cpdef void set_global_logger_level(level)
