@@ -61,10 +61,13 @@ jobs:
       if: matrix.type == 'cython'
       env:
         CYTHON_IGNORE: True
+        ENABLE_SENTRY: False
       run: pytest --cov=. --cov-config=.coveragerc --durations=0 -rw tests
 
     - name: Pytests
       if: matrix.type != 'cython'
+      env:
+        ENABLE_SENTRY: False
       run: pytest --cov=. --cov-config=.coveragerc --durations=0 -rw tests
 
     - name: Publish coverage

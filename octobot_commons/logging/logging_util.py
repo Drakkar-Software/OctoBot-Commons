@@ -26,7 +26,6 @@ LOG_DATABASE = "log_db"
 LOG_NEW_ERRORS_COUNT = "log_new_errors_count"
 
 SENTRY_ENABLED = os.getenv("ENABLE_SENTRY", True)
-SENTRY_ENV = os.getenv("SENTRY_ENV", "production")
 SENTRY_URL = os.getenv("SENTRY_URL", "o563811.ingest.sentry.io")
 SENTRY_KEY = os.getenv("SENTRY_KEY", "f6f03e8677274fe29d273af3f4a2195c")
 SENTRY_PROJECT = os.getenv("SENTRY_PROJECT", "5704153")
