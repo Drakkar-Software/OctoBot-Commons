@@ -1,4 +1,4 @@
-# pylint: disable=W0603
+# pylint: disable=C0415, W0603, W1508
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -19,6 +19,7 @@ import logging
 import os
 
 import sentry_sdk
+import sentry_sdk.integrations.logging as sentry_logging
 
 import octobot_commons.timestamp_util as timestamp_util
 
@@ -26,9 +27,11 @@ LOG_DATABASE = "log_db"
 LOG_NEW_ERRORS_COUNT = "log_new_errors_count"
 
 SENTRY_ENABLED = os.getenv("ENABLE_SENTRY", True)
-SENTRY_URL = os.getenv("SENTRY_URL", "o563811.ingest.sentry.io")
-SENTRY_KEY = os.getenv("SENTRY_KEY", "f6f03e8677274fe29d273af3f4a2195c")
-SENTRY_PROJECT = os.getenv("SENTRY_PROJECT", "5704153")
+SENTRY_URL = os.getenv("SENTRY_URL", "o563994.ingest.sentry.io")
+SENTRY_KEY = os.getenv("SENTRY_KEY", "e0847deba5334a3aa668c461ed44c218")
+SENTRY_PROJECT = os.getenv("SENTRY_PROJECT", "5704514")
+SENTRY_RATE = os.getenv("SENTRY_RATE", 1.0)
+SENTRY_ENV = os.getenv("SENTRY_ENV", "production")
 
 BACKTESTING_NEW_ERRORS_COUNT: str = "log_backtesting_errors_count"
 
@@ -147,14 +150,7 @@ class BotLogger:
     def __init__(self, logger_name):
         self.logger_name = logger_name
         self.logger = logging.getLogger(logger_name)
-        if SENTRY_ENABLED:
-            sentry_sdk.init(
-                f"https://{SENTRY_KEY}@{SENTRY_URL}/{SENTRY_PROJECT}",
-                # Set traces_sample_rate to 1.0 to capture 100%
-                # of transactions for performance monitoring.
-                # We recommend adjusting this value in production.
-                traces_sample_rate=1.0,
-            )
+        self.setup_sentry_logging()
 
     def debug(self, message) -> None:
         """
@@ -258,6 +254,30 @@ class BotLogger:
             message,
             call_notifiers=ERROR_PUBLICATION_ENABLED,
         )
+
+    def setup_sentry_logging(self):
+        """
+        Setup sentry logging if SENTRY_ENABLED and OctoBot version is importable
+        """
+        if SENTRY_ENABLED:
+            try:
+                from octobot.constants import VERSION
+
+                sentry_sdk.init(
+                    f"https://{SENTRY_KEY}@{SENTRY_URL}/{SENTRY_PROJECT}",
+                    traces_sample_rate=SENTRY_RATE,
+                    release=VERSION,
+                    environment=SENTRY_ENV,
+                    integrations=[
+                        sentry_logging.LoggingIntegration(
+                            level=logging.ERROR, event_level=logging.ERROR
+                        )
+                    ],
+                )
+            except ImportError:
+                self.logger.warning(
+                    "Failed to start sentry : can't import OctoBot version"
+                )
 
 
 def get_backtesting_errors_count() -> int:
