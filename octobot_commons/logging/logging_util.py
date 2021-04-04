@@ -275,7 +275,7 @@ class BotLogger:
                     ],
                 )
             except ImportError:
-                self.logger.warning(
+                self.logger.debug(
                     "Failed to start sentry : can't import OctoBot version"
                 )
 
