@@ -26,7 +26,7 @@ import octobot_commons.timestamp_util as timestamp_util
 LOG_DATABASE = "log_db"
 LOG_NEW_ERRORS_COUNT = "log_new_errors_count"
 
-SENTRY_ENABLED = os.getenv("ENABLE_SENTRY", True)
+DISABLE_SENTRY = os.getenv("DISABLE_SENTRY", None)
 SENTRY_URL = os.getenv("SENTRY_URL", "o563994.ingest.sentry.io")
 SENTRY_KEY = os.getenv("SENTRY_KEY", "e0847deba5334a3aa668c461ed44c218")
 SENTRY_PROJECT = os.getenv("SENTRY_PROJECT", "5704514")
@@ -259,7 +259,7 @@ class BotLogger:
         """
         Setup sentry logging if SENTRY_ENABLED and OctoBot version is importable
         """
-        if SENTRY_ENABLED:
+        if DISABLE_SENTRY is None:
             try:
                 from octobot.constants import VERSION
 
