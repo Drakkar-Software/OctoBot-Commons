@@ -18,9 +18,6 @@
 import logging
 import os
 
-import sentry_sdk
-import sentry_sdk.integrations.logging as sentry_logging
-
 import octobot_commons.timestamp_util as timestamp_util
 
 LOG_DATABASE = "log_db"
@@ -150,7 +147,8 @@ class BotLogger:
     def __init__(self, logger_name):
         self.logger_name = logger_name
         self.logger = logging.getLogger(logger_name)
-        self.setup_sentry_logging()
+        # Disable until performance impact measured
+        # self.setup_sentry_logging()
 
     def debug(self, message) -> None:
         """
@@ -262,6 +260,8 @@ class BotLogger:
         if DISABLE_SENTRY is None:
             try:
                 from octobot.constants import VERSION
+                import sentry_sdk
+                import sentry_sdk.integrations.logging as sentry_logging
 
                 sentry_sdk.init(
                     f"https://{SENTRY_KEY}@{SENTRY_URL}/{SENTRY_PROJECT}",
