@@ -147,7 +147,7 @@ class BotLogger:
     def __init__(self, logger_name):
         self.logger_name = logger_name
         self.logger = logging.getLogger(logger_name)
-        # Disable until performance impact measured
+        # Disable until performance impact is measured
         # self.setup_sentry_logging()
 
     def debug(self, message) -> None:
