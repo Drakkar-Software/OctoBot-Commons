@@ -1,5 +1,5 @@
 # Setup requirements
-cython==0.29.22
+cython==0.29.23
 numpy==1.20.1
 
 # Commons requirements
