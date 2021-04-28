@@ -76,12 +76,19 @@ class Configuration:
             should_raise=should_raise,
             fill_missing_fields=fill_missing_fields,
         )
-        self.load_profiles()
-        selected_profile_id = self._get_selected_profile()
         self.config = copy.deepcopy(self._read_config)
-        self.select_profile(selected_profile_id)
+        self.load_profiles_if_possible_and_necessary()
 
-    def select_profile(self, profile_id):
+    def load_profiles_if_possible_and_necessary(self) -> None:
+        """
+        Loads profiles if profiles already exists and have not been already loaded
+        :return: None
+        """
+        if not self.are_profiles_empty_or_missing() and not self.are_profile_loaded():
+            self.load_profiles()
+            self.select_profile(self._get_selected_profile())
+
+    def select_profile(self, profile_id) -> None:
         """
         Sets self.profile using its profile_id
         :param profile_id: id of the profile to select
@@ -153,17 +160,20 @@ class Configuration:
             self.config_path
         ).st_size == 0
 
+    def are_profile_loaded(self) -> bool:
+        """
+        Checks if profiles have already been loaded
+        :return: True if profiles have been loaded
+        """
+        return self.profile is not None
+
     def are_profiles_empty_or_missing(self) -> bool:
         """
-        Checks if self.profiles_path exists and contains the default profile
-        :return: True if the default profile is accessible
+        Checks if self.profiles_path exists and contains folders
+        :return: True if profiles folder is not empty
         """
-        return not os.path.isfile(
-            os.path.join(
-                self.profiles_path,
-                commons_constants.DEFAULT_PROFILE,
-                commons_constants.PROFILE_CONFIG_FILE,
-            )
+        return not (
+            os.path.isdir(self.profiles_path) and os.listdir(self.profiles_path)
         )
 
     def get_tentacles_config_path(self) -> str:
