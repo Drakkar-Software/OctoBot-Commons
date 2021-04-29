@@ -123,6 +123,13 @@ def test_import_profile(profile):
                 os.path.isfile(os.path.join(dir_path, f))
                 for f in files
             )
+        profiles.import_profile(exported_file)
+        assert os.path.isdir(f"{imported_profile_path}_2")
+        with mock.patch.object(shutil, "rmtree", mock.Mock()) as shutil_rmtree_mock:
+            profiles.import_profile(exported_file, replace_if_exists=True)
+            shutil_rmtree_mock.assert_called_once()
+        assert os.path.isdir(imported_profile_path)
+        assert not os.path.isdir(f"{imported_profile_path}_3")
 
 
 def test_get_unique_profile_folder(profile):
