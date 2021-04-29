@@ -40,32 +40,72 @@ def export_profile(profile, export_path: str) -> str:
 
 
 def import_profile(
-    import_path: str, name: str = None, bot_install_path: str = "."
+    import_path: str,
+    name: str = None,
+    bot_install_path: str = ".",
+    replace_if_exists: bool = False,
 ) -> None:
     """
     Imports the given profile export archive into the user's profile directory with the "imported_" prefix
     :param import_path: path to the profile zipped archive
     :param name: name of the profile folder
     :param bot_install_path: path to the octobot installation
+    :param replace_if_exists: when True erase the profile with the same name if it exists
     :return: None
     """
     profile_name = name or (
         f"{constants.IMPORTED_PROFILE_PREFIX}_{os.path.split(import_path)[-1]}"
     )
     profile_name = profile_name.split(f".{constants.PROFILE_EXPORT_FORMAT}")[0]
-    target_import_path = os.path.join(
-        bot_install_path, constants.USER_PROFILES_FOLDER, profile_name
+    target_import_path = _get_target_import_path(
+        bot_install_path, profile_name, replace_if_exists
     )
-    target_import_path = _get_unique_profile_folder(target_import_path)
-    if zipfile.is_zipfile(import_path):
-        with zipfile.ZipFile(import_path) as zipped:
-            zipped.extractall(target_import_path)
-    else:
-        shutil.copytree(import_path, target_import_path)
+    _import_profile_files(import_path, target_import_path)
     _ensure_unique_profile_id(target_import_path)
 
 
-def _get_unique_profile_folder(target_import_path):
+def _get_target_import_path(
+    bot_install_path: str, profile_name: str, replace_if_exists: bool
+) -> str:
+    """
+    Get the target profile folder path
+    :param bot_install_path: path to the octobot installation
+    :param profile_name: name of the profile folder
+    :param replace_if_exists: when True erase the profile with the same name if it exists
+    :return: the final target import path
+    """
+    target_import_path = os.path.join(
+        bot_install_path, constants.USER_PROFILES_FOLDER, profile_name
+    )
+    if replace_if_exists:
+        try:
+            shutil.rmtree(target_import_path)
+        except FileNotFoundError:
+            pass
+        return target_import_path
+    return _get_unique_profile_folder(target_import_path)
+
+
+def _import_profile_files(profile_path: str, target_profile_path: str) -> None:
+    """
+    Copy or extract profile files to destination
+    :param profile_path: the current profile path
+    :param target_profile_path: the target profile path
+    :return: None
+    """
+    if zipfile.is_zipfile(profile_path):
+        with zipfile.ZipFile(profile_path) as zipped:
+            zipped.extractall(target_profile_path)
+    else:
+        shutil.copytree(profile_path, target_profile_path)
+
+
+def _get_unique_profile_folder(target_import_path: str) -> str:
+    """
+    Creates an unique profile folder name
+    :param target_import_path: the expected target profile folder name
+    :return: the unique profile folder name
+    """
     iteration = 1
     candidate = target_import_path
     while os.path.exists(candidate) and iteration < 100:
@@ -74,7 +114,12 @@ def _get_unique_profile_folder(target_import_path):
     return candidate
 
 
-def _ensure_unique_profile_id(profile_path):
+def _ensure_unique_profile_id(profile_path: str) -> None:
+    """
+    Ensure that no other installed profile has the same id
+    :param profile_path: the installed profile folder
+    :return: None
+    """
     ids = Profile.get_all_profiles_ids(
         pathlib.Path(profile_path).parent, ignore=profile_path
     )
