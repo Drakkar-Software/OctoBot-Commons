@@ -49,6 +49,13 @@ class Authenticator:
         raise NotImplementedError
 
     @abc.abstractmethod
+    def is_logged_in(self):
+        """
+        :return: True when authenticated
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def ensure_token_validity(self):
         """
         Called before @authenticated methods to ensure authentication
