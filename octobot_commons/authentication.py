@@ -18,17 +18,42 @@ import functools
 
 
 class Authenticator:
+    """
+    Abstract class to be implemented when using authenticated requests
+    """
 
     @abc.abstractmethod
     def login(self, username, password):
+        """
+        Used to trigger a login
+        :param username: authentication username
+        :param password: authentication password
+        :return:
+        """
         raise NotImplementedError
 
     @abc.abstractmethod
     def logout(self):
+        """
+        Used to clear a logged in session
+        :return:
+        """
         raise NotImplementedError
 
     @abc.abstractmethod
     def get_aiohttp_session(self):
+        """
+        Get the aiohttp authenticated session
+        :return:
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def ensure_token_validity(self):
+        """
+        Called before @authenticated methods to ensure authentication
+        :return:
+        """
         raise NotImplementedError
 
 
@@ -57,8 +82,15 @@ class AuthenticationRequired(Exception):
 
 
 def authenticated(func):
+    """
+    Annotation to required authentication for a method call
+    :param func:
+    :return:
+    """
+
     @functools.wraps(func)
     def wrapped(self, *args, **kwargs):
         self.ensure_token_validity()
         return func(self, *args, **kwargs)
+
     return wrapped
