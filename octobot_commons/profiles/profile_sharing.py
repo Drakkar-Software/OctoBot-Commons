@@ -19,6 +19,7 @@ import shutil
 import pathlib
 import uuid
 import octobot_commons.constants as constants
+import octobot_commons.logging as bot_logging
 
 # avoid cyclic import
 from octobot_commons.profiles.profile import Profile
@@ -57,33 +58,38 @@ def import_profile(
         f"{constants.IMPORTED_PROFILE_PREFIX}_{os.path.split(import_path)[-1]}"
     )
     profile_name = profile_name.split(f".{constants.PROFILE_EXPORT_FORMAT}")[0]
-    target_import_path = _get_target_import_path(
+    target_import_path, replaced = _get_target_import_path(
         bot_install_path, profile_name, replace_if_exists
     )
+    action = "Creating"
+    if replaced:
+        action = "Updating"
+    bot_logging.get_logger("ProfileSharing").info(f"{action} {profile_name} profile.")
     _import_profile_files(import_path, target_import_path)
     _ensure_unique_profile_id(target_import_path)
 
 
 def _get_target_import_path(
     bot_install_path: str, profile_name: str, replace_if_exists: bool
-) -> str:
+) -> (str, bool):
     """
     Get the target profile folder path
     :param bot_install_path: path to the octobot installation
     :param profile_name: name of the profile folder
     :param replace_if_exists: when True erase the profile with the same name if it exists
-    :return: the final target import path
+    :return: (the final target import path, True if the profile is replaced)
     """
     target_import_path = os.path.join(
         bot_install_path, constants.USER_PROFILES_FOLDER, profile_name
     )
     if replace_if_exists:
         try:
+            replaced = True
             shutil.rmtree(target_import_path)
         except FileNotFoundError:
-            pass
-        return target_import_path
-    return _get_unique_profile_folder(target_import_path)
+            replaced = False
+        return target_import_path, replaced
+    return _get_unique_profile_folder(target_import_path), False
 
 
 def _import_profile_files(profile_path: str, target_profile_path: str) -> None:
