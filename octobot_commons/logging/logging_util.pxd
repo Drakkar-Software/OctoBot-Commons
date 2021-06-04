@@ -19,13 +19,6 @@ cdef class BotLogger:
     cdef str logger_name
     cdef object logger
 
-    cpdef void debug(self, str message)
-    cpdef void info(self, str message)
-    cpdef void warning(self, str message)
-    cpdef void error(self, str message)
-    cpdef exception(self, object exception, bint publish_error_if_necessary=*, object error_message=*, bint include_exception_name=*)
-    cpdef void critical(self, str message)
-    cpdef void fatal(self, str message)
     cpdef void disable(self, bint disabled)
     cpdef void setup_sentry_logging(self)
 
