@@ -150,36 +150,36 @@ class BotLogger:
         # Disable until performance impact is measured
         # self.setup_sentry_logging()
 
-    def debug(self, message) -> None:
+    def debug(self, message, *args, **kwargs) -> None:
         """
         Called for a debug log
         :param message: the log message
         """
-        self.logger.debug(message)
+        self.logger.debug(message, *args, **kwargs)
         self._publish_log_if_necessary(message, logging.DEBUG)
 
-    def info(self, message) -> None:
+    def info(self, message, *args, **kwargs) -> None:
         """
         Called for an info log
         :param message: the log message
         """
-        self.logger.info(message)
+        self.logger.info(message, *args, **kwargs)
         self._publish_log_if_necessary(message, logging.INFO)
 
-    def warning(self, message) -> None:
+    def warning(self, message, *args, **kwargs) -> None:
         """
         Called for a warning log
         :param message: the log message
         """
-        self.logger.warning(message)
+        self.logger.warning(message, *args, **kwargs)
         self._publish_log_if_necessary(message, logging.WARNING)
 
-    def error(self, message) -> None:
+    def error(self, message, *args, **kwargs) -> None:
         """
         Called for an error log
         :param message: the log message
         """
-        self.logger.error(message)
+        self.logger.error(message, *args, **kwargs)
         self._publish_log_if_necessary(message, logging.ERROR)
 
     def exception(
@@ -188,6 +188,7 @@ class BotLogger:
         publish_error_if_necessary=True,
         error_message=None,
         include_exception_name=True,
+        **kwargs,
     ) -> None:
         """
         Called for an exception log
@@ -196,7 +197,7 @@ class BotLogger:
         :param error_message: the log message
         :param include_exception_name: when True adds the __class__.__name__ of the exception at the end of the message
         """
-        self.logger.exception(exception)
+        self.logger.exception(exception, **kwargs)
         if publish_error_if_necessary:
             message = error_message
             if message is None:
@@ -205,20 +206,20 @@ class BotLogger:
                 message = f"{message} ({exception.__class__.__name__})"
             self.error(message)
 
-    def critical(self, message) -> None:
+    def critical(self, message, *args, **kwargs) -> None:
         """
         Called for a critical log
         :param message: the log message
         """
-        self.logger.critical(message)
+        self.logger.critical(message, *args, **kwargs)
         self._publish_log_if_necessary(message, logging.CRITICAL)
 
-    def fatal(self, message) -> None:
+    def fatal(self, message, *args, **kwargs) -> None:
         """
         Called for a fatal log
         :param message: the log message
         """
-        self.logger.fatal(message)
+        self.logger.fatal(message, *args, **kwargs)
         self._publish_log_if_necessary(message, logging.FATAL)
 
     def disable(self, disabled):
