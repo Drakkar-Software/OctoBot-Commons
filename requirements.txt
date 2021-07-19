@@ -1,10 +1,7 @@
 # Setup requirements
-cython==0.29.23
-numpy==1.21.0
+cython==0.29.24
+numpy==1.21.1
 
 # Commons requirements
 jsonschema==3.2.0
 cryptography
-
-# error tracking
-sentry-sdk==1.0.0
