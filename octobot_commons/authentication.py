@@ -15,12 +15,22 @@
 #  License along with this library.
 import abc
 import functools
+import asyncio
+
+import octobot_commons.logging as bot_logging
 
 
 class Authenticator:
     """
     Abstract class to be implemented when using authenticated requests
     """
+
+    def __init__(self):
+        self.logger: bot_logging.BotLogger = bot_logging.get_logger(
+            self.__class__.__name__
+        )
+        self.initialized_event: asyncio.Event = None
+        self.supports: None
 
     @abc.abstractmethod
     def login(self, username, password):
@@ -62,6 +72,21 @@ class Authenticator:
         :return:
         """
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def is_initialized(self) -> bool:
+        """
+        Returns True when initialized
+        :return:
+        """
+        raise NotImplementedError
+
+    async def await_initialization(self, timeout):
+        """
+        Returns when initialized
+        :return:
+        """
+        await asyncio.wait_for(self.initialized_event.wait(), timeout)
 
 
 class FailedAuthentication(Exception):
