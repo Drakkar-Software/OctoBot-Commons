@@ -18,6 +18,10 @@
 cimport numpy as np
 
 cpdef object normalize_data(object data)
+cpdef object HL2(object high, object low)
+cpdef object HLC3(object high, object low, object close)
+cpdef object OHLC4(object open, object high, object low, object close)
+cpdef tuple HeikinAshi(object open, object high, object low, object close)
 cpdef double mean(object number_list)
 cpdef np.float64_t[::1] shift_value_array(np.float64_t[::1] array, int shift_count=*,
                                           object fill_value=*, object dtype=*)
