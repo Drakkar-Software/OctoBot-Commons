@@ -88,3 +88,32 @@ async def wait_asyncio_next_cycle():
         pass
 
     await asyncio.create_task(do_nothing())
+
+
+class RLock(asyncio.Lock):
+    """
+    Async Lock implementing reentrancy
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._task = None
+        self._depth = 0
+
+    async def acquire(self):
+        if self._task is None or self._task is not asyncio.current_task():
+            await super().acquire()
+            self._task = asyncio.current_task()
+            if self._depth != 0:
+                raise RuntimeError(
+                    f"Async RLock acquired when depth !=0 (depth = {self._depth})."
+                )
+        self._depth += 1
+        return True
+
+    def release(self):
+        if self._depth > 0:
+            self._depth -= 1
+        if self._depth == 0:
+            super().release()
+            self._task = None
