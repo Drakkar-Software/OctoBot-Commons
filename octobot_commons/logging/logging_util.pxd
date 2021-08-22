@@ -20,7 +20,6 @@ cdef class BotLogger:
     cdef object logger
 
     cpdef void disable(self, bint disabled)
-    cpdef void setup_sentry_logging(self)
 
     cdef void _publish_log_if_necessary(self, str message, object level)
     cdef void _web_interface_publish_log(self, str message, object level)
