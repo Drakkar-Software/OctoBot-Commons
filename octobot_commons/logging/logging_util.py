@@ -1,4 +1,4 @@
-# pylint: disable=C0415, W0603, W1508
+# pylint: disable=C0415, W0603, W1508, R0913
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -131,10 +131,16 @@ def register_error_notifier(callback):
     error_notifier_callbacks.append(callback)
 
 
+def _default_callback(*_, **__):
+    pass
+
+
 class BotLogger:
     """
     The bot logger that manage all OctoBot's logs
     """
+
+    ERROR_CALLBACK = _default_callback
 
     def __init__(self, logger_name):
         self.logger_name = logger_name
@@ -164,13 +170,15 @@ class BotLogger:
         self.logger.warning(message, *args, **kwargs)
         self._publish_log_if_necessary(message, logging.WARNING)
 
-    def error(self, message, *args, **kwargs) -> None:
+    def error(self, message, *args, skip_post_callback=False, **kwargs) -> None:
         """
         Called for an error log
         :param message: the log message
+        :param skip_post_callback: when True, the error callback wont be called
         """
         self.logger.error(message, *args, **kwargs)
         self._publish_log_if_necessary(message, logging.ERROR)
+        self._post_callback_if_necessary(None, message, skip_post_callback)
 
     def exception(
         self,
@@ -178,6 +186,7 @@ class BotLogger:
         publish_error_if_necessary=True,
         error_message=None,
         include_exception_name=True,
+        skip_post_callback=False,
         **kwargs,
     ) -> None:
         """
@@ -186,6 +195,7 @@ class BotLogger:
         :param publish_error_if_necessary: if the error should be published
         :param error_message: the log message
         :param include_exception_name: when True adds the __class__.__name__ of the exception at the end of the message
+        :param skip_post_callback: when True, the error callback wont be called
         """
         self.logger.exception(exception, **kwargs)
         if publish_error_if_necessary:
@@ -194,7 +204,8 @@ class BotLogger:
                 message = exception if str(exception) else exception.__class__.__name__
             elif include_exception_name:
                 message = f"{message} ({exception.__class__.__name__})"
-            self.error(message)
+            self.error(message, skip_post_callback=True)
+        self._post_callback_if_necessary(exception, error_message, skip_post_callback)
 
     def critical(self, message, *args, **kwargs) -> None:
         """
@@ -243,6 +254,18 @@ class BotLogger:
             message,
             call_notifiers=ERROR_PUBLICATION_ENABLED,
         )
+
+    @staticmethod
+    def register_error_callback(callback):
+        """
+        :param callback: the callback to be called upon errors and exceptions
+        Register callback as the ERROR_CALLBACK
+        """
+        BotLogger.ERROR_CALLBACK = callback
+
+    def _post_callback_if_necessary(self, exception, error_message, skip_post_callback):
+        if not skip_post_callback:
+            self.ERROR_CALLBACK(exception, error_message)
 
 
 def get_backtesting_errors_count() -> int:
