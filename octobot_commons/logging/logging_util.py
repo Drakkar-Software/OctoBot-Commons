@@ -16,7 +16,6 @@
 #  License along with this library.
 
 import logging
-import os
 
 import octobot_commons.timestamp_util as timestamp_util
 

@@ -1,4 +1,3 @@
-# pylint: disable=R1732
 #  Drakkar-Software OctoBot
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
