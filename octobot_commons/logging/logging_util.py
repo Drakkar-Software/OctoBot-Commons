@@ -23,13 +23,6 @@ import octobot_commons.timestamp_util as timestamp_util
 LOG_DATABASE = "log_db"
 LOG_NEW_ERRORS_COUNT = "log_new_errors_count"
 
-DISABLE_SENTRY = os.getenv("DISABLE_SENTRY", None)
-SENTRY_URL = os.getenv("SENTRY_URL", "o563994.ingest.sentry.io")
-SENTRY_KEY = os.getenv("SENTRY_KEY", "e0847deba5334a3aa668c461ed44c218")
-SENTRY_PROJECT = os.getenv("SENTRY_PROJECT", "5704514")
-SENTRY_RATE = os.getenv("SENTRY_RATE", 1.0)
-SENTRY_ENV = os.getenv("SENTRY_ENV", "production")
-
 BACKTESTING_NEW_ERRORS_COUNT: str = "log_backtesting_errors_count"
 
 logs_database = {
@@ -147,8 +140,6 @@ class BotLogger:
     def __init__(self, logger_name):
         self.logger_name = logger_name
         self.logger = logging.getLogger(logger_name)
-        # Disable until performance impact is measured
-        # self.setup_sentry_logging()
 
     def debug(self, message, *args, **kwargs) -> None:
         """
@@ -253,32 +244,6 @@ class BotLogger:
             message,
             call_notifiers=ERROR_PUBLICATION_ENABLED,
         )
-
-    def setup_sentry_logging(self):
-        """
-        Setup sentry logging if SENTRY_ENABLED and OctoBot version is importable
-        """
-        if DISABLE_SENTRY is None:
-            try:
-                from octobot.constants import VERSION
-                import sentry_sdk
-                import sentry_sdk.integrations.logging as sentry_logging
-
-                sentry_sdk.init(
-                    f"https://{SENTRY_KEY}@{SENTRY_URL}/{SENTRY_PROJECT}",
-                    traces_sample_rate=SENTRY_RATE,
-                    release=VERSION,
-                    environment=SENTRY_ENV,
-                    integrations=[
-                        sentry_logging.LoggingIntegration(
-                            level=logging.ERROR, event_level=logging.ERROR
-                        )
-                    ],
-                )
-            except ImportError:
-                self.logger.debug(
-                    "Failed to start sentry : can't import OctoBot version"
-                )
 
 
 def get_backtesting_errors_count() -> int:
