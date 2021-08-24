@@ -39,6 +39,13 @@ ERROR_PUBLICATION_ENABLED = True
 SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED = False
 
 
+def _default_callback(*_, **__):
+    pass
+
+
+_ERROR_CALLBACK = _default_callback
+
+
 def set_global_logger_level(level) -> None:
     """
     Set the global logger level
@@ -131,16 +138,10 @@ def register_error_notifier(callback):
     error_notifier_callbacks.append(callback)
 
 
-def _default_callback(*_, **__):
-    pass
-
-
 class BotLogger:
     """
     The bot logger that manage all OctoBot's logs
     """
-
-    ERROR_CALLBACK = _default_callback
 
     def __init__(self, logger_name):
         self.logger_name = logger_name
@@ -261,11 +262,13 @@ class BotLogger:
         :param callback: the callback to be called upon errors and exceptions
         Register callback as the ERROR_CALLBACK
         """
-        BotLogger.ERROR_CALLBACK = callback
+        global _ERROR_CALLBACK
+        _ERROR_CALLBACK = callback
 
-    def _post_callback_if_necessary(self, exception, error_message, skip_post_callback):
+    @staticmethod
+    def _post_callback_if_necessary(exception, error_message, skip_post_callback):
         if not skip_post_callback:
-            self.ERROR_CALLBACK(exception, error_message)
+            _ERROR_CALLBACK(exception, error_message)
 
 
 def get_backtesting_errors_count() -> int:
