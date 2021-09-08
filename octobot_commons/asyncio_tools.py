@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import asyncio
+import traceback
 
 import octobot_commons.constants as constants
 import octobot_commons.logging as logging_util
@@ -69,6 +70,11 @@ class ErrorContainer:
         self.errors.append(context)
         if self.print_received_exceptions:
             print(context)
+            error = context.get("exception")
+            if error:
+                traceback.print_exception(
+                    etype=type(error), value=error, tb=error.__traceback__
+                )
 
     async def check(self) -> None:
         """
