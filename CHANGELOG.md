@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.13] - 2021-09-14
+### Added
+- Singleton: get_instance_if_exists method
+
 ## [1.6.12] - 2021-09-08
 ### Added
 - ErrorContainer: print traceback
