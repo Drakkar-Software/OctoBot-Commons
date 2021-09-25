@@ -99,3 +99,12 @@ def _is_on_docker():
         )
     except FileNotFoundError:
         return False
+
+
+def parse_boolean_environment_var(env_key: str, default_value: str) -> bool:
+    """
+    :param env_key: the environment var key
+    :param default_value: the default value
+    :return: True when the var value is "True" or "true" else false
+    """
+    return bool(os.getenv(env_key, default_value).lower() == "true")
