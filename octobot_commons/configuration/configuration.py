@@ -216,6 +216,26 @@ class Configuration:
         self.config[commons_constants.CONFIG_ACCEPTED_TERMS] = accepted
         self.save()
 
+    def get_community_configuration(self) -> (str, str):
+        """
+        Returns the activated configuration name and id
+        :return: (name, id)
+        """
+        community_config = self.config.get(commons_constants.CONFIG_COMMUNITY_CONFIGURATION, {})
+        return community_config.get(commons_constants.CONFIG_NAME, commons_constants.CONFIG_ID)
+
+    def update_community_configuration(self, name: str, identifier: str) -> None:
+        """
+        Update the current community configuration details
+        :param name: name of the configuration
+        :param identifier: id of the configuration
+        """
+        self.config[commons_constants.CONFIG_COMMUNITY_CONFIGURATION] = {
+            commons_constants.CONFIG_NAME: name,
+            commons_constants.CONFIG_ID: identifier,
+        }
+        self.save()
+
     def update_config_fields(
         self,
         to_update_fields,

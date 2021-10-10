@@ -123,6 +123,7 @@ CONFIG_ACCEPTED_TERMS = "accepted_terms"
 
 # community
 CONFIG_COMMUNITY_TOKEN = "community-token"
+CONFIG_COMMUNITY_CONFIGURATION = "community_configuration"
 
 # metrics
 CONFIG_METRICS = "metrics"
