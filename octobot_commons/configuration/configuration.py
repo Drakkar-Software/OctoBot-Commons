@@ -289,3 +289,13 @@ class Configuration:
         for profile_managed_element in self.profile.FULLY_MANAGED_ELEMENTS:
             filtered_config.pop(profile_managed_element, None)
         return filtered_config
+
+    def dev_mode_enabled(self) -> bool:
+        """
+        Check if DEV_MODE is enabled
+        :return: bool
+        """
+        return os.getenv(
+            commons_constants.CONFIG_DEBUG_OPTION,
+            self.config.get(commons_constants.CONFIG_DEBUG_OPTION, False),
+        )
