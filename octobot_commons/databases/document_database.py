@@ -27,6 +27,20 @@ class DocumentDatabase:
         """
         self.adaptor = database_adaptor
 
+    def select(self, table_name: str, query) -> list:
+        """
+        Select data from the table_name table
+        :param table_name: name of the table
+        :param query: select query
+        """
+        return self.adaptor.select(table_name, query)
+
+    def tables(self) -> list:
+        """
+        Select tables
+        """
+        return self.adaptor.tables()
+
     def insert(self, table_name: str, row: dict):
         """
         Insert dict data into the table_name table
@@ -43,13 +57,14 @@ class DocumentDatabase:
         """
         self.adaptor.insert_many(table_name, rows)
 
-    def select(self, table_name: str, query) -> list:
+    def update(self, table_name: str, row: dict, query: dict):
         """
-        Select data from the table_name table
+        Insert dict data into the table_name table
         :param table_name: name of the table
-        :param query: select query
+        :param row: data to update
+        :param query: select statement
         """
-        return self.adaptor.select(table_name, query)
+        self.adaptor.update(table_name, row, query)
 
     def count(self, table_name: str, query) -> int:
         """
@@ -64,3 +79,9 @@ class DocumentDatabase:
         Creates a new empty select query
         """
         return self.adaptor.query_factory()
+
+    def close(self):
+        """
+        Closes the database
+        """
+        return self.adaptor.close()
