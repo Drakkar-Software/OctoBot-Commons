@@ -20,6 +20,14 @@ class AbstractDatabaseAdaptor:
     AbstractDatabaseAdaptor is an interface listing document databases public methods
     """
 
+    def select(self, table_name: str, query) -> list:
+        """
+        Select data from the table_name table
+        :param table_name: name of the table
+        :param query: select query
+        """
+        raise NotImplementedError("select is not implemented")
+
     def insert(self, table_name: str, row: dict):
         """
         Insert dict data into the table_name table
@@ -27,6 +35,12 @@ class AbstractDatabaseAdaptor:
         :param row: data to insert
         """
         raise NotImplementedError("insert is not implemented")
+
+    def tables(self) -> list:
+        """
+        Select tables
+        """
+        raise NotImplementedError("tables is not implemented")
 
     def insert_many(self, table_name: str, rows: list):
         """
@@ -36,13 +50,14 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("insert_many is not implemented")
 
-    def select(self, table_name: str, query) -> list:
+    def update(self, table_name: str, row: dict, query) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
+        :param row: data to update
         :param query: select query
         """
-        raise NotImplementedError("select is not implemented")
+        raise NotImplementedError("update is not implemented")
 
     def count(self, table_name: str, query) -> int:
         """
@@ -57,3 +72,9 @@ class AbstractDatabaseAdaptor:
         Creates a new empty select query
         """
         raise NotImplementedError("query_factory is not implemented")
+
+    def close(self):
+        """
+        Closes the database
+        """
+        raise NotImplementedError("close is not implemented")
