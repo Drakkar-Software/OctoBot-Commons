@@ -24,7 +24,8 @@ import octobot_commons.databases.adaptors.abstract_database_adaptor as abstract_
 class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
     """
     TinyDBAdaptor is an AbstractDatabaseAdaptor implemented using tinydb: a minimal python only
-    local document database
+    local document database.
+    Warning: loads the whole file in RAM
     """
 
     def __init__(self, file_path: str):
@@ -34,6 +35,20 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         super().__init__()
         self.database = tinydb.TinyDB(file_path)
+
+    def select(self, table_name: str, query) -> list:
+        """
+        Select data from the table_name table
+        :param table_name: name of the table
+        :param query: select query
+        """
+        return self.database.table(table_name).search(query) if query else self.database.table(table_name).all()
+
+    def tables(self) -> list:
+        """
+        Select tables
+        """
+        return list(self.database.tables())
 
     def insert(self, table_name: str, row: dict):
         """
@@ -51,13 +66,14 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         self.database.table(table_name).insert_multiple(rows)
 
-    def select(self, table_name: str, query) -> list:
+    def update(self, table_name: str, row: dict, query):
         """
         Select data from the table_name table
         :param table_name: name of the table
+        :param row: data to update
         :param query: select query
         """
-        return self.database.table(table_name).search(query)
+        self.database.table(table_name).update(row, query)
 
     def count(self, table_name: str, query) -> int:
         """
@@ -72,3 +88,9 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         Creates a new empty select query
         """
         return tinydb.Query()
+
+    def close(self):
+        """
+        Closes the database
+        """
+        return self.database.close()
