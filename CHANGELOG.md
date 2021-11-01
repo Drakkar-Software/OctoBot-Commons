@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.18] - 2021-11-01
+### Update
+- [Configuration] Add merge_sub_array option in merge_dictionaries_by_appending_keys
+
 ## [1.6.17] - 2021-10-30
 ### Updated
 - Bump requirements
