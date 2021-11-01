@@ -20,7 +20,14 @@ class AbstractDatabaseAdaptor:
     AbstractDatabaseAdaptor is an interface listing document databases public methods
     """
 
-    def select(self, table_name: str, query) -> list:
+    def __init__(self, db_path: str):
+        """
+        TinyDBAdaptor constructor
+        :param db_path: database path
+        """
+        self.db_path = db_path
+
+    async def select(self, table_name: str, query) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
@@ -28,7 +35,7 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("select is not implemented")
 
-    def insert(self, table_name: str, row: dict):
+    async def insert(self, table_name: str, row: dict):
         """
         Insert dict data into the table_name table
         :param table_name: name of the table
@@ -36,13 +43,13 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("insert is not implemented")
 
-    def tables(self) -> list:
+    async def tables(self) -> list:
         """
         Select tables
         """
         raise NotImplementedError("tables is not implemented")
 
-    def insert_many(self, table_name: str, rows: list):
+    async def insert_many(self, table_name: str, rows: list):
         """
         Insert multiple dict data into the table_name table
         :param table_name: name of the table
@@ -50,7 +57,7 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("insert_many is not implemented")
 
-    def update(self, table_name: str, row: dict, query) -> list:
+    async def update(self, table_name: str, row: dict, query) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
@@ -59,7 +66,7 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("update is not implemented")
 
-    def count(self, table_name: str, query) -> int:
+    async def count(self, table_name: str, query) -> int:
         """
         Counts documents in the table_name table
         :param table_name: name of the table
@@ -67,13 +74,13 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("count is not implemented")
 
-    def query_factory(self):
+    async def query_factory(self):
         """
         Creates a new empty select query
         """
         raise NotImplementedError("query_factory is not implemented")
 
-    def close(self):
+    async def close(self):
         """
         Closes the database
         """
