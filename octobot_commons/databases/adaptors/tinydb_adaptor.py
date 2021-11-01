@@ -33,10 +33,10 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         TinyDBAdaptor constructor
         :param file_path: path to the database file
         """
-        super().__init__()
+        super().__init__(file_path)
         self.database = tinydb.TinyDB(file_path)
 
-    def select(self, table_name: str, query) -> list:
+    async def select(self, table_name: str, query) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
@@ -44,13 +44,13 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         return self.database.table(table_name).search(query) if query else self.database.table(table_name).all()
 
-    def tables(self) -> list:
+    async def tables(self) -> list:
         """
         Select tables
         """
         return list(self.database.tables())
 
-    def insert(self, table_name: str, row: dict):
+    async def insert(self, table_name: str, row: dict):
         """
         Insert dict data into the table_name table
         :param table_name: name of the table
@@ -58,7 +58,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         self.database.table(table_name).insert(row)
 
-    def insert_many(self, table_name: str, rows: list):
+    async def insert_many(self, table_name: str, rows: list):
         """
         Insert multiple dict data into the table_name table
         :param table_name: name of the table
@@ -66,7 +66,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         self.database.table(table_name).insert_multiple(rows)
 
-    def update(self, table_name: str, row: dict, query):
+    async def update(self, table_name: str, row: dict, query):
         """
         Select data from the table_name table
         :param table_name: name of the table
@@ -75,7 +75,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         self.database.table(table_name).update(row, query)
 
-    def count(self, table_name: str, query) -> int:
+    async def count(self, table_name: str, query) -> int:
         """
         Counts documents in the table_name table
         :param table_name: name of the table
@@ -83,13 +83,13 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         return self.database.table(table_name).count(query)
 
-    def query_factory(self):
+    async def query_factory(self):
         """
         Creates a new empty select query
         """
         return tinydb.Query()
 
-    def close(self):
+    async def close(self):
         """
         Closes the database
         """
