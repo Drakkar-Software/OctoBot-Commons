@@ -27,61 +27,67 @@ class DocumentDatabase:
         """
         self.adaptor = database_adaptor
 
-    def select(self, table_name: str, query) -> list:
+    def get_db_path(self):
+        """
+        Select database path
+        """
+        return self.adaptor.db_path
+
+    async def select(self, table_name: str, query) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
         :param query: select query
         """
-        return self.adaptor.select(table_name, query)
+        return await self.adaptor.select(table_name, query)
 
-    def tables(self) -> list:
+    async def tables(self) -> list:
         """
         Select tables
         """
-        return self.adaptor.tables()
+        return await self.adaptor.tables()
 
-    def insert(self, table_name: str, row: dict):
+    async def insert(self, table_name: str, row: dict):
         """
         Insert dict data into the table_name table
         :param table_name: name of the table
         :param row: data to insert
         """
-        self.adaptor.insert(table_name, row)
+        await self.adaptor.insert(table_name, row)
 
-    def insert_many(self, table_name: str, rows: list):
+    async def insert_many(self, table_name: str, rows: list):
         """
         Insert multiple dict data into the table_name table
         :param table_name: name of the table
         :param rows: data to insert
         """
-        self.adaptor.insert_many(table_name, rows)
+        await self.adaptor.insert_many(table_name, rows)
 
-    def update(self, table_name: str, row: dict, query: dict):
+    async def update(self, table_name: str, row: dict, query: dict):
         """
         Insert dict data into the table_name table
         :param table_name: name of the table
         :param row: data to update
         :param query: select statement
         """
-        self.adaptor.update(table_name, row, query)
+        await self.adaptor.update(table_name, row, query)
 
-    def count(self, table_name: str, query) -> int:
+    async def count(self, table_name: str, query) -> int:
         """
         Counts documents in the table_name table
         :param table_name: name of the table
         :param query: select query
         """
-        return self.adaptor.count(table_name, query)
+        return await self.adaptor.count(table_name, query)
 
-    def query_factory(self):
+    async def query_factory(self):
         """
         Creates a new empty select query
         """
-        return self.adaptor.query_factory()
+        return await self.adaptor.query_factory()
 
-    def close(self):
+    async def close(self):
         """
         Closes the database
         """
-        return self.adaptor.close()
+        return await self.adaptor.close()
