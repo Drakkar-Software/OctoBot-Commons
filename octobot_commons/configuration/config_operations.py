@@ -60,7 +60,9 @@ def parse_and_update(key, new_data, config_separator):
     return new_config
 
 
-def merge_dictionaries_by_appending_keys(dict_dest, dict_src) -> dict:
+def merge_dictionaries_by_appending_keys(
+    dict_dest, dict_src, merge_sub_array=False
+) -> dict:
     """
     Merge dictionnaries by appending keys
     :param dict_dest: the destination dictionnary
@@ -79,7 +81,11 @@ def merge_dictionaries_by_appending_keys(dict_dest, dict_src) -> dict:
                 # simple type: update value
                 dict_dest[key] = src_val
             elif isinstance(dest_val, list) and isinstance(src_val, list):
-                dict_dest[key] = src_val
+                if merge_sub_array:
+                    dict_dest[key] += src_val
+                    dict_dest[key] = list(set(dict_dest[key]))
+                else:
+                    dict_dest[key] = src_val
             else:
                 logging.get_logger("ConfigOperations").error(
                     f"Conflict when merging dict with key : {key}"
