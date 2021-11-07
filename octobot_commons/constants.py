@@ -45,6 +45,7 @@ SCHEMA = "schema"
 CONFIG_FILE_EXT = ".json"
 CONFIG_FILE_SCHEMA = f"{CONFIG_FOLDER}/config_{SCHEMA}.json"
 CONFIG_REFRESH_RATE = "refresh_rate_seconds"
+CONFIG_OPTIMIZER_ID = "optimizer_id"
 
 # profiles
 PROFILES_FOLDER = "profiles"
@@ -105,6 +106,9 @@ CONFIG_SIMULATOR_FEES = "fees"
 CONFIG_SIMULATOR_FEES_MAKER = "maker"
 CONFIG_SIMULATOR_FEES_TAKER = "taker"
 CONFIG_SIMULATOR_FEES_WITHDRAW = "withdraw"
+
+# Optimizer
+OPTIMIZER_RUNS_FOLDER = "optimizer"
 
 # OS
 PLATFORM_DATA_SEPARATOR = ":"
