@@ -50,30 +50,38 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         return list(self.database.tables())
 
-    async def insert(self, table_name: str, row: dict):
+    async def insert(self, table_name: str, row: dict) -> int:
         """
         Insert dict data into the table_name table
         :param table_name: name of the table
         :param row: data to insert
         """
-        self.database.table(table_name).insert(row)
+        return self.database.table(table_name).insert(row)
 
-    async def insert_many(self, table_name: str, rows: list):
+    async def insert_many(self, table_name: str, rows: list) -> list:
         """
         Insert multiple dict data into the table_name table
         :param table_name: name of the table
         :param rows: data to insert
         """
-        self.database.table(table_name).insert_multiple(rows)
+        return self.database.table(table_name).insert_multiple(rows)
 
-    async def update(self, table_name: str, row: dict, query):
+    async def update(self, table_name: str, row: dict, query) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
         :param row: data to update
         :param query: select query
         """
-        self.database.table(table_name).update(row, query)
+        return self.database.table(table_name).update(row, query)
+
+    async def delete(self, table_name: str, query) -> list:
+        """
+        Delete data from the table_name table
+        :param table_name: name of the table
+        :param query: select query
+        """
+        return self.database.table(table_name).remove(query)
 
     async def count(self, table_name: str, query) -> int:
         """
