@@ -47,30 +47,38 @@ class DocumentDatabase:
         """
         return await self.adaptor.tables()
 
-    async def insert(self, table_name: str, row: dict):
+    async def insert(self, table_name: str, row: dict) -> int:
         """
         Insert dict data into the table_name table
         :param table_name: name of the table
         :param row: data to insert
         """
-        await self.adaptor.insert(table_name, row)
+        return await self.adaptor.insert(table_name, row)
 
-    async def insert_many(self, table_name: str, rows: list):
+    async def insert_many(self, table_name: str, rows: list) -> list:
         """
         Insert multiple dict data into the table_name table
         :param table_name: name of the table
         :param rows: data to insert
         """
-        await self.adaptor.insert_many(table_name, rows)
+        return await self.adaptor.insert_many(table_name, rows)
 
-    async def update(self, table_name: str, row: dict, query: dict):
+    async def update(self, table_name: str, row: dict, query: dict) -> list:
         """
         Insert dict data into the table_name table
         :param table_name: name of the table
         :param row: data to update
         :param query: select statement
         """
-        await self.adaptor.update(table_name, row, query)
+        return await self.adaptor.update(table_name, row, query)
+
+    async def delete(self, table_name: str, query) -> list:
+        """
+        Delete data from the table_name table
+        :param table_name: name of the table
+        :param query: select query
+        """
+        return await self.adaptor.delete(table_name, query)
 
     async def count(self, table_name: str, query) -> int:
         """

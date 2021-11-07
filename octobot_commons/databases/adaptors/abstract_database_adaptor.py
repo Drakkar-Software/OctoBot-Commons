@@ -35,7 +35,7 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("select is not implemented")
 
-    async def insert(self, table_name: str, row: dict):
+    async def insert(self, table_name: str, row: dict) -> int:
         """
         Insert dict data into the table_name table
         :param table_name: name of the table
@@ -49,7 +49,7 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("tables is not implemented")
 
-    async def insert_many(self, table_name: str, rows: list):
+    async def insert_many(self, table_name: str, rows: list) -> list:
         """
         Insert multiple dict data into the table_name table
         :param table_name: name of the table
@@ -65,6 +65,14 @@ class AbstractDatabaseAdaptor:
         :param query: select query
         """
         raise NotImplementedError("update is not implemented")
+
+    async def delete(self, table_name: str, query) -> list:
+        """
+        Delete data from the table_name table
+        :param table_name: name of the table
+        :param query: select query
+        """
+        raise NotImplementedError("delete is not implemented")
 
     async def count(self, table_name: str, query) -> int:
         """
