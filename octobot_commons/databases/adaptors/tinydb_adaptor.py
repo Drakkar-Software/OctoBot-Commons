@@ -15,6 +15,8 @@
 #  License along with this library.
 try:
     import tinydb
+    import tinydb.storages
+    import tinydb.middlewares
 except ImportError:
     pass
 
@@ -22,19 +24,23 @@ import octobot_commons.databases.adaptors.abstract_database_adaptor as abstract_
 
 
 class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
+    WRITE_CACHE_SIZE = 5000
+
     """
     TinyDBAdaptor is an AbstractDatabaseAdaptor implemented using tinydb: a minimal python only
     local document database.
-    Warning: loads the whole file in RAM
+    Warning: loads the whole file in RAM and must be closed to ensure writing
     """
 
     def __init__(self, file_path: str):
         """
-        TinyDBAdaptor constructor
+        TinyDBAdaptor constructor.
         :param file_path: path to the database file
         """
         super().__init__(file_path)
-        self.database = tinydb.TinyDB(file_path)
+        tinydb.middlewares.CachingMiddleware.WRITE_CACHE_SIZE = self.WRITE_CACHE_SIZE
+        self.database = tinydb.TinyDB(file_path,
+                                      storage=tinydb.middlewares.CachingMiddleware(tinydb.storages.JSONStorage))
 
     async def select(self, table_name: str, query) -> list:
         """
