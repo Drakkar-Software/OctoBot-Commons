@@ -108,6 +108,12 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         return tinydb.Query()
 
+    async def flush(self):
+        """
+        Flushes the database cache
+        """
+        return self.database.storage.flush()
+
     async def close(self):
         """
         Closes the database
