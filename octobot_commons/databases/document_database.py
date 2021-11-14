@@ -94,6 +94,12 @@ class DocumentDatabase:
         """
         return await self.adaptor.query_factory()
 
+    async def flush(self):
+        """
+        Flushes the database cache
+        """
+        return await self.adaptor.flush()
+
     async def close(self):
         """
         Closes the database
