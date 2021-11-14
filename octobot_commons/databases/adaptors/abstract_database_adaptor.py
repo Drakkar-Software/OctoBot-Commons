@@ -90,6 +90,12 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("query_factory is not implemented")
 
+    async def flush(self):
+        """
+        Flushes the database cache
+        """
+        raise NotImplementedError("flush is not implemented")
+
     async def close(self):
         """
         Closes the database
