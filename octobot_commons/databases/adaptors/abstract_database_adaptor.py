@@ -1,3 +1,4 @@
+# pylint: disable=W0613
 #  Drakkar-Software OctoBot-Trading
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -20,10 +21,11 @@ class AbstractDatabaseAdaptor:
     AbstractDatabaseAdaptor is an interface listing document databases public methods
     """
 
-    def __init__(self, db_path: str):
+    def __init__(self, db_path: str, **kwargs):
         """
         TinyDBAdaptor constructor
         :param db_path: database path
+        :param kwargs: kwargs to pass to the underlying db driver constructor
         """
         self.db_path = db_path
 
