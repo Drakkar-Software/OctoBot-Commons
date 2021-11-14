@@ -24,23 +24,24 @@ import octobot_commons.databases.adaptors.abstract_database_adaptor as abstract_
 
 
 class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
-    WRITE_CACHE_SIZE = 5000
-
     """
     TinyDBAdaptor is an AbstractDatabaseAdaptor implemented using tinydb: a minimal python only
     local document database.
     Warning: loads the whole file in RAM and must be closed to ensure writing
     """
 
-    def __init__(self, file_path: str):
+    DEFAULT_WRITE_CACHE_SIZE = 5000
+
+    def __init__(self, file_path: str, cache_size: int = None):
         """
         TinyDBAdaptor constructor.
         :param file_path: path to the database file
+        :param cache_size: size of the in memory cache (number of operations before updating the file
         """
         super().__init__(file_path)
-        tinydb.middlewares.CachingMiddleware.WRITE_CACHE_SIZE = self.WRITE_CACHE_SIZE
-        self.database = tinydb.TinyDB(file_path,
-                                      storage=tinydb.middlewares.CachingMiddleware(tinydb.storages.JSONStorage))
+        middleware = tinydb.middlewares.CachingMiddleware(tinydb.storages.JSONStorage)
+        middleware.WRITE_CACHE_SIZE = cache_size or self.DEFAULT_WRITE_CACHE_SIZE
+        self.database = tinydb.TinyDB(file_path, storage=middleware)
 
     async def select(self, table_name: str, query) -> list:
         """
@@ -48,7 +49,11 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param table_name: name of the table
         :param query: select query
         """
-        return self.database.table(table_name).search(query) if query else self.database.table(table_name).all()
+        return (
+            self.database.table(table_name).search(query)
+            if query
+            else self.database.table(table_name).all()
+        )
 
     async def tables(self) -> list:
         """
