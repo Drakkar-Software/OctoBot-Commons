@@ -14,6 +14,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import octobot_commons.multiprocessing_util as multiprocessing_util
+import octobot_trading.enums as trading_enums
 
 
 class AbstractDatabaseAdaptor:
@@ -28,6 +30,12 @@ class AbstractDatabaseAdaptor:
         :param kwargs: kwargs to pass to the underlying db driver constructor
         """
         self.db_path = db_path
+
+    def initialize(self):
+        """
+        Initialize the database.
+        """
+        raise NotImplementedError("initialize is not implemented")
 
     async def select(self, table_name: str, query) -> list:
         """
@@ -101,3 +109,31 @@ class AbstractDatabaseAdaptor:
         Closes the database
         """
         raise NotImplementedError("close is not implemented")
+
+    @staticmethod
+    def is_multiprocessing():
+        """
+        Returns True if the current process is run in a multiprocessing context using the multiprocessing_util module.
+        """
+        try:
+            multiprocessing_util.get_lock(trading_enums.MultiprocessingLocks.DBLock.value)
+            return True
+        except KeyError:
+            # no lock to acquire: we are not in a multiprocessing context
+            return False
+
+    @staticmethod
+    def _get_lock():
+        return multiprocessing_util.get_lock(trading_enums.MultiprocessingLocks.DBLock.value)
+
+    async def acquire(self):
+        """
+        Acquires the database lock.
+        """
+        self._get_lock().acquire()
+
+    async def release(self):
+        """
+        Releases the database lock.
+        """
+        self._get_lock().release()

@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import contextlib
 
 
 class DocumentDatabase:
@@ -26,6 +27,12 @@ class DocumentDatabase:
         :param database_adaptor: database adaptor
         """
         self.adaptor = database_adaptor
+
+    def initialize(self):
+        """
+        Initialize the database adaptor.
+        """
+        self.adaptor.initialize()
 
     def get_db_path(self):
         """
@@ -105,3 +112,27 @@ class DocumentDatabase:
         Closes the database
         """
         return await self.adaptor.close()
+
+    @classmethod
+    @contextlib.asynccontextmanager
+    async def locked_database(cls, *args, **kwargs):
+        """
+        Instantiate and then ensure lock is acquired before initializing the database.
+        Closes the database and then releases the lock when exiting
+        :param args: args to pass to the database constructor
+        :param kwargs: kwargs to pass to the database constructor
+        """
+        instance = None
+        try:
+            instance = cls(*args, **kwargs)
+            if instance.adaptor.is_multiprocessing():
+                await instance.adaptor.acquire()
+            instance.initialize()
+            yield instance
+        finally:
+            if instance is not None:
+                try:
+                    await instance.close()
+                finally:
+                    if instance.adaptor.is_multiprocessing():
+                        await instance.adaptor.release()
