@@ -32,16 +32,24 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
 
     DEFAULT_WRITE_CACHE_SIZE = 5000
 
-    def __init__(self, file_path: str, cache_size: int = None):
+    def __init__(self, file_path: str, cache_size: int = None, **kwargs):
         """
         TinyDBAdaptor constructor.
         :param file_path: path to the database file
         :param cache_size: size of the in memory cache (number of operations before updating the file
+        :param kwargs: unused
         """
         super().__init__(file_path)
+        self.database = None
+        self.cache_size = cache_size
+
+    def initialize(self):
+        """
+        Initialize the database: opens the database file.
+        """
         middleware = tinydb.middlewares.CachingMiddleware(tinydb.storages.JSONStorage)
-        middleware.WRITE_CACHE_SIZE = cache_size or self.DEFAULT_WRITE_CACHE_SIZE
-        self.database = tinydb.TinyDB(file_path, storage=middleware)
+        middleware.WRITE_CACHE_SIZE = self.cache_size or self.DEFAULT_WRITE_CACHE_SIZE
+        self.database = tinydb.TinyDB(self.db_path, storage=middleware)
 
     async def select(self, table_name: str, query) -> list:
         """
