@@ -127,3 +127,7 @@ class OctoBotChannelSubjects(enum.Enum):
     UPDATE = "update"
     DELETION = "deletion"
     ERROR = "error"
+
+
+class MultiprocessingLocks(enum.Enum):
+    DBLock = "db_lock"
