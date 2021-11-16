@@ -15,7 +15,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import octobot_commons.multiprocessing_util as multiprocessing_util
-import octobot_trading.enums as trading_enums
+import octobot_commons.enums as commons_enums
 
 
 class AbstractDatabaseAdaptor:
@@ -116,7 +116,7 @@ class AbstractDatabaseAdaptor:
         Returns True if the current process is run in a multiprocessing context using the multiprocessing_util module.
         """
         try:
-            multiprocessing_util.get_lock(trading_enums.MultiprocessingLocks.DBLock.value)
+            multiprocessing_util.get_lock(commons_enums.MultiprocessingLocks.DBLock.value)
             return True
         except KeyError:
             # no lock to acquire: we are not in a multiprocessing context
@@ -124,7 +124,7 @@ class AbstractDatabaseAdaptor:
 
     @staticmethod
     def _get_lock():
-        return multiprocessing_util.get_lock(trading_enums.MultiprocessingLocks.DBLock.value)
+        return multiprocessing_util.get_lock(commons_enums.MultiprocessingLocks.DBLock.value)
 
     async def acquire(self):
         """
