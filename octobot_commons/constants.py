@@ -46,6 +46,7 @@ CONFIG_FILE_EXT = ".json"
 CONFIG_FILE_SCHEMA = f"{CONFIG_FOLDER}/config_{SCHEMA}.json"
 CONFIG_REFRESH_RATE = "refresh_rate_seconds"
 CONFIG_OPTIMIZER_ID = "optimizer_id"
+CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
 
 # profiles
 PROFILES_FOLDER = "profiles"
