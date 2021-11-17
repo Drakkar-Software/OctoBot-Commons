@@ -77,6 +77,15 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         return self.database.table(table_name).insert(row)
 
+    async def upsert(self, table_name: str, row: dict, query) -> int:
+        """
+        Insert or update dict data into the table_name table
+        :param table_name: name of the table
+        :param row: data to insert
+        :param query: select query
+        """
+        return self.database.table(table_name).upsert(row, query)
+
     async def insert_many(self, table_name: str, rows: list) -> list:
         """
         Insert multiple dict data into the table_name table
