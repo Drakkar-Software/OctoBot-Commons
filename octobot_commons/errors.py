@@ -49,3 +49,9 @@ class TentacleNotFound(Exception):
     """
     Tentacle not found related Exception
     """
+
+
+class NoCacheValue(Exception):
+    """
+    Raised when a cache value is selected but is not available in database
+    """
