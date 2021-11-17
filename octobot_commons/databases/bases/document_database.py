@@ -1,4 +1,4 @@
-#  Drakkar-Software OctoBot-Trading
+#  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -61,6 +61,15 @@ class DocumentDatabase:
         :param row: data to insert
         """
         return await self.adaptor.insert(table_name, row)
+
+    async def upsert(self, table_name: str, row: dict, query) -> int:
+        """
+        Insert or update dict data into the table_name table
+        :param table_name: name of the table
+        :param row: data to insert
+        :param query: select query
+        """
+        return await self.adaptor.upsert(table_name, row, query)
 
     async def insert_many(self, table_name: str, rows: list) -> list:
         """

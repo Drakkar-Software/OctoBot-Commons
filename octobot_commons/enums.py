@@ -131,3 +131,8 @@ class OctoBotChannelSubjects(enum.Enum):
 
 class MultiprocessingLocks(enum.Enum):
     DBLock = "db_lock"
+
+
+class CacheDatabaseColumns(enum.Enum):
+    TIMESTAMP = "t"
+    VALUE = "v"

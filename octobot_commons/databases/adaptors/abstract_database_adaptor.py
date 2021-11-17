@@ -1,5 +1,5 @@
 # pylint: disable=W0613
-#  Drakkar-Software OctoBot-Trading
+#  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -52,6 +52,15 @@ class AbstractDatabaseAdaptor:
         :param row: data to insert
         """
         raise NotImplementedError("insert is not implemented")
+
+    async def upsert(self, table_name: str, row: dict, query) -> int:
+        """
+        Insert or update dict data into the table_name table
+        :param table_name: name of the table
+        :param row: data to insert
+        :param query: select query
+        """
+        raise NotImplementedError("upsert is not implemented")
 
     async def tables(self) -> list:
         """
