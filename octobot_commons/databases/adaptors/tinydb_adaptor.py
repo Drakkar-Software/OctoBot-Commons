@@ -17,6 +17,7 @@ try:
     import tinydb
     import tinydb.storages
     import tinydb.middlewares
+    import tinydb.table
 except ImportError:
     pass
 
@@ -51,17 +52,20 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         middleware.WRITE_CACHE_SIZE = self.cache_size or self.DEFAULT_WRITE_CACHE_SIZE
         self.database = tinydb.TinyDB(self.db_path, storage=middleware)
 
-    async def select(self, table_name: str, query) -> list:
+    async def select(self, table_name: str, query, uuid=None) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
         :param query: select query
+        :param uuid: id of the document
         """
-        return (
-            self.database.table(table_name).search(query)
-            if query
-            else self.database.table(table_name).all()
-        )
+        if uuid is None:
+            return (
+                self.database.table(table_name).search(query)
+                if query
+                else self.database.table(table_name).all()
+            )
+        return self.database.table(table_name).get(doc_id=uuid)
 
     async def tables(self) -> list:
         """
@@ -77,14 +81,17 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         return self.database.table(table_name).insert(row)
 
-    async def upsert(self, table_name: str, row: dict, query) -> int:
+    async def upsert(self, table_name: str, row: dict, query, uuid=None) -> int:
         """
         Insert or update dict data into the table_name table
         :param table_name: name of the table
         :param row: data to insert
         :param query: select query
+        :param uuid: id of the document
         """
-        return self.database.table(table_name).upsert(row, query)
+        if uuid is None:
+            return self.database.table(table_name).upsert(row, query)
+        return self.database.table(table_name).upsert(tinydb.table.Document(row, doc_id=uuid))
 
     async def insert_many(self, table_name: str, rows: list) -> list:
         """
@@ -94,22 +101,28 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         return self.database.table(table_name).insert_multiple(rows)
 
-    async def update(self, table_name: str, row: dict, query) -> list:
+    async def update(self, table_name: str, row: dict, query, uuid=None) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
         :param row: data to update
         :param query: select query
+        :param uuid: id of the document
         """
-        return self.database.table(table_name).update(row, query)
+        if uuid is None:
+            return self.database.table(table_name).update(row, query)
+        return self.database.table(table_name).update(tinydb.table.Document(row, doc_id=uuid))
 
-    async def delete(self, table_name: str, query) -> list:
+    async def delete(self, table_name: str, query, uuid=None) -> list:
         """
         Delete data from the table_name table
         :param table_name: name of the table
         :param query: select query
+        :param uuid: id of the document
         """
-        return self.database.table(table_name).remove(query)
+        if uuid is None:
+            return self.database.table(table_name).remove(query)
+        return self.database.table(table_name).remove(doc_ids=(uuid,))
 
     async def count(self, table_name: str, query) -> int:
         """
