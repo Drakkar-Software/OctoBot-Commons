@@ -46,7 +46,6 @@ CONFIG_FILE_EXT = ".json"
 CONFIG_FILE_SCHEMA = f"{CONFIG_FOLDER}/config_{SCHEMA}.json"
 CONFIG_REFRESH_RATE = "refresh_rate_seconds"
 CONFIG_OPTIMIZER_ID = "optimizer_id"
-CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
 
 # profiles
 PROFILES_FOLDER = "profiles"
@@ -155,6 +154,12 @@ DEFAULT_CONFIG_VALUES = {
     "NO KEY",
     "Empty",
 }
+
+# cache
+CACHE_FOLDER = "cache"
+CACHE_FILE = "cache.json"
+CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
+CACHE_HASH_SIZE = 15
 
 # Async settings
 DEFAULT_FUTURE_TIMEOUT = 120
