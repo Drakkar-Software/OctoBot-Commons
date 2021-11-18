@@ -133,6 +133,12 @@ class MultiprocessingLocks(enum.Enum):
     DBLock = "db_lock"
 
 
+class CacheDatabaseTables(enum.Enum):
+    CACHE = "cache"
+    METADATA = "metadata"
+
+
 class CacheDatabaseColumns(enum.Enum):
     TIMESTAMP = "t"
     VALUE = "v"
+    TYPE = "ty"

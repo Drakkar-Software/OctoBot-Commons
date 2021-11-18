@@ -32,6 +32,7 @@ from octobot_commons.databases.bases import (
     DocumentDatabase,
     DatabaseCache,
     BaseDatabase,
+    CacheDatabase,
 )
 
 from octobot_commons.databases.reader import (
@@ -57,6 +58,7 @@ __all__ = [
     "DocumentDatabase",
     "DatabaseCache",
     "BaseDatabase",
+    "CacheDatabase",
     "DBReader",
     "DBWriter",
     "DBWriterReader",

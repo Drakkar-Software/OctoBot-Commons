@@ -21,18 +21,31 @@ import octobot_commons.errors as errors
 class CacheTimestampDatabase(bases.CacheDatabase):
     async def get(self, timestamp: float, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> dict:
         try:
-            return (await self._database.select(self.CACHE_TABLE, await self._timestamp_query(timestamp)))[0][name]
-        except IndexError:
-            raise errors.NoCacheValue(f"No cache value associated to {timestamp}")
+            return await self._get_from_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name)
         except KeyError:
-            raise errors.NoCacheValue(f"No {name} value associated to {timestamp} cache.")
+            try:
+                value = (await self._database.select(self.CACHE_TABLE, await self._timestamp_query(timestamp)))[0][name]
+                await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, update=True)
+                return value
+            except IndexError:
+                raise errors.NoCacheValue(f"No cache value associated to {timestamp}")
+            except KeyError:
+                raise errors.NoCacheValue(f"No {name} value associated to {timestamp} cache.")
 
     async def set(self, timestamp: float, value, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> None:
-        set_value = {
-            commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp,
-            name: value,
-        }
-        await self._database.upsert(self.CACHE_TABLE, set_value, await self._timestamp_query(timestamp))
+        await self._ensure_metadata()
+        if await self._needs_update(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name, value):
+            set_value = {
+                commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp,
+                name: value,
+            }
+            await self._database.upsert(self.CACHE_TABLE, set_value, await self._timestamp_query(timestamp))
+            if timestamp in self._local_cache:
+                self._local_cache[timestamp][name] = value
+            else:
+                self._local_cache[timestamp] = {
+                    name: value
+                }
 
     async def contains(self, timestamp: float) -> bool:
         return await self._database.count(self.CACHE_TABLE, await self._timestamp_query(timestamp)) > 0
