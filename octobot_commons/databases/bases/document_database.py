@@ -40,13 +40,14 @@ class DocumentDatabase:
         """
         return self.adaptor.db_path
 
-    async def select(self, table_name: str, query) -> list:
+    async def select(self, table_name: str, query, uuid=None) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
         :param query: select query
+        :param uuid: id of the document
         """
-        return await self.adaptor.select(table_name, query)
+        return await self.adaptor.select(table_name, query, uuid=uuid)
 
     async def tables(self) -> list:
         """
@@ -62,14 +63,15 @@ class DocumentDatabase:
         """
         return await self.adaptor.insert(table_name, row)
 
-    async def upsert(self, table_name: str, row: dict, query) -> int:
+    async def upsert(self, table_name: str, row: dict, query, uuid=None) -> int:
         """
         Insert or update dict data into the table_name table
         :param table_name: name of the table
         :param row: data to insert
         :param query: select query
+        :param uuid: id of the document
         """
-        return await self.adaptor.upsert(table_name, row, query)
+        return await self.adaptor.upsert(table_name, row, query, uuid=uuid)
 
     async def insert_many(self, table_name: str, rows: list) -> list:
         """
@@ -79,22 +81,24 @@ class DocumentDatabase:
         """
         return await self.adaptor.insert_many(table_name, rows)
 
-    async def update(self, table_name: str, row: dict, query: dict) -> list:
+    async def update(self, table_name: str, row: dict, query: dict, uuid=None) -> list:
         """
         Insert dict data into the table_name table
         :param table_name: name of the table
         :param row: data to update
         :param query: select statement
+        :param uuid: id of the document
         """
-        return await self.adaptor.update(table_name, row, query)
+        return await self.adaptor.update(table_name, row, query, uuid=uuid)
 
-    async def delete(self, table_name: str, query) -> list:
+    async def delete(self, table_name: str, query, uuid=None) -> list:
         """
         Delete data from the table_name table
         :param table_name: name of the table
         :param query: select query
+        :param uuid: id of the document
         """
-        return await self.adaptor.delete(table_name, query)
+        return await self.adaptor.delete(table_name, query, uuid=uuid)
 
     async def count(self, table_name: str, query) -> int:
         """

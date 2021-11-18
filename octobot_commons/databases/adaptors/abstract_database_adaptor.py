@@ -37,11 +37,12 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("initialize is not implemented")
 
-    async def select(self, table_name: str, query) -> list:
+    async def select(self, table_name: str, query, uuid=None) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
         :param query: select query
+        :param uuid: id of the document
         """
         raise NotImplementedError("select is not implemented")
 
@@ -53,12 +54,13 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("insert is not implemented")
 
-    async def upsert(self, table_name: str, row: dict, query) -> int:
+    async def upsert(self, table_name: str, row: dict, query, uuid=None) -> int:
         """
         Insert or update dict data into the table_name table
         :param table_name: name of the table
         :param row: data to insert
         :param query: select query
+        :param uuid: id of the document
         """
         raise NotImplementedError("upsert is not implemented")
 
@@ -76,20 +78,22 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("insert_many is not implemented")
 
-    async def update(self, table_name: str, row: dict, query) -> list:
+    async def update(self, table_name: str, row: dict, query, uuid=None) -> list:
         """
         Select data from the table_name table
         :param table_name: name of the table
         :param row: data to update
         :param query: select query
+        :param uuid: id of the document
         """
         raise NotImplementedError("update is not implemented")
 
-    async def delete(self, table_name: str, query) -> list:
+    async def delete(self, table_name: str, query, uuid=None) -> list:
         """
         Delete data from the table_name table
         :param table_name: name of the table
         :param query: select query
+        :param uuid: id of the document
         """
         raise NotImplementedError("delete is not implemented")
 
