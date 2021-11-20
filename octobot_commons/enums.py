@@ -129,6 +129,10 @@ class OctoBotChannelSubjects(enum.Enum):
     ERROR = "error"
 
 
+class UserCommands(enum.Enum):
+    RELOAD_SCRIPT = "reload_script"
+
+
 class MultiprocessingLocks(enum.Enum):
     DBLock = "db_lock"
 

@@ -39,6 +39,9 @@ class BaseDatabase:
     async def count(self, table_name: str, query) -> int:
         return await self._database.count(table_name, query)
 
+    async def flush(self):
+        await self._database.flush()
+
     async def close(self):
         await self._database.close()
 

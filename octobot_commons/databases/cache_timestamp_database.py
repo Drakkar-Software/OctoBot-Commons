@@ -34,17 +34,18 @@ class CacheTimestampDatabase(bases.CacheDatabase):
 
     async def set(self, timestamp: float, value, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> None:
         await self._ensure_metadata()
-        if await self._needs_update(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name, value):
+        saved_value = self.get_serializable_value(value)
+        if await self._needs_update(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name, saved_value):
             set_value = {
                 commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp,
-                name: value,
+                name: saved_value,
             }
             await self._database.upsert(self.CACHE_TABLE, set_value, await self._timestamp_query(timestamp))
             if timestamp in self._local_cache:
-                self._local_cache[timestamp][name] = value
+                self._local_cache[timestamp][name] = saved_value
             else:
                 self._local_cache[timestamp] = {
-                    name: value
+                    name: saved_value
                 }
 
     async def contains(self, timestamp: float) -> bool:
