@@ -46,6 +46,7 @@ CONFIG_FILE_EXT = ".json"
 CONFIG_FILE_SCHEMA = f"{CONFIG_FOLDER}/config_{SCHEMA}.json"
 CONFIG_REFRESH_RATE = "refresh_rate_seconds"
 CONFIG_OPTIMIZER_ID = "optimizer_id"
+CONFIG_BACKTESTING_ID = "backtesting_id"
 
 # profiles
 PROFILES_FOLDER = "profiles"
@@ -161,6 +162,7 @@ CACHE_FILE = "cache.json"
 CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
 CACHE_HASH_SIZE = 15
 CACHE_RELATED_DATA_SEPARATOR = "##"
+LOCAL_BOT_DATA = "local_bot_data"
 
 # Async settings
 DEFAULT_FUTURE_TIMEOUT = 120
@@ -173,3 +175,17 @@ GITHUB_ORGANISATION = "Drakkar-Software"
 
 # External resources
 EXTERNAL_RESOURCE_URL = "https://raw.githubusercontent.com/Drakkar-Software/OctoBot/assets/external_resources.json"
+
+# Run databases
+LIVE = "live"
+BACKTESTING = "backtesting"
+OPTIMIZER = "optimizer"
+OPTIMIZER_RUNS_SCHEDULE_DB = "runs_schedule"
+RUN_DATA_DB = "run_data"
+ORDERS_DB = "orders"
+TRADES_DB = "trades"
+EXCHANGES = "exchanges"
+METADATA = "metadata"
+DB_SEPARATOR = "_"
+TINYDB_EXT = ".json"
+MAX_BACKTESTING_RUNS = 50000

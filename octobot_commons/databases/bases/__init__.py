@@ -19,6 +19,7 @@ from octobot_commons.databases.bases import document_database
 from octobot_commons.databases.bases import database_cache
 from octobot_commons.databases.bases import base_database
 from octobot_commons.databases.bases import cache_database
+from octobot_commons.databases.bases import meta_database
 
 
 from octobot_commons.databases.bases.document_database import (
@@ -33,6 +34,9 @@ from octobot_commons.databases.bases.base_database import (
 from octobot_commons.databases.bases.cache_database import (
     CacheDatabase,
 )
+from octobot_commons.databases.bases.meta_database import (
+    MetaDatabase,
+)
 
 
 __all__ = [
@@ -40,4 +44,5 @@ __all__ = [
     "DatabaseCache",
     "BaseDatabase",
     "CacheDatabase",
+    "MetaDatabase",
 ]

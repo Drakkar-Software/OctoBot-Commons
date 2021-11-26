@@ -53,13 +53,13 @@ class BaseDatabase:
 
     @classmethod
     @contextlib.asynccontextmanager
-    async def database(cls, *args, with_lock=False, cache_size=None, **kwargs):
+    async def database(cls, *args, with_lock=False, cache_size=None, database_adaptor=None, **kwargs):
         if with_lock:
             adaptor = kwargs.pop("database_adaptor", adaptors.TinyDBAdaptor)
             if adaptor is None:
                 raise RuntimeError("database_adaptor parameter required")
             adaptor_instance = adaptor(*args, cache_size=cache_size, **kwargs)
-            database = cls(*args, database_adaptor=None, cache_size=cache_size, **kwargs)
+            database = cls(*args, database_adaptor=database_adaptor, cache_size=cache_size, **kwargs)
             async with document_database.DocumentDatabase.locked_database(adaptor_instance) as db:
                 database._database = db
                 yield database

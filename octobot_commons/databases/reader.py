@@ -13,10 +13,10 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import octobot_commons.databases.bases as bases
+import octobot_commons.databases.bases.base_database as base_database
 
 
-class DBReader(bases.BaseDatabase):
+class DBReader(base_database.BaseDatabase):
     async def select(self, table_name: str, query: str) -> list:
         return await self._database.select(table_name, query)
 
