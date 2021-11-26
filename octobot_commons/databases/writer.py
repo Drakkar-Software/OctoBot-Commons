@@ -13,10 +13,10 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import octobot_commons.databases.bases as bases
+import octobot_commons.databases.bases.base_database as base_database
 
 
-class DBWriter(bases.BaseDatabase):
+class DBWriter(base_database.BaseDatabase):
 
     async def log(self, table_name: str, row: dict):
         self.cache.register(table_name, row)

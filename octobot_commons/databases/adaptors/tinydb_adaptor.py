@@ -121,6 +121,8 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param uuid: id of the document
         """
         if uuid is None:
+            if query is None:
+                return self.database.drop_table(table_name)
             return self.database.table(table_name).remove(query)
         return self.database.table(table_name).remove(doc_ids=(uuid,))
 
