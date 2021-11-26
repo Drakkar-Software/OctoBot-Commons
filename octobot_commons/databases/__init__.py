@@ -22,6 +22,7 @@ from octobot_commons.databases import reader
 from octobot_commons.databases import writer
 from octobot_commons.databases import writer_reader
 from octobot_commons.databases import cache_timestamp_database
+from octobot_commons.databases import database_manager
 
 from octobot_commons.databases.adaptors import (
     AbstractDatabaseAdaptor,
@@ -33,6 +34,7 @@ from octobot_commons.databases.bases import (
     DatabaseCache,
     BaseDatabase,
     CacheDatabase,
+    MetaDatabase,
 )
 
 from octobot_commons.databases.reader import (
@@ -51,6 +53,10 @@ from octobot_commons.databases.cache_timestamp_database import (
     CacheTimestampDatabase,
 )
 
+from octobot_commons.databases.database_manager import (
+    DatabaseManager,
+)
+
 
 __all__ = [
     "AbstractDatabaseAdaptor",
@@ -59,8 +65,10 @@ __all__ = [
     "DatabaseCache",
     "BaseDatabase",
     "CacheDatabase",
+    "MetaDatabase",
     "DBReader",
     "DBWriter",
     "DBWriterReader",
     "CacheTimestampDatabase",
+    "DatabaseManager",
 ]
