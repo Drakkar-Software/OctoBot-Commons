@@ -20,24 +20,24 @@ class DBWriter(base_database.BaseDatabase):
 
     async def log(self, table_name: str, row: dict):
         self.cache.register(table_name, row)
-        await self._database.insert(table_name, row)
+        return await self._database.insert(table_name, row)
 
     async def update(self, table_name: str, row: dict, query):
-        await self._database.update(table_name, row, query)
+        return await self._database.update(table_name, row, query)
 
     async def upsert(self, table_name: str, row: dict, query, uuid=None):
-        await self._database.upsert(table_name, row, query, uuid=uuid)
+        return await self._database.upsert(table_name, row, query, uuid=uuid)
 
     async def update_many(self, table_name: str, update_values: list):
-        await self._database.update_many(table_name, update_values)
+        return await self._database.update_many(table_name, update_values)
 
     async def delete(self, table_name: str, query):
-        await self._database.delete(table_name, query)
+        return await self._database.delete(table_name, query)
 
     async def log_many(self, table_name: str, rows: list):
         for row in rows:
             self.cache.register(table_name, row)
-        await self._database.insert_many(table_name, rows)
+        return await self._database.insert_many(table_name, rows)
 
     @staticmethod
     def get_value_from_array(array, index, multiplier=1):
