@@ -21,6 +21,7 @@ try:
 except ImportError:
     pass
 
+import octobot_commons.errors as errors
 import octobot_commons.databases.adaptors.abstract_database_adaptor as abstract_database_adaptor
 
 
@@ -50,7 +51,10 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         middleware = tinydb.middlewares.CachingMiddleware(tinydb.storages.JSONStorage)
         middleware.WRITE_CACHE_SIZE = self.cache_size or self.DEFAULT_WRITE_CACHE_SIZE
-        self.database = tinydb.TinyDB(self.db_path, storage=middleware)
+        try:
+            self.database = tinydb.TinyDB(self.db_path, storage=middleware)
+        except FileNotFoundError as e:
+            raise errors.DatabaseNotFoundError from e
 
     async def select(self, table_name: str, query, uuid=None) -> list:
         """
@@ -112,6 +116,14 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         if uuid is None:
             return self.database.table(table_name).update(row, query)
         return self.database.table(table_name).update(tinydb.table.Document(row, doc_id=uuid))
+
+    async def update_many(self, table_name: str, update_values: list) -> list:
+        """
+        Update multiple values from the table_name table
+        :param table_name: name of the table
+        :param update_values: values to update
+        """
+        return self.database.table(table_name).update_multiple(update_values)
 
     async def delete(self, table_name: str, query, uuid=None) -> list:
         """

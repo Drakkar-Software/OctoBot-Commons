@@ -88,6 +88,14 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("update is not implemented")
 
+    async def update_many(self, table_name: str, update_values: list) -> list:
+        """
+        Update multiple values from the table_name table
+        :param table_name: name of the table
+        :param update_values: values to update
+        """
+        raise NotImplementedError("update_many is not implemented")
+
     async def delete(self, table_name: str, query, uuid=None) -> list:
         """
         Delete data from the table_name table
@@ -122,6 +130,9 @@ class AbstractDatabaseAdaptor:
         Closes the database
         """
         raise NotImplementedError("close is not implemented")
+
+    def __str__(self):
+        return f"{self.__class__.__name__} [{self.db_path}]"
 
     @staticmethod
     def is_multiprocessing():

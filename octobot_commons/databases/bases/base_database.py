@@ -51,6 +51,9 @@ class BaseDatabase:
     def contains_values(self, table: str, val_by_keys: dict):
         return self.cache.contains_values(table, val_by_keys)
 
+    def __str__(self):
+        return f"{self.__class__.__name__}, database: {self._database}"
+
     @classmethod
     @contextlib.asynccontextmanager
     async def database(cls, *args, with_lock=False, cache_size=None, database_adaptor=None, **kwargs):

@@ -25,6 +25,12 @@ class DBWriter(base_database.BaseDatabase):
     async def update(self, table_name: str, row: dict, query):
         await self._database.update(table_name, row, query)
 
+    async def upsert(self, table_name: str, row: dict, query, uuid=None):
+        await self._database.upsert(table_name, row, query, uuid=uuid)
+
+    async def update_many(self, table_name: str, update_values: list):
+        await self._database.update_many(table_name, update_values)
+
     async def delete(self, table_name: str, query):
         await self._database.delete(table_name, query)
 
