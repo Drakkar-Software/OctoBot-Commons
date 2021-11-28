@@ -91,6 +91,14 @@ class DocumentDatabase:
         """
         return await self.adaptor.update(table_name, row, query, uuid=uuid)
 
+    async def update_many(self, table_name: str, update_values: list) -> list:
+        """
+        Update multiple values from the table_name table
+        :param table_name: name of the table
+        :param update_values: values to update
+        """
+        return await self.adaptor.update(table_name, update_values)
+
     async def delete(self, table_name: str, query, uuid=None) -> list:
         """
         Delete data from the table_name table
@@ -125,6 +133,9 @@ class DocumentDatabase:
         Closes the database
         """
         return await self.adaptor.close()
+
+    def __str__(self):
+        return f"{self.__class__.__name__} with adaptor: {self.adaptor}"
 
     @classmethod
     @contextlib.asynccontextmanager
