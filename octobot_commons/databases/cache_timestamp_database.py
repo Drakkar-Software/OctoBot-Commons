@@ -32,6 +32,26 @@ class CacheTimestampDatabase(bases.CacheDatabase):
             except KeyError:
                 raise errors.NoCacheValue(f"No {name} value associated to {timestamp} cache.")
 
+    async def get_values(self, timestamp: float, name: str = commons_enums.CacheDatabaseColumns.VALUE.value, limit=-1) -> list:
+        try:
+            await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value)
+            cache_values = [values
+                            for value_timestamp, values in self._local_cache.items()
+                            if value_timestamp <= timestamp]
+            if limit != -1:
+                cache_values = cache_values[-limit:]
+            values = []
+            for cache in cache_values:
+                try:
+                    values.append(cache[name])
+                except KeyError:
+                    pass
+            return values
+        except IndexError:
+            raise errors.NoCacheValue(f"No cache value associated to {name}")
+        except KeyError:
+            raise errors.NoCacheValue(f"No {name} value associated to {name} cache.")
+
     async def set(self, timestamp: float, value, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> None:
         await self._ensure_metadata()
         saved_value = self.get_serializable_value(value)
@@ -53,3 +73,8 @@ class CacheTimestampDatabase(bases.CacheDatabase):
 
     async def _timestamp_query(self, timestamp):
         return (await self._database.query_factory()).t == timestamp
+
+    async def get_cache(self):
+        # relies on the fact that python dicts keep order
+        return sorted(await self._database.select(self.CACHE_TABLE, None),
+                      key=lambda x: x[commons_enums.CacheDatabaseColumns.TIMESTAMP.value])
