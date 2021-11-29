@@ -28,6 +28,7 @@ class MetaDatabase:
         self.run_db: writer_reader.DBWriterReader = None
         self.orders_db: writer_reader.DBWriterReader = None
         self.trades_db: writer_reader.DBWriterReader = None
+        self.backtesting_metadata_db: writer_reader.DBWriterReader = None
         self.symbol_dbs: dict = {}
 
     def get_run_db(self):
@@ -45,11 +46,22 @@ class MetaDatabase:
             self.trades_db = self._get_db(self.database_manager.get_trades_db_identifier())
         return self.trades_db
 
+    def get_backtesting_metadata_db(self):
+        if self.backtesting_metadata_db is None:
+            self.backtesting_metadata_db = self._get_db(self.database_manager.get_backtesting_metadata_identifier())
+        return self.backtesting_metadata_db
+
     def get_symbol_db(self, exchange, symbol):
         key = self._get_symbol_db_key(exchange, symbol)
         if key not in self.symbol_dbs:
             self.symbol_dbs[key] = self._get_db(self.database_manager.get_symbol_db_identifier(exchange, symbol))
         return self.symbol_dbs[key]
+
+    def all_basic_db(self):
+        yield self.get_backtesting_metadata_db()
+        yield self.get_run_db()
+        yield self.get_orders_db()
+        yield self.get_trades_db()
 
     def _get_symbol_db_key(self, exchange, symbol):
         return f"{exchange}{symbol}"
@@ -62,7 +74,7 @@ class MetaDatabase:
         await asyncio.gather(
             *(
                 db.close()
-                for db in (self.run_db, self.orders_db, self.trades_db, *self.symbol_dbs.values())
+                for db in (self.run_db, self.orders_db, self.trades_db, self.backtesting_metadata_db, *self.symbol_dbs.values())
                 if db is not None
             )
         )
