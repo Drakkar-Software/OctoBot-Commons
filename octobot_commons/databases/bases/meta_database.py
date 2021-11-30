@@ -17,6 +17,7 @@ import contextlib
 import asyncio
 
 import octobot_commons.databases.writer_reader as writer_reader
+import octobot_commons.enums as enums
 
 
 class MetaDatabase:
@@ -50,6 +51,13 @@ class MetaDatabase:
         if self.backtesting_metadata_db is None:
             self.backtesting_metadata_db = self._get_db(self.database_manager.get_backtesting_metadata_identifier())
         return self.backtesting_metadata_db
+
+    async def get_backtesting_metadata_from_run(self):
+        db = self.get_backtesting_metadata_db()
+        return (await db.select(
+            enums.CacheDatabaseTables.METADATA.value,
+            (await db.search()).id == self.database_manager.backtesting_id
+        ))[0]
 
     def get_symbol_db(self, exchange, symbol):
         key = self._get_symbol_db_key(exchange, symbol)
