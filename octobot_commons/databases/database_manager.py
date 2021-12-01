@@ -50,52 +50,73 @@ class DatabaseManager:
         return self._merge_parts(self._base_folder(), exchange, f"{symbol_util.merge_symbol(symbol)}{self.suffix}")
 
     def get_backtesting_metadata_identifier(self) -> str:
-        return self._merge_parts(self._base_folder(ignore_backtesting_id=True, ignore_optimizer_id=True),
-                                 f"{constants.METADATA}{self.suffix}")
+        return self._merge_parts(self._base_folder(ignore_backtesting_id=True), f"{constants.METADATA}{self.suffix}")
+
+    def get_backtesting_run_folder(self) -> str:
+        return self._base_folder()
+
+    def get_optimizer_runs_identifier(self) -> str:
+        return self._merge_parts(self._base_folder(ignore_backtesting_id=True))
 
     def get_optimizer_runs_schedule_identifier(self) -> str:
         return self._merge_parts(self.base_path, constants.OPTIMIZER,
                                  f"{constants.OPTIMIZER_RUNS_SCHEDULE_DB}{self.suffix}")
 
     async def generate_new_backtesting_id(self) -> int:
+        return await self._generate_new_id(is_optimizer=False)
+
+    async def generate_new_optimizer_id(self) -> int:
+        return await self._generate_new_id(is_optimizer=True)
+
+    async def _generate_new_id(self, is_optimizer=False):
+        max_runs = constants.MAX_OPTIMIZER_RUNS if is_optimizer else constants.MAX_BACKTESTING_RUNS
         index = 1
-        while index < constants.MAX_BACKTESTING_RUNS:
-            name_candidate = self._base_folder(backtesting_id=index)
-            if self._exists(name_candidate):
-                index += 1
+        while index < max_runs:
+            name_candidate = self._base_folder(optimizer_id=index) if is_optimizer\
+                else self._base_folder(backtesting_id=index)
+            if self.database_adaptor == adaptors.TinyDBAdaptor:
+                if self._exists(name_candidate):
+                    index += 1
+                else:
+                    return index
             else:
-                return index
-        raise RuntimeError(f"Reached maximum number of backtesting runs ({constants.MAX_BACKTESTING_RUNS}). "
-                           f"Please remove some.")
+                raise RuntimeError(f"Unsupported database adaptor runs ({self.database_adaptor}).")
+        raise RuntimeError(f"Reached maximum number of {'optimizer' if is_optimizer else 'backtesting'} runs "
+                           f"({constants.MAX_BACKTESTING_RUNS}). Please remove some.")
 
     async def get_optimizer_run_ids(self) -> list:
         if self.database_adaptor == adaptors.TinyDBAdaptor:
             optimizer_runs_path = self._merge_parts(self.base_path, constants.OPTIMIZER)
             if os.path.exists(optimizer_runs_path):
-                return [folder
+                return [self._parse_optimizer_id(folder.name)
                         for folder in os.scandir(optimizer_runs_path)
                         if os.path.isdir(folder)]
         return []
 
-    def _base_folder(self, ignore_backtesting_id=False, backtesting_id=None, ignore_optimizer_id=False) -> str:
+    def _parse_optimizer_id(self, identifier) -> str:
+        return identifier.split(constants.DB_SEPARATOR)[-1]
+
+    def _base_folder(self, ignore_backtesting_id=False, backtesting_id=None,
+                     ignore_optimizer_id=False, optimizer_id=None) -> str:
         path = self.base_path
         backtesting_id = backtesting_id or self.backtesting_id
-        if self.optimizer_id is not None:
+        optimizer_id = optimizer_id or self.optimizer_id
+        if optimizer_id is not None:
             if ignore_optimizer_id:
                 path = self._merge_parts(path, constants.OPTIMIZER)
             else:
                 path = self._merge_parts(
                     path,
                     constants.OPTIMIZER,
-                    f"{constants.OPTIMIZER}{constants.DB_SEPARATOR}{self.optimizer_id}"
+                    f"{constants.OPTIMIZER}{constants.DB_SEPARATOR}{optimizer_id}"
                 )
         if backtesting_id is not None:
-            if self.optimizer_id is None:
+            if optimizer_id is None:
                 path = self._merge_parts(path, constants.BACKTESTING)
             if ignore_backtesting_id:
                 return path
             return self._merge_parts(path, f"{constants.BACKTESTING}{constants.DB_SEPARATOR}{backtesting_id}")
-        if self.optimizer_id is None:
+        if optimizer_id is None:
             # live mode
             return self._merge_parts(path, constants.LIVE)
         return path
