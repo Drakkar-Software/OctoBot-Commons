@@ -28,6 +28,7 @@ class BaseDatabase:
                                                                                  **kwargs))
             self._database.initialize()
         self.are_data_initialized = False
+        self.are_data_initialized_by_key = {}
         self.cache = database_cache.DatabaseCache()
 
     def get_db_path(self):
