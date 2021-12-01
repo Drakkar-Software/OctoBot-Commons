@@ -50,7 +50,8 @@ class DatabaseManager:
         return self._merge_parts(self._base_folder(), exchange, f"{symbol_util.merge_symbol(symbol)}{self.suffix}")
 
     def get_backtesting_metadata_identifier(self) -> str:
-        return self._merge_parts(self._base_folder(ignore_backtesting_id=True), f"{constants.METADATA}{self.suffix}")
+        return self._merge_parts(self._base_folder(ignore_backtesting_id=True, ignore_optimizer_id=True),
+                                 f"{constants.METADATA}{self.suffix}")
 
     def get_optimizer_runs_schedule_identifier(self) -> str:
         return self._merge_parts(self.base_path, constants.OPTIMIZER,
@@ -67,15 +68,27 @@ class DatabaseManager:
         raise RuntimeError(f"Reached maximum number of backtesting runs ({constants.MAX_BACKTESTING_RUNS}). "
                            f"Please remove some.")
 
-    def _base_folder(self, ignore_backtesting_id=False, backtesting_id=None) -> str:
+    async def get_optimizer_run_ids(self) -> list:
+        if self.database_adaptor == adaptors.TinyDBAdaptor:
+            optimizer_runs_path = self._merge_parts(self.base_path, constants.OPTIMIZER)
+            if os.path.exists(optimizer_runs_path):
+                return [folder
+                        for folder in os.scandir(optimizer_runs_path)
+                        if os.path.isdir(folder)]
+        return []
+
+    def _base_folder(self, ignore_backtesting_id=False, backtesting_id=None, ignore_optimizer_id=False) -> str:
         path = self.base_path
         backtesting_id = backtesting_id or self.backtesting_id
         if self.optimizer_id is not None:
-            path = self._merge_parts(
-                path,
-                constants.OPTIMIZER,
-                f"{constants.OPTIMIZER}{constants.DB_SEPARATOR}{self.optimizer_id}"
-            )
+            if ignore_optimizer_id:
+                path = self._merge_parts(path, constants.OPTIMIZER)
+            else:
+                path = self._merge_parts(
+                    path,
+                    constants.OPTIMIZER,
+                    f"{constants.OPTIMIZER}{constants.DB_SEPARATOR}{self.optimizer_id}"
+                )
         if backtesting_id is not None:
             if self.optimizer_id is None:
                 path = self._merge_parts(path, constants.BACKTESTING)
