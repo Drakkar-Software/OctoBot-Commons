@@ -54,7 +54,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         try:
             self.database = tinydb.TinyDB(self.db_path, storage=middleware)
         except FileNotFoundError as e:
-            raise errors.DatabaseNotFoundError from e
+            raise errors.DatabaseNotFoundError(f"Can't open database at \"{self.db_path}\"") from e
 
     async def select(self, table_name: str, query, uuid=None) -> list:
         """
