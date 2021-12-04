@@ -34,6 +34,9 @@ class DBWriter(base_database.BaseDatabase):
     async def delete(self, table_name: str, query):
         return await self._database.delete(table_name, query)
 
+    async def delete_all(self, table_name: str):
+        return await self._database.delete(table_name, None)
+
     async def log_many(self, table_name: str, rows: list):
         for row in rows:
             self.cache.register(table_name, row)
