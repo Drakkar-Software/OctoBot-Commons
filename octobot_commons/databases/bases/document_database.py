@@ -147,10 +147,12 @@ class DocumentDatabase:
         :param kwargs: kwargs to pass to the database constructor
         """
         instance = None
+        lock_acquired = False
         try:
             instance = cls(*args, **kwargs)
             if instance.adaptor.is_multiprocessing():
                 await instance.adaptor.acquire()
+                lock_acquired = True
             instance.initialize()
             yield instance
         finally:
@@ -158,5 +160,5 @@ class DocumentDatabase:
                 try:
                     await instance.close()
                 finally:
-                    if instance.adaptor.is_multiprocessing():
+                    if lock_acquired and instance.adaptor.is_multiprocessing():
                         await instance.adaptor.release()
