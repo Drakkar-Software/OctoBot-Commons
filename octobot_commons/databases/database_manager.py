@@ -65,13 +65,17 @@ class DatabaseManager:
     async def generate_new_backtesting_id(self) -> int:
         return await self._generate_new_id(is_optimizer=False)
 
-    async def generate_new_optimizer_id(self) -> int:
-        return await self._generate_new_id(is_optimizer=True)
+    async def generate_new_optimizer_id(self, back_list) -> int:
+        return await self._generate_new_id(back_list=back_list, is_optimizer=True)
 
-    async def _generate_new_id(self, is_optimizer=False):
+    async def _generate_new_id(self, back_list=None, is_optimizer=False):
+        back_list = back_list or []
         max_runs = constants.MAX_OPTIMIZER_RUNS if is_optimizer else constants.MAX_BACKTESTING_RUNS
         index = 1
         while index < max_runs:
+            if index in back_list:
+                index += 1
+                continue
             name_candidate = self._base_folder(optimizer_id=index) if is_optimizer\
                 else self._base_folder(backtesting_id=index)
             if self.database_adaptor == adaptors.TinyDBAdaptor:
