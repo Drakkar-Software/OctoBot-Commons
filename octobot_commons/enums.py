@@ -131,6 +131,10 @@ class OctoBotChannelSubjects(enum.Enum):
 
 class UserCommands(enum.Enum):
     RELOAD_SCRIPT = "reload_script"
+    CLEAR_ALL_CACHE = "clear_all_cache"
+    CLEAR_PLOTTING_CACHE = "clear_plotting_cache"
+    CLEAR_SIMULATED_ORDERS_CACHE = "clear_simulated_orders_cache"
+    CLEAR_SIMULATED_TRADES_CACHE = "clear_simulated_trades_cache"
 
 
 class MultiprocessingLocks(enum.Enum):

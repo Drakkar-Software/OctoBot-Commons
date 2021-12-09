@@ -54,6 +54,14 @@ class CacheDatabase(base_database.BaseDatabase):
     async def get_cache(self):
         return await self._database.select(self.CACHE_TABLE, None)
 
+    async def clear(self):
+        await self._database.delete(self.CACHE_TABLE, None)
+        await self._database.delete(self.CACHE_METADATA_TABLE, None)
+        self._are_metadata_written = False
+        # always rewrite metadata as they are necessary to handle cache later
+        await self._ensure_metadata()
+        await self.flush()
+
     async def _get_from_local_cache(self, identifier_key, identifier_value, sub_key):
         await self._ensure_local_cache(identifier_key)
         return self._local_cache[identifier_value][sub_key]
