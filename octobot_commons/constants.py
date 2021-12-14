@@ -122,6 +122,8 @@ START_PENDING_EVAL_NOTE = "0"
 # tentacles
 TENTACLE_DEFAULT_CONFIG = "default_config"
 CONFIG_TENTACLES_FILE = "tentacles_config.json"
+PRIORITY = "priority"
+DEFAULT_PRIORITY = 0
 
 # terms of service
 CONFIG_ACCEPTED_TERMS = "accepted_terms"
