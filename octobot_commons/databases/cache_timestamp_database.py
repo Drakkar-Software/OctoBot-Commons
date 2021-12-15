@@ -62,11 +62,10 @@ class CacheTimestampDatabase(bases.CacheDatabase):
             }
             await self._database.upsert(self.CACHE_TABLE, set_value, await self._timestamp_query(timestamp))
             if timestamp in self._local_cache:
+                self._local_cache[timestamp][commons_enums.CacheDatabaseColumns.TIMESTAMP.value] = timestamp
                 self._local_cache[timestamp][name] = saved_value
             else:
-                self._local_cache[timestamp] = {
-                    name: saved_value
-                }
+                self._local_cache[timestamp] = set_value
 
     async def contains(self, timestamp: float) -> bool:
         return await self._database.count(self.CACHE_TABLE, await self._timestamp_query(timestamp)) > 0
