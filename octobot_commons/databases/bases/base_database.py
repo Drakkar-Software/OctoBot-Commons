@@ -31,6 +31,12 @@ class BaseDatabase:
         self.are_data_initialized_by_key = {}
         self.cache = database_cache.DatabaseCache()
 
+    def set_initialized_flags(self, value, keys=None):
+        self.are_data_initialized = False
+        keys = keys or self.are_data_initialized_by_key.keys()
+        for key in keys:
+            self.are_data_initialized_by_key[key] = value
+
     def get_db_path(self):
         return self._database.get_db_path()
 
