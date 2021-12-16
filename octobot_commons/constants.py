@@ -165,6 +165,7 @@ CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
 CACHE_HASH_SIZE = 15
 CACHE_RELATED_DATA_SEPARATOR = "##"
 LOCAL_BOT_DATA = "local_bot_data"
+DO_NOT_CACHE = "do_not_cache"
 
 # Async settings
 DEFAULT_FUTURE_TIMEOUT = 120
