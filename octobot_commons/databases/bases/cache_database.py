@@ -14,11 +14,11 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import octobot_commons.enums as enums
-import octobot_commons.databases.bases.base_database as base_database
+import octobot_commons.databases.writer as writer
 import octobot_commons.databases.adaptors as adaptors
 
 
-class CacheDatabase(base_database.BaseDatabase):
+class CacheDatabase(writer.DBWriter):
     CACHE_TABLE = enums.CacheDatabaseTables.CACHE.value
     CACHE_METADATA_TABLE = enums.CacheDatabaseTables.METADATA.value
 

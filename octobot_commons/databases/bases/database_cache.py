@@ -18,25 +18,53 @@
 class DatabaseCache:
 
     def __init__(self):
-        self.cache = {}
+        self.rows_cache = {}
+        self.query_cache = {}
+        self.uuid_cache = {}
 
-    def register(self, table, row):
-        try:
-            self.cache[table].append(row)
-        except KeyError:
-            self.cache[table] = [row]
+    def register(self, table, row, result=None, uuid=None):
+        if uuid is not None:
+            try:
+                self.uuid_cache[table][row] = uuid
+            except KeyError:
+                self.uuid_cache[table] = {row: uuid}
+        elif result is not None:
+            try:
+                self.query_cache[table][row] = result
+            except KeyError:
+                self.query_cache[table] = {row: result}
+        else:
+            try:
+                self.rows_cache[table].append(row)
+            except KeyError:
+                self.rows_cache[table] = [row]
 
     def has(self, table):
-        return table in self.cache
+        return table in self.rows_cache
 
-    def contains_values(self, table, val_by_keys):
+    def cached_uuid(self, table, identifier):
         try:
-            for element in self.cache[table]:
+            return self.uuid_cache[table][identifier]
+        except KeyError:
+            return None
+
+    def cached_query(self, table, identifier):
+        try:
+            return self.query_cache[table][identifier]
+        except KeyError:
+            return None
+
+    def contains_row(self, table, val_by_keys):
+        try:
+            for element in self.rows_cache[table]:
                 try:
+                    found = True
                     for key, val in val_by_keys.items():
                         if element[key] != val:
+                            found = False
                             break
-                    return True
+                    if found:
+                        return True
                 except KeyError:
                     pass
         except KeyError:
@@ -45,7 +73,7 @@ class DatabaseCache:
 
     def contains_x(self, table, x_val):
         try:
-            for element in self.cache[table]:
+            for element in self.rows_cache[table]:
                 if element["x"] == x_val:
                     return True
         except KeyError:

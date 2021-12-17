@@ -40,8 +40,10 @@ class BaseDatabase:
     def get_db_path(self):
         return self._database.get_db_path()
 
-    async def search(self):
-        return await self._database.query_factory()
+    async def search(self, dict_query: dict = None):
+        if dict_query is None:
+            return await self._database.query_factory()
+        return (await self._database.query_factory()).fragment(dict_query)
 
     async def count(self, table_name: str, query) -> int:
         return await self._database.count(table_name, query)
@@ -50,13 +52,16 @@ class BaseDatabase:
         await self._database.flush()
 
     async def close(self):
+        await self.flush()
         await self._database.close()
 
     def contains_x(self, table: str, x_val):
         return self.cache.contains_x(table, x_val)
 
-    def contains_values(self, table: str, val_by_keys: dict):
-        return self.cache.contains_values(table, val_by_keys)
+    async def contains_row(self, table: str, row: dict):
+        if self.cache.contains_row(table, row):
+            return True
+        return await self.count(table, await self.search(row)) > 0
 
     def __str__(self):
         return f"{self.__class__.__name__}, database: {self._database}"

@@ -60,7 +60,14 @@ class CacheTimestampDatabase(bases.CacheDatabase):
                 commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp,
                 name: saved_value,
             }
-            await self._database.upsert(self.CACHE_TABLE, set_value, await self._timestamp_query(timestamp))
+            await self.upsert(
+                self.CACHE_TABLE,
+                set_value,
+                None,
+                cache_query={
+                    commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp
+                }
+            )
             if timestamp in self._local_cache:
                 self._local_cache[timestamp][commons_enums.CacheDatabaseColumns.TIMESTAMP.value] = timestamp
                 self._local_cache[timestamp][name] = saved_value
