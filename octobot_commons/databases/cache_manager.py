@@ -125,28 +125,50 @@ class CacheManager:
         except KeyError:
             sanitized_pair = symbol_util.merge_symbol(symbol) if symbol else symbol
             # warning: very slow, should be called as rarely as possible
+            required_tentacles = self._get_linked_tentacles(tentacle, tentacles_setup_config)
+            identifying_tentacles = [tentacle] + required_tentacles
             return os.path.join(common_constants.USER_FOLDER, common_constants.CACHE_FOLDER, tentacle_name,
                                 exchange, sanitized_pair, time_frame,
-                                self._code_hash(tentacle), self._config_hash(tentacle, tentacles_setup_config),
+                                self._code_hash(identifying_tentacles),
+                                self._config_hash(identifying_tentacles, tentacles_setup_config),
                                 common_constants.CACHE_FILE)
 
-    @staticmethod
-    def _code_hash(tentacle) -> str:
-        code_location = tentacle.get_script() if hasattr(tentacle, "get_script") else tentacle.__class__
-        return hashlib.sha256(
-            inspect.getsource(code_location).replace(" ", "").replace("\n", "").encode()
-        ).hexdigest()[:common_constants.CACHE_HASH_SIZE]
-
-    def _config_hash(self, tentacle, tentacles_setup_config) -> str:
+    def _get_linked_tentacles(self, tentacle, tentacles_setup_config):
         try:
             import octobot_tentacles_manager.api as tentacles_manager_api
-            config = tentacle.specific_config if hasattr(tentacle, "specific_config") else \
-                tentacles_manager_api.get_tentacle_config(tentacles_setup_config, tentacle.__class__)
-            return hashlib.sha256(
-                json.dumps(config).encode()
-            ).hexdigest()[:common_constants.CACHE_HASH_SIZE]
-        except ImportError:
-            self.logger.error("octobot_tentacles_manager is required to use cache")
+            linked_tentacles_classes = tentacles_manager_api.get_tentacle_classes_requirements(tentacle)
+            tentacles = []
+            for tentacle_class in linked_tentacles_classes:
+                # try instantiating tentacles, if not possible, then ignore it. Works with evaluator tentacles.
+                try:
+                    tentacles.append(tentacle_class(tentacles_setup_config))
+                except TypeError:
+                    pass
+            return tentacles
+        except ImportError as e:
+            raise ImportError("octobot_tentacles_manager is required to use cache") from e
+
+    def _code_hash(self, identifying_tentacles) -> str:
+        full_code = ""
+        for linked_tentacle in identifying_tentacles:
+            code_location = linked_tentacle.get_script() if hasattr(linked_tentacle, "get_script") \
+                else linked_tentacle.__class__
+            tentacle_code = inspect.getsource(code_location).replace(" ", "").replace("\n", "")
+            full_code = f"{full_code}{tentacle_code}"
+        return hashlib.sha256(full_code.encode()).hexdigest()[:common_constants.CACHE_HASH_SIZE]
+
+    def _config_hash(self, identifying_tentacles, tentacles_setup_config) -> str:
+        try:
+            import octobot_tentacles_manager.api as tentacles_manager_api
+            full_config = ""
+            for linked_tentacle in identifying_tentacles:
+                config = linked_tentacle.specific_config if hasattr(linked_tentacle, "specific_config") \
+                    and linked_tentacle.specific_config else \
+                    tentacles_manager_api.get_tentacle_config(tentacles_setup_config, linked_tentacle.__class__)
+                full_config = f"{full_config}{json.dumps(config)}"
+            return hashlib.sha256(full_config.encode()).hexdigest()[:common_constants.CACHE_HASH_SIZE]
+        except ImportError as e:
+            raise ImportError("octobot_tentacles_manager is required to use cache") from e
 
 
 class _CacheWrapper:

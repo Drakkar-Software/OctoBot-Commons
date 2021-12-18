@@ -55,6 +55,9 @@ class BaseDatabase:
         await self.flush()
         await self._database.close()
 
+    async def clear(self):
+        self.cache.clear()
+
     def contains_x(self, table: str, x_val):
         return self.cache.contains_x(table, x_val)
 
