@@ -192,9 +192,11 @@ class _CacheWrapper:
         return self._cache_database is not None
 
     async def close(self):
-        await self._cache_database.close()
-        self._cache_database = None
-        return True
+        if self.is_open():
+            await self._cache_database.close()
+            self._cache_database = None
+            return True
+        return False
 
     async def clear(self):
         await self._cache_database.clear()
