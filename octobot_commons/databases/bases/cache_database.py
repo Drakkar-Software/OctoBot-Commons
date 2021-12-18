@@ -57,7 +57,7 @@ class CacheDatabase(writer.DBWriter):
     async def clear(self):
         await self._database.delete(self.CACHE_TABLE, None)
         await self._database.delete(self.CACHE_METADATA_TABLE, None)
-        self.cache.clear()
+        await super().clear()
         self._local_cache = {}
         self._are_metadata_written = False
         # always rewrite metadata as they are necessary to handle cache later
