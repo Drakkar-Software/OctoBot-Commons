@@ -79,3 +79,8 @@ class DatabaseCache:
         except KeyError:
             pass
         return False
+
+    def clear(self):
+        self.rows_cache = {}
+        self.query_cache = {}
+        self.uuid_cache = {}
