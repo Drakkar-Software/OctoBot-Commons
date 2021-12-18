@@ -66,22 +66,30 @@ class CacheManager:
 
     async def clear_cache(self, tentacle_name, exchange_name=None, symbol=None, time_frame=None):
         try:
-            for cache in self._caches(tentacle_name, exchange_name, symbol, time_frame):
+            for cache, _ in self._caches(tentacle_name, exchange_name, symbol, time_frame):
                 await cache.clear()
             return True
         except KeyError:
             return False
 
-    async def close_cache(self, tentacle_name, exchange_name=None, symbol=None, time_frame=None):
+    async def close_cache(self, tentacle_name, exchange_name=None, symbol=None, time_frame=None,
+                          reset_cache_db_ids=False):
         try:
-            for cache in self._caches(tentacle_name, exchange_name, symbol, time_frame):
+            to_remove_caches = []
+            for cache, identifiers in self._caches(tentacle_name, exchange_name, symbol, time_frame):
                 await cache.close()
+                to_remove_caches.append(identifiers)
+            if reset_cache_db_ids:
+                # remove cache from caches to force complete reopen of the cache db
+                # (might be at a different place)
+                for identifier in to_remove_caches:
+                    self.__class__.CACHES[identifier[0]][identifier[1]][identifier[2]].pop(identifier[3])
             return True
         except KeyError:
             return False
 
     async def reset(self):
-        for cache in self._caches(None, None, None, None):
+        for cache, _ in self._caches(None, None, None, None):
             if cache.is_open():
                 await cache.close()
         self.__class__.CACHES = {}
@@ -92,7 +100,8 @@ class CacheManager:
                 for _symbol in [symbol] if symbol else list(self.__class__.CACHES[_tentacle_name][_exchange_name]):
                     for _time_frame in [time_frame] if time_frame else list(
                             self.__class__.CACHES[_tentacle_name][_exchange_name][_symbol]):
-                        yield self.__class__.CACHES[_tentacle_name][_exchange_name][_symbol][_time_frame]
+                        yield self.__class__.CACHES[_tentacle_name][_exchange_name][_symbol][_time_frame], \
+                              (_tentacle_name, _exchange_name, _symbol, _time_frame)
 
     def _open_or_create_cache_database(self, tentacle, exchange, symbol, time_frame,
                                        tentacle_name, tentacles_setup_config, cache_type):
