@@ -40,7 +40,7 @@ class CacheTimestampDatabase(bases.CacheDatabase):
             values = [
                 values[name]
                 for value_timestamp, values in self._local_cache.items()
-                if value_timestamp <= timestamp
+                if value_timestamp <= timestamp and name in values
             ]
             if limit != -1:
                 return values[-limit:]
