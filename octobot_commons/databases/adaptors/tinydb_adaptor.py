@@ -162,4 +162,8 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         Closes the database
         """
-        return self.database.close()
+        try:
+            return self.database.close()
+        except AttributeError:
+            # when self.database didn't open properly
+            pass
