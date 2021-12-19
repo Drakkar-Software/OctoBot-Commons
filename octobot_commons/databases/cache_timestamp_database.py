@@ -24,6 +24,8 @@ class CacheTimestampDatabase(bases.CacheDatabase):
             return await self._get_from_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name)
         except KeyError:
             try:
+                if self._is_empty_database:
+                    raise errors.NoCacheValue(f"No cache value associated to {timestamp}")
                 value = (await self._database.select(self.CACHE_TABLE, await self._timestamp_query(timestamp)))[0][name]
                 await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, update=True)
                 return value
@@ -35,17 +37,13 @@ class CacheTimestampDatabase(bases.CacheDatabase):
     async def get_values(self, timestamp: float, name: str = commons_enums.CacheDatabaseColumns.VALUE.value, limit=-1) -> list:
         try:
             await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value)
-            cache_values = [values
-                            for value_timestamp, values in self._local_cache.items()
-                            if value_timestamp <= timestamp]
+            values = [
+                values[name]
+                for value_timestamp, values in self._local_cache.items()
+                if value_timestamp <= timestamp
+            ]
             if limit != -1:
-                cache_values = cache_values[-limit:]
-            values = []
-            for cache in cache_values:
-                try:
-                    values.append(cache[name])
-                except KeyError:
-                    pass
+                return values[-limit:]
             return values
         except IndexError:
             raise errors.NoCacheValue(f"No cache value associated to {name}")
@@ -73,9 +71,6 @@ class CacheTimestampDatabase(bases.CacheDatabase):
                 self._local_cache[timestamp][name] = saved_value
             else:
                 self._local_cache[timestamp] = set_value
-
-    async def contains(self, timestamp: float) -> bool:
-        return await self._database.count(self.CACHE_TABLE, await self._timestamp_query(timestamp)) > 0
 
     async def _timestamp_query(self, timestamp):
         return (await self._database.query_factory()).t == timestamp
