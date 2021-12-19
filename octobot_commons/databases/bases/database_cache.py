@@ -16,6 +16,7 @@
 
 
 class DatabaseCache:
+    MAX_CACHE_SIZE = 512
 
     def __init__(self):
         self.rows_cache = {}
@@ -35,6 +36,8 @@ class DatabaseCache:
                 self.query_cache[table] = {row: result}
         else:
             try:
+                if len(self.rows_cache[table]) >= self.MAX_CACHE_SIZE:
+                    self.rows_cache[table] = row[self.MAX_CACHE_SIZE // 2:]
                 self.rows_cache[table].append(row)
             except KeyError:
                 self.rows_cache[table] = [row]

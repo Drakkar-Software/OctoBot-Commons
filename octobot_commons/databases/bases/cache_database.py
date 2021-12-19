@@ -26,6 +26,7 @@ class CacheDatabase(writer.DBWriter):
         super().__init__(file_path, database_adaptor=database_adaptor, cache_size=cache_size, **kwargs)
         self._are_metadata_written = False
         self._local_cache = None
+        self._is_empty_database = False
 
     def generate_metadata(self) -> dict:
         """
@@ -47,6 +48,8 @@ class CacheDatabase(writer.DBWriter):
                 cache[identifier_key]: cache
                 for cache in await self.get_cache()
             }
+            if self._local_cache == {}:
+                self._is_empty_database = True
 
     async def get_metadata(self):
         return await self._database.select(self.CACHE_METADATA_TABLE, None, uuid=1)
