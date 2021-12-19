@@ -16,7 +16,6 @@
 #  License along with this library.
 
 import octobot_commons
-import octobot_commons.constants as constants
 import octobot_commons.enums as enums
 import octobot_commons.logging as logging_util
 import octobot_commons.symbol_util as symbol_util
@@ -138,13 +137,13 @@ def global_portfolio_pretty_print(
     :return: the global portfolio pretty printed
     """
     result = []
-    for currency, amounts in global_portfolio.items():
-        if amounts[constants.PORTFOLIO_TOTAL] > 0:
+    for currency, asset in global_portfolio.items():
+        if asset.total > 0:
             # fill lines with empty spaces if necessary
-            total = get_min_string_from_number(amounts[constants.PORTFOLIO_TOTAL])
+            total = get_min_string_from_number(asset.total)
             if markdown:
                 total = "{:<10}".format(total)
-            available = f"({get_min_string_from_number(amounts[constants.PORTFOLIO_AVAILABLE])})"
+            available = f"({get_min_string_from_number(asset.available)})"
             if markdown:
                 available = "{:<12}".format(available)
 
