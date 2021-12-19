@@ -44,6 +44,17 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         super().__init__(file_path)
         self.database = None
         self.cache_size = cache_size
+        self.calls = {
+            "select": 0,
+            "insert": 0,
+            "upsert": 0,
+            "insert_many": 0,
+            "update": 0,
+            "update_many": 0,
+            "count": 0,
+            "flush": 0,
+            "delete": 0
+        }
 
     def initialize(self):
         """
@@ -63,6 +74,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param query: select query
         :param uuid: id of the document
         """
+        self.calls["select"] += 1
         if uuid is None:
             return (
                 self.database.table(table_name).search(query)
@@ -83,6 +95,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param table_name: name of the table
         :param row: data to insert
         """
+        self.calls["insert"] += 1
         return self.database.table(table_name).insert(row)
 
     async def upsert(self, table_name: str, row: dict, query, uuid=None) -> int:
@@ -93,6 +106,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param query: select query
         :param uuid: id of the document
         """
+        self.calls["upsert"] += 1
         if uuid is None:
             return self.database.table(table_name).upsert(row, query)
         return self.database.table(table_name).upsert(tinydb.table.Document(row, doc_id=uuid))
@@ -103,6 +117,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param table_name: name of the table
         :param rows: data to insert
         """
+        self.calls["insert_many"] += 1
         return self.database.table(table_name).insert_multiple(rows)
 
     async def update(self, table_name: str, row: dict, query, uuid=None) -> list:
@@ -113,6 +128,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param query: select query
         :param uuid: id of the document
         """
+        self.calls["update"] += 1
         if uuid is None:
             return self.database.table(table_name).update(row, query)
         return self.database.table(table_name).update(tinydb.table.Document(row, doc_id=uuid))
@@ -123,6 +139,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param table_name: name of the table
         :param update_values: values to update
         """
+        self.calls["update_many"] += 1
         return self.database.table(table_name).update_multiple(update_values)
 
     async def delete(self, table_name: str, query, uuid=None) -> list:
@@ -132,6 +149,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param query: select query
         :param uuid: id of the document
         """
+        self.calls["delete"] += 1
         if uuid is None:
             if query is None:
                 return self.database.drop_table(table_name)
@@ -144,6 +162,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param table_name: name of the table
         :param query: select query
         """
+        self.calls["count"] += 1
         return self.database.table(table_name).count(query)
 
     async def query_factory(self):
@@ -156,6 +175,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         """
         Flushes the database cache
         """
+        self.calls["flush"] += 1
         return self.database.storage.flush()
 
     async def close(self):
@@ -163,6 +183,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         Closes the database
         """
         try:
+            print(f"{self.db_path} : {self.calls}")
             return self.database.close()
         except AttributeError:
             # when self.database didn't open properly
