@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import octobot_commons.errors as errors
 
 
 class DatabaseCache:
@@ -24,20 +25,27 @@ class DatabaseCache:
         self.uuid_cache = {}
 
     def register(self, table, row, result=None, uuid=None):
-        if uuid is not None:
-            try:
-                self.uuid_cache[table][row] = uuid
-            except KeyError:
-                self.uuid_cache[table] = {row: uuid}
-        elif result is not None:
-            try:
-                self.query_cache[table][row] = result
-            except KeyError:
-                self.query_cache[table] = {row: result}
-        else:
+        cached = False
+        try:
+            if uuid is not None:
+                cached = True
+                try:
+                    self.uuid_cache[table][row] = uuid
+                except KeyError:
+                    self.uuid_cache[table] = {row: uuid}
+            elif result is not None:
+                cached = True
+                try:
+                    self.query_cache[table][row] = result
+                except KeyError:
+                    self.query_cache[table] = {row: result}
+        except TypeError as e:
+            # might happen when row can't be hashed: impossible to cache it in this case
+            raise errors.UncachableValue(f"Unhashable row: {row}") from e
+        if not cached:
             try:
                 if len(self.rows_cache[table]) >= self.MAX_CACHE_SIZE:
-                    self.rows_cache[table] = row[self.MAX_CACHE_SIZE // 2:]
+                    self.rows_cache[table] = self.rows_cache[table][self.MAX_CACHE_SIZE // 2:]
                 self.rows_cache[table].append(row)
             except KeyError:
                 self.rows_cache[table] = [row]
@@ -58,6 +66,7 @@ class DatabaseCache:
             return None
 
     def contains_row(self, table, val_by_keys):
+        # Should check the real database in case this returns false
         try:
             for element in self.rows_cache[table]:
                 try:
