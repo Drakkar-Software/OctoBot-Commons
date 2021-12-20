@@ -57,6 +57,12 @@ class NoCacheValue(Exception):
     """
 
 
+class UncachableValue(Exception):
+    """
+    Raised when a cache value is selected but is not available in database
+    """
+
+
 class DatabaseNotFoundError(Exception):
     """
     Raised when a database can't be found

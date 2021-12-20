@@ -15,6 +15,7 @@
 #  License along with this library.
 import octobot_commons.databases.bases.base_database as base_database
 import octobot_commons.databases.adaptors as adaptors
+import octobot_commons.errors as commons_errors
 
 
 class DBWriter(base_database.BaseDatabase):
@@ -27,7 +28,10 @@ class DBWriter(base_database.BaseDatabase):
 
     async def log(self, table_name: str, row: dict, cache=True, rows_buffering=False):
         if cache:
-            self.cache.register(table_name, row)
+            try:
+                self.cache.register(table_name, row)
+            except commons_errors.UncachableValue:
+                await self._database.insert(table_name, row)
         if rows_buffering:
             await self._buffer_row(table_name, row)
         else:
@@ -61,7 +65,11 @@ class DBWriter(base_database.BaseDatabase):
     async def log_many(self, table_name: str, rows: list, cache=True):
         if cache:
             for row in rows:
-                self.cache.register(table_name, row)
+                try:
+                    self.cache.register(table_name, row)
+                except commons_errors.UncachableValue:
+                    # can pass here since row will be inserted anyway
+                    pass
         return await self._database.insert_many(table_name, rows)
 
     async def flush(self):
