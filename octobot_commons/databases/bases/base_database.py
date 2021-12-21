@@ -33,8 +33,7 @@ class BaseDatabase:
 
     def set_initialized_flags(self, value, keys=None):
         self.are_data_initialized = False
-        keys = keys or self.are_data_initialized_by_key.keys()
-        for key in keys:
+        for key in keys or self.are_data_initialized_by_key.keys():
             self.are_data_initialized_by_key[key] = value
 
     def get_db_path(self):
