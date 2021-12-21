@@ -148,6 +148,7 @@ class CacheManager:
         except ImportError as e:
             raise ImportError("octobot_tentacles_manager is required to use cache") from e
 
+    # TODO move in tentacles manager
     def _code_hash(self, identifying_tentacles) -> str:
         full_code = ""
         for linked_tentacle in identifying_tentacles:
@@ -157,6 +158,7 @@ class CacheManager:
             full_code = f"{full_code}{tentacle_code}"
         return hashlib.sha256(full_code.encode()).hexdigest()[:common_constants.CACHE_HASH_SIZE]
 
+    # TODO move in tentacles manager
     def _config_hash(self, identifying_tentacles, tentacles_setup_config) -> str:
         try:
             import octobot_tentacles_manager.api as tentacles_manager_api
