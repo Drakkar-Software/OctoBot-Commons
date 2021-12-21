@@ -122,8 +122,9 @@ START_PENDING_EVAL_NOTE = "0"
 # tentacles
 TENTACLE_DEFAULT_CONFIG = "default_config"
 CONFIG_TENTACLES_FILE = "tentacles_config.json"
-PRIORITY = "priority"
-DEFAULT_PRIORITY = 0
+EVALUATOR_PRIORITY = "priority"
+DEFAULT_EVALUATOR_PRIORITY = 0
+CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
 
 # terms of service
 CONFIG_ACCEPTED_TERMS = "accepted_terms"
@@ -161,7 +162,6 @@ DEFAULT_CONFIG_VALUES = {
 # cache
 CACHE_FOLDER = "cache"
 CACHE_FILE = "cache.json"
-CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
 CACHE_HASH_SIZE = 15
 CACHE_RELATED_DATA_SEPARATOR = "##"
 LOCAL_BOT_DATA = "local_bot_data"
