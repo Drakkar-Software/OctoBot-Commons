@@ -18,24 +18,35 @@ import contextlib
 
 
 _LOCKS = {}
+_ELEMENTS = {}
 
 
-def register_lock(name: str, lock: multiprocessing.RLock):
+def register_lock_and_shared_elements(name: str, lock: multiprocessing.RLock, shared_elements: dict):
     _LOCKS[name] = lock
+    _ELEMENTS.update(shared_elements)
 
 
-def unregister_lock(name: str) -> multiprocessing.RLock:
+def unregister_lock_and_shared_elements(name: str, shared_elements=None) -> multiprocessing.RLock:
+    if shared_elements is None:
+        _ELEMENTS.clear()
+    else:
+        for key in shared_elements:
+            _ELEMENTS.pop(key)
     return _LOCKS.pop(name)
 
 
 @contextlib.contextmanager
-def registered_lock(name: str, lock: multiprocessing.RLock):
+def registered_lock_and_shared_elements(name: str, lock: multiprocessing.RLock, shared_elements: dict):
     try:
-        register_lock(name, lock)
+        register_lock_and_shared_elements(name, lock, shared_elements)
         yield lock
     finally:
-        unregister_lock(name)
+        unregister_lock_and_shared_elements(name, shared_elements)
 
 
 def get_lock(name: str) -> multiprocessing.RLock:
     return _LOCKS[name]
+
+
+def get_shared_element(shared_elements_name: str) -> multiprocessing.RLock:
+    return _ELEMENTS[shared_elements_name]
