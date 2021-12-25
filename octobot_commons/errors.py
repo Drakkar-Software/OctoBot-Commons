@@ -67,3 +67,9 @@ class DatabaseNotFoundError(Exception):
     """
     Raised when a database can't be found
     """
+
+
+class MissingDataError(Exception):
+    """
+    Raised when there is not enough available candles
+    """
