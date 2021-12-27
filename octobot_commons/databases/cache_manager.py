@@ -32,15 +32,17 @@ class CacheManager:
     """
 
     CACHES = {}
+    DEFAULT_CONFIG_IDENTIFIER = "default"
 
     def __init__(self, database_adaptor=adaptors.TinyDBAdaptor):
         self.database_adaptor = database_adaptor
         self.logger = logging.get_logger(self.__class__.__name__)
 
-    def get_cache(self, tentacle, tentacle_name, exchange_name, symbol, time_frame, tentacles_setup_config,
+    def get_cache(self, tentacle, tentacle_name, exchange_name, symbol, time_frame, config_name, tentacles_setup_config,
                   cache_type=cache_timestamp_database.CacheTimestampDatabase, open_if_missing=True):
+        identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         try:
-            return self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame].get_database()
+            return self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame][identifier].get_database()
         except KeyError:
             if open_if_missing:
                 if tentacle_name not in self.__class__.CACHES:
@@ -49,64 +51,73 @@ class CacheManager:
                     self.__class__.CACHES[tentacle_name][exchange_name] = {}
                 if symbol not in self.__class__.CACHES[tentacle_name][exchange_name]:
                     self.__class__.CACHES[tentacle_name][exchange_name][symbol] = {}
+                if time_frame not in self.__class__.CACHES[tentacle_name][exchange_name][symbol]:
+                    self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame] = {}
                 if tentacle is None:
                     raise RuntimeError("tentacle parameter must be set to get the associated cache path database")
                 cache = self._open_or_create_cache_database(tentacle, exchange_name, symbol, time_frame,
-                                                            tentacle_name, tentacles_setup_config, cache_type)
-                self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame] = cache
+                                                            tentacle_name, identifier,
+                                                            tentacles_setup_config, cache_type)
+                self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame][identifier] = cache
                 return cache.get_database()
             raise common_errors.NoCacheValue(f"Cache is initialized for {tentacle_name} on {exchange_name} "
                                              f"{symbol} {time_frame}")
 
-    def has_cache(self, tentacle_name, exchange_name, symbol, time_frame):
+    def has_cache(self, tentacle_name, exchange_name, symbol, time_frame, config_name=None):
+        identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         try:
-            return bool(self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame])
+            return bool(self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame][identifier])
         except KeyError:
             return False
 
-    async def clear_cache(self, tentacle_name, exchange_name=None, symbol=None, time_frame=None):
+    async def clear_cache(self, tentacle_name, exchange_name=None, symbol=None, time_frame=None, config_name=None):
         try:
-            for cache, _ in self._caches(tentacle_name, exchange_name, symbol, time_frame):
+            for cache, _ in self._caches(tentacle_name, exchange_name, symbol, time_frame, config_name):
                 await cache.clear()
             return True
         except KeyError:
             return False
 
-    async def close_cache(self, tentacle_name, exchange_name=None, symbol=None, time_frame=None,
+    async def close_cache(self, tentacle_name, exchange_name=None, symbol=None, time_frame=None, config_name=None,
                           reset_cache_db_ids=False):
         try:
             to_remove_caches = []
-            for cache, identifiers in self._caches(tentacle_name, exchange_name, symbol, time_frame):
+            for cache, identifiers in self._caches(tentacle_name, exchange_name, symbol, time_frame, config_name):
                 await cache.close()
                 to_remove_caches.append(identifiers)
             if reset_cache_db_ids:
                 # remove cache from caches to force complete reopen of the cache db
                 # (might be at a different place)
                 for identifier in to_remove_caches:
-                    self.__class__.CACHES[identifier[0]][identifier[1]][identifier[2]].pop(identifier[3])
+                    self.__class__.CACHES[identifier[0]][identifier[1]][identifier[2]][identifier[3]].pop(identifier[4])
             return True
         except KeyError:
             return False
 
     async def reset(self):
-        for cache, _ in self._caches(None, None, None, None):
+        for cache, _ in self._caches(None, None, None, None, None):
             if cache.is_open():
                 await cache.close()
         self.__class__.CACHES = {}
 
-    def _caches(self, tentacle_name, exchange_name, symbol, time_frame):
+    def _caches(self, tentacle_name, exchange_name, symbol, time_frame, config_name):
         for _tentacle_name in [tentacle_name] if tentacle_name else list(self.__class__.CACHES):
             for _exchange_name in [exchange_name] if exchange_name else list(self.__class__.CACHES[_tentacle_name]):
                 for _symbol in [symbol] if symbol else list(self.__class__.CACHES[_tentacle_name][_exchange_name]):
                     for _time_frame in [time_frame] if time_frame else list(
                             self.__class__.CACHES[_tentacle_name][_exchange_name][_symbol]):
-                        yield self.__class__.CACHES[_tentacle_name][_exchange_name][_symbol][_time_frame], \
-                              (_tentacle_name, _exchange_name, _symbol, _time_frame)
+                        for _identifier in [config_name] if config_name else list(
+                                self.__class__.CACHES[_tentacle_name][_exchange_name][_symbol][_time_frame]):
+                            yield (
+                                self.__class__.CACHES[_tentacle_name][_exchange_name][_symbol]
+                                [_time_frame][_identifier],
+                                (_tentacle_name, _exchange_name, _symbol, _time_frame, _identifier)
+                            )
 
     def _open_or_create_cache_database(self, tentacle, exchange, symbol, time_frame,
-                                       tentacle_name, tentacles_setup_config, cache_type):
+                                       tentacle_name, identifier, tentacles_setup_config, cache_type):
         cache_full_path = self.get_cache_path(tentacle, exchange, symbol, time_frame,
-                                              tentacle_name, tentacles_setup_config)
+                                              tentacle_name, identifier, tentacles_setup_config)
         cache_dir = os.path.split(cache_full_path)[0]
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
@@ -119,9 +130,10 @@ class CacheManager:
         """
         return _CacheWrapper(file_path, cache_type, self.database_adaptor)
 
-    def get_cache_path(self, tentacle, exchange, symbol, time_frame, tentacle_name, tentacles_setup_config):
+    def get_cache_path(self, tentacle, exchange, symbol, time_frame, tentacle_name, config_name, tentacles_setup_config):
+        identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         try:
-            return self.__class__.CACHES[tentacle_name][exchange][symbol][time_frame].get_path()
+            return self.__class__.CACHES[tentacle_name][exchange][symbol][time_frame][identifier].get_path()
         except KeyError:
             sanitized_pair = symbol_util.merge_symbol(symbol) if symbol else symbol
             # warning: very slow, should be called as rarely as possible

@@ -125,7 +125,7 @@ CONFIG_TENTACLES_FILE = "tentacles_config.json"
 EVALUATOR_PRIORITY = "priority"
 DEFAULT_EVALUATOR_PRIORITY = 0
 CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
-NESTED_TENTACLES_CONFIG = "nested_tentacles"
+NESTED_TENTACLE_CONFIG = "nested_tentacle_configuration"
 
 # terms of service
 CONFIG_ACCEPTED_TERMS = "accepted_terms"
