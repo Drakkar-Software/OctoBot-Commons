@@ -150,3 +150,10 @@ class CacheDatabaseColumns(enum.Enum):
     TIMESTAMP = "t"
     VALUE = "v"
     TYPE = "ty"
+
+
+class ActivationTopics(enum.Enum):
+    FULL_CANDLES = "once per bar close"
+    IN_CONSTRUCTION_CANDLES = "once per second (Live Price)"
+    RECENT_TRADES = "recent trades"
+    EVALUATORS = "after evaluators"
