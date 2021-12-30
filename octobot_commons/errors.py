@@ -51,6 +51,12 @@ class TentacleNotFound(Exception):
     """
 
 
+class UninitializedCache(Exception):
+    """
+    Raised when a cache is requested but has not yet been initialized
+    """
+
+
 class NoCacheValue(Exception):
     """
     Raised when a cache value is selected but is not available in database
