@@ -72,6 +72,10 @@ class CacheTimestampDatabase(bases.CacheDatabase):
             else:
                 self._local_cache[timestamp] = set_value
 
+    async def set_values(self, timestamps, values, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> None:
+        for timestamp, value in zip(timestamps, values):
+            await self.set(timestamp, value, name=name)
+
     async def _timestamp_query(self, timestamp):
         return (await self._database.query_factory()).t == timestamp
 
