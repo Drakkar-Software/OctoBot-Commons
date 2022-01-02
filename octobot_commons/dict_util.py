@@ -38,6 +38,23 @@ def find_nested_value(dict_, field):
     return False, field
 
 
+def nested_update_dict(base_dict, updated_dict):
+    """
+     Updates a dict with values from another but keeps the 1st dict values when not specified
+     in the update dict. Handle nested values unlike the default dict.update().
+    :param base_dict: the dict to be updated
+    :param updated_dict: the dict to take updated values from
+    """
+    for key, val in updated_dict.items():
+        if isinstance(val, dict):
+            if key in base_dict:
+                nested_update_dict(base_dict[key], val)
+            else:
+                base_dict[key] = val
+        else:
+            base_dict[key] = val
+
+
 def check_and_merge_values_from_reference(
     current_dict, reference_dict, exception_list, logger=None
 ):
