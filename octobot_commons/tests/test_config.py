@@ -20,23 +20,24 @@ import octobot_commons.constants as constants
 import octobot_commons.enums as enums
 
 TEST_FOLDER = "tests"
+STATIC_FOLDER = "static"
 TEST_CONFIG_FOLDER = f"{TEST_FOLDER}/static"
 
 
-def get_test_config():
+def get_test_config(test_folder=TEST_FOLDER):
     """
     Return test default config
     :return: test default config
     """
-    return os.path.join(TEST_CONFIG_FOLDER, constants.CONFIG_FILE)
+    return os.path.join(test_folder, STATIC_FOLDER, constants.CONFIG_FILE)
 
 
-def get_test_profile():
+def get_test_profile(test_folder=TEST_FOLDER):
     """
     Return test default config
     :return: test default config
     """
-    return TEST_FOLDER
+    return test_folder
 
 
 def init_config_time_frame_for_tests(config):
@@ -51,12 +52,13 @@ def init_config_time_frame_for_tests(config):
     config[constants.CONFIG_TIME_FRAME] = result
 
 
-def load_test_config(dict_only=True):
+def load_test_config(dict_only=True, test_folder=TEST_FOLDER):
     """
     Return the complete default test configs
     :return: the complete default test config
     """
-    config = configuration.Configuration(get_test_config(), get_test_profile())
+    config = configuration.Configuration(get_test_config(test_folder=test_folder),
+                                         get_test_profile(test_folder=test_folder))
     config.read()
     init_config_time_frame_for_tests(config.config)
     return config.config if dict_only else config
