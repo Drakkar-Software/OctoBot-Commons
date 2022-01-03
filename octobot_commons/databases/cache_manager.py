@@ -39,7 +39,7 @@ class CacheManager:
         self.logger = logging.get_logger(self.__class__.__name__)
 
     def get_cache(self, tentacle, tentacle_name, exchange_name, symbol, time_frame, config_name, tentacles_setup_config,
-                  cache_type=cache_timestamp_database.CacheTimestampDatabase, open_if_missing=True):
+                  cache_type=cache_timestamp_database.CacheTimestampDatabase, open_if_missing=True) -> tuple:
         identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         try:
             return self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame][identifier].get_database()
@@ -195,13 +195,15 @@ class _CacheWrapper:
         self._cache_database = None
         self._db_path = None
 
-    def get_database(self):
+    def get_database(self) -> tuple:
+        created = False
         if self._cache_database is None:
             self._cache_database = self.cache_type(self.file_path,
                                                    database_adaptor=self.database_adaptor,
                                                    **self.db_kwargs)
             self._db_path = self._cache_database.get_db_path()
-        return self._cache_database
+            created = True
+        return self._cache_database, created
 
     def is_open(self):
         return self._cache_database is not None

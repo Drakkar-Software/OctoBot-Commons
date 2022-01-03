@@ -28,19 +28,16 @@ class CacheDatabase(writer.DBWriter):
         self._are_metadata_written = False
         self._local_cache = None
         self._is_empty_database = False
-
-    def generate_metadata(self) -> dict:
-        """
-        Override if more metadata are required
-        :return: the metadata dict
-        """
-        return {
+        self.metadata = {
             enums.CacheDatabaseColumns.TYPE.value: self.__class__.__name__,
         }
 
+    def add_metadata(self, additional_metadata: dict):
+        self.metadata.update(additional_metadata)
+
     async def _ensure_metadata(self):
         if not self._are_metadata_written:
-            await self._database.upsert(self.CACHE_METADATA_TABLE, self.generate_metadata(), None, uuid=1)
+            await self._database.upsert(self.CACHE_METADATA_TABLE, self.metadata, None, uuid=1)
             self._are_metadata_written = True
 
     async def _ensure_local_cache(self, identifier_key, update=False):
