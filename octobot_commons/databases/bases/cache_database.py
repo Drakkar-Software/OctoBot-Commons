@@ -21,6 +21,7 @@ import octobot_commons.databases.adaptors as adaptors
 class CacheDatabase(writer.DBWriter):
     CACHE_TABLE = enums.CacheDatabaseTables.CACHE.value
     CACHE_METADATA_TABLE = enums.CacheDatabaseTables.METADATA.value
+    UUID_KEY = "uuid"
 
     def __init__(self, file_path: str, database_adaptor=adaptors.TinyDBAdaptor, cache_size=None, **kwargs):
         super().__init__(file_path, database_adaptor=database_adaptor, cache_size=cache_size, **kwargs)
@@ -44,10 +45,10 @@ class CacheDatabase(writer.DBWriter):
 
     async def _ensure_local_cache(self, identifier_key, update=False):
         if update or self._local_cache is None:
-            self._local_cache = {
-                cache[identifier_key]: cache
-                for cache in await self.get_cache()
-            }
+            self._local_cache = {}
+            for cache in await self.get_cache():
+                cache[self.UUID_KEY] = self._database.get_uuid(cache)
+                self._local_cache[cache[identifier_key]] = cache
             if self._local_cache == {}:
                 self._is_empty_database = True
 

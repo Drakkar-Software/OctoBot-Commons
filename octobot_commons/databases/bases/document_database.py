@@ -34,6 +34,13 @@ class DocumentDatabase:
         """
         self.adaptor.initialize()
 
+    def get_uuid(self, document) -> int:
+        """
+        Returns the uuid of the document
+        :param document: the document
+        """
+        return self.adaptor.get_uuid(document)
+
     def get_db_path(self):
         """
         Select database path
