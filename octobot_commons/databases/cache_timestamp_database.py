@@ -54,23 +54,27 @@ class CacheTimestampDatabase(bases.CacheDatabase):
         await self._ensure_metadata()
         saved_value = self.get_serializable_value(value)
         if await self._needs_update(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name, saved_value):
+            uuid = None
             set_value = {
                 commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp,
                 name: saved_value,
             }
-            await self.upsert(
-                self.CACHE_TABLE,
-                set_value,
-                None,
-                cache_query={
-                    commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp
-                }
-            )
             if timestamp in self._local_cache:
+                # set uuid in case this value already exist in db
+                uuid = self._local_cache[timestamp].get(self.UUID_KEY)
                 self._local_cache[timestamp][commons_enums.CacheDatabaseColumns.TIMESTAMP.value] = timestamp
                 self._local_cache[timestamp][name] = saved_value
             else:
                 self._local_cache[timestamp] = set_value
+            await self.upsert(
+                self.CACHE_TABLE,
+                set_value,
+                None,
+                uuid=uuid,
+                cache_query={
+                    commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp
+                }
+            )
 
     async def set_values(self, timestamps, values, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> None:
         for timestamp, value in zip(timestamps, values):

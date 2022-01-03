@@ -56,6 +56,13 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         except FileNotFoundError as e:
             raise errors.DatabaseNotFoundError(f"Can't open database at \"{self.db_path}\"") from e
 
+    def get_uuid(self, document) -> int:
+        """
+        Returns the uuid of the document
+        :param document: the document
+        """
+        return document.doc_id
+
     async def select(self, table_name: str, query, uuid=None) -> list:
         """
         Select data from the table_name table

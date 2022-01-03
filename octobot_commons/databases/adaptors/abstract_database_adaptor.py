@@ -37,6 +37,13 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("initialize is not implemented")
 
+    def get_uuid(self, document) -> int:
+        """
+        Returns the uuid of the document
+        :param document: the document
+        """
+        raise NotImplementedError("get_uuid is not implemented")
+
     async def select(self, table_name: str, query, uuid=None) -> list:
         """
         Select data from the table_name table
