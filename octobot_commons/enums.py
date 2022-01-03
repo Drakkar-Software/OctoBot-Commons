@@ -150,6 +150,7 @@ class CacheDatabaseColumns(enum.Enum):
     TIMESTAMP = "t"
     VALUE = "v"
     TYPE = "ty"
+    TRIGGERED_AFTER_CANDLES_CLOSE = "triggered_after_candles_close"
 
 
 class ActivationTopics(enum.Enum):
