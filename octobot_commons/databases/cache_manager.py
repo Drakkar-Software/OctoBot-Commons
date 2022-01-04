@@ -38,7 +38,8 @@ class CacheManager:
         self.database_adaptor = database_adaptor
         self.logger = logging.get_logger(self.__class__.__name__)
 
-    def get_cache(self, tentacle, tentacle_name, exchange_name, symbol, time_frame, config_name, tentacles_setup_config,
+    def get_cache(self, tentacle, tentacle_name, exchange_name, symbol, time_frame, config_name,
+                  tentacles_setup_config, tentacles_requirements,
                   cache_type=cache_timestamp_database.CacheTimestampDatabase, open_if_missing=True) -> tuple:
         identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         try:
@@ -58,7 +59,7 @@ class CacheManager:
                                                            f"must be set to get the associated cache database path")
                 cache = self._open_or_create_cache_database(tentacle, exchange_name, symbol, time_frame,
                                                             tentacle_name, identifier,
-                                                            tentacles_setup_config, cache_type)
+                                                            tentacles_setup_config, cache_type, tentacles_requirements)
                 self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame][identifier] = cache
                 return cache.get_database()
             raise common_errors.NoCacheValue(f"Cache is initialized for {tentacle_name} on {exchange_name} "
@@ -71,6 +72,16 @@ class CacheManager:
         except KeyError:
             return False
 
+    def get_cache_registered_requirements(self, tentacle_name, exchange_name, symbol, time_frame, config_name=None):
+        identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
+        return self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame][identifier].\
+            tentacles_requirements
+
+    def get_cache_previous_db_metadata(self, tentacle_name, exchange_name, symbol, time_frame, config_name=None):
+        identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
+        return self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame][identifier].\
+            previous_db_metadata
+
     async def clear_cache(self, tentacle_name, exchange_name=None, symbol=None, time_frame=None, config_name=None):
         try:
             for cache, _ in self._caches(tentacle_name, exchange_name, symbol, time_frame, config_name):
@@ -78,6 +89,11 @@ class CacheManager:
             return True
         except KeyError:
             return False
+
+    async def reset_cache(self, tentacle_name, exchange_name, symbol, time_frame, config_name):
+        identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
+        cache = self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame].pop(identifier)
+        await cache.close()
 
     async def close_cache(self, tentacle_name, exchange_name=None, symbol=None, time_frame=None, config_name=None,
                           reset_cache_db_ids=False):
@@ -116,29 +132,33 @@ class CacheManager:
                             )
 
     def _open_or_create_cache_database(self, tentacle, exchange, symbol, time_frame,
-                                       tentacle_name, identifier, tentacles_setup_config, cache_type):
-        cache_full_path = self.get_cache_path(tentacle, exchange, symbol, time_frame,
-                                              tentacle_name, identifier, tentacles_setup_config)
+                                       tentacle_name, identifier, tentacles_setup_config,
+                                       cache_type, tentacles_requirements):
+        cache_full_path = self.get_cache_or_build_path(
+            tentacle, exchange, symbol, time_frame,
+            tentacle_name, identifier, tentacles_setup_config, tentacles_requirements)
         cache_dir = os.path.split(cache_full_path)[0]
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
-        return self._open_cache_database(cache_full_path, cache_type)
+        return self._open_cache_database(cache_full_path, cache_type, tentacles_requirements)
 
-    def _open_cache_database(self, file_path, cache_type):
+    def _open_cache_database(self, file_path, cache_type, tentacles_requirements):
         """
         Override to use another cache database or adaptor
         :return: the cache database class
         """
-        return _CacheWrapper(file_path, cache_type, self.database_adaptor)
+        return _CacheWrapper(file_path, cache_type, self.database_adaptor, tentacles_requirements)
 
-    def get_cache_path(self, tentacle, exchange, symbol, time_frame, tentacle_name, config_name, tentacles_setup_config):
+    def get_cache_or_build_path(self, tentacle, exchange, symbol, time_frame, tentacle_name, config_name,
+                                tentacles_setup_config, tentacles_requirements):
         identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         try:
             return self.__class__.CACHES[tentacle_name][exchange][symbol][time_frame][identifier].get_path()
         except KeyError:
             sanitized_pair = symbol_util.merge_symbol(symbol) if symbol else symbol
             # warning: very slow, should be called as rarely as possible
-            required_tentacles = self._get_linked_tentacles(tentacle, tentacles_setup_config)
+            required_tentacles = tentacles_requirements.get_all_required_tentacles(False) or \
+                self._get_linked_tentacles(tentacle, tentacles_setup_config)
             identifying_tentacles = [tentacle] + required_tentacles
             return os.path.join(common_constants.USER_FOLDER, common_constants.CACHE_FOLDER, tentacle_name,
                                 exchange, sanitized_pair, time_frame,
@@ -187,13 +207,15 @@ class CacheManager:
 
 
 class _CacheWrapper:
-    def __init__(self, file_path, cache_type, database_adaptor, **kwargs):
+    def __init__(self, file_path, cache_type, database_adaptor, tentacles_requirements, **kwargs):
         self.file_path = file_path
         self.cache_type = cache_type
         self.database_adaptor = database_adaptor
         self.db_kwargs = kwargs
         self._cache_database = None
         self._db_path = None
+        self.previous_db_metadata = None
+        self.tentacles_requirements = tentacles_requirements.summary()
 
     def get_database(self) -> tuple:
         created = False
@@ -210,6 +232,7 @@ class _CacheWrapper:
 
     async def close(self):
         if self.is_open():
+            self.previous_db_metadata = self._cache_database.get_non_default_metadata()
             await self._cache_database.close()
             self._cache_database = None
             return True

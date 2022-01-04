@@ -16,6 +16,7 @@
 
 from octobot_commons.tentacles_management import abstract_tentacle
 from octobot_commons.tentacles_management import class_inspector
+from octobot_commons.tentacles_management import tentacle_requirements
 
 from octobot_commons.tentacles_management.abstract_tentacle import AbstractTentacle
 from octobot_commons.tentacles_management.class_inspector import (
@@ -30,6 +31,7 @@ from octobot_commons.tentacles_management.class_inspector import (
     get_all_classes_from_parent,
     get_single_deepest_child_class,
 )
+from octobot_commons.tentacles_management.tentacle_requirements import TentacleRequirements
 
 __all__ = [
     "AbstractTentacle",
@@ -43,4 +45,5 @@ __all__ = [
     "is_abstract_using_inspection_and_class_naming",
     "get_all_classes_from_parent",
     "get_single_deepest_child_class",
+    "TentacleRequirements",
 ]
