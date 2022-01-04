@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import copy
+
 import octobot_commons.enums as enums
 import octobot_commons.databases.writer as writer
 import octobot_commons.databases.adaptors as adaptors
@@ -31,6 +33,11 @@ class CacheDatabase(writer.DBWriter):
         self.metadata = {
             enums.CacheDatabaseColumns.TYPE.value: self.__class__.__name__,
         }
+
+    def get_non_default_metadata(self):
+        metadata = copy.copy(self.metadata)
+        metadata.pop(enums.CacheDatabaseColumns.TYPE.value)
+        return metadata
 
     def add_metadata(self, additional_metadata: dict):
         self.metadata.update(additional_metadata)
