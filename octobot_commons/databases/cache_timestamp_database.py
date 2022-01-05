@@ -77,8 +77,33 @@ class CacheTimestampDatabase(bases.CacheDatabase):
             )
 
     async def set_values(self, timestamps, values, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> None:
+        # 1. update values that exist already (can't be done all at once and is slower)
+        handled_timestamps = set()
         for timestamp, value in zip(timestamps, values):
-            await self.set(timestamp, value, name=name)
+            if timestamp in self._local_cache and name in self._local_cache[timestamp]:
+                await self.set(timestamp, value, name=name)
+                handled_timestamps.add(timestamp)
+        # 2. use optimized multiple insert to speed up the database insert operation
+        await self._set_non_existent_values(
+            ((timestamp, value) for timestamp, value in zip(timestamps, values) if timestamp not in handled_timestamps),
+            name=name
+        )
+
+    async def _set_non_existent_values(self, timestamps_and_values, name):
+        await self._ensure_metadata()
+        rows = []
+        for timestamp, value in timestamps_and_values:
+            if timestamp in self._local_cache:
+                row = self._local_cache[timestamp]
+                row[name] = value
+            else:
+                row = {
+                    commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp,
+                    name: value
+                }
+                self._local_cache[timestamp] = row
+            rows.append(row)
+        await self.log_many(self.CACHE_TABLE, rows)
 
     async def _timestamp_query(self, timestamp):
         return (await self._database.query_factory()).t == timestamp
