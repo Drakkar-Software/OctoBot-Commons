@@ -77,6 +77,7 @@ class CacheTimestampDatabase(bases.CacheDatabase):
             )
 
     async def set_values(self, timestamps, values, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> None:
+        await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value)
         # 1. update values that exist already (can't be done all at once and is slower)
         handled_timestamps = set()
         for timestamp, value in zip(timestamps, values):
