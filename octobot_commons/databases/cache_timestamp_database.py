@@ -34,13 +34,14 @@ class CacheTimestampDatabase(bases.CacheDatabase):
             except KeyError:
                 raise errors.NoCacheValue(f"No {name} value associated to {timestamp} cache.")
 
-    async def get_values(self, timestamp: float, name: str = commons_enums.CacheDatabaseColumns.VALUE.value, limit=-1) -> list:
+    async def get_values(self, timestamp: float, name: str = commons_enums.CacheDatabaseColumns.VALUE.value, limit=-1,
+                         min_timestamp=0) -> list:
         try:
             await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value)
             values = [
                 values[name]
                 for value_timestamp, values in self._local_cache.items()
-                if value_timestamp <= timestamp and name in values
+                if min_timestamp <= value_timestamp <= timestamp and name in values
             ]
             if limit != -1:
                 return values[-limit:]
