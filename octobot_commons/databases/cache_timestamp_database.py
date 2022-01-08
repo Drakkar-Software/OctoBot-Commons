@@ -76,37 +76,62 @@ class CacheTimestampDatabase(bases.CacheDatabase):
                 }
             )
 
-    async def set_values(self, timestamps, values, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> None:
+    async def set_values(self, timestamps, values, name: str = commons_enums.CacheDatabaseColumns.VALUE.value,
+                         additional_values_by_key: dict = None) -> None:
         await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value)
-        # 1. update values that exist already (can't be done all at once and is slower)
-        handled_timestamps = set()
-        serializable_values = [self.get_serializable_value(value) for value in values]
-        for timestamp, value in zip(timestamps, serializable_values):
-            if timestamp in self._local_cache and name in self._local_cache[timestamp]:
-                await self.set(timestamp, value, name=name)
-                handled_timestamps.add(timestamp)
-        # 2. use optimized multiple insert to speed up the database insert operation
-        await self._set_non_existent_values(
-            ((timestamp, value)
-             for timestamp, value in zip(timestamps, serializable_values) if timestamp not in handled_timestamps),
-            name=name
-        )
+        to_bulk_update = {
+            name: [self.get_serializable_value(value) for value in values]
+        }
+        if additional_values_by_key:
+            to_bulk_update.update({
+                key: [self.get_serializable_value(value) for value in values]
+                for key, values in additional_values_by_key.items()
+            })
+        # use optimized multiple insert to speed up the database insert operation
+        await self._bulk_update_values(timestamps, to_bulk_update)
 
-    async def _set_non_existent_values(self, timestamps_and_values, name):
+    async def _bulk_update_values(self, timestamps, to_bulk_update):
         await self._ensure_metadata()
         rows = []
-        for timestamp, value in timestamps_and_values:
-            if timestamp in self._local_cache:
-                row = self._local_cache[timestamp]
-                row[name] = value
-            else:
-                row = {
-                    commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp,
-                    name: value
-                }
+        can_just_insert_data = True
+        key = None
+        try:
+            # try to write data in the scenario their timestamp is not in cache already: can insert directly
+            for index, timestamp in enumerate(timestamps):
+                if timestamp in self._local_cache:
+                    row = self._local_cache[timestamp]
+                    # will have to update data
+                    can_just_insert_data = False
+                else:
+                    row = {
+                        commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp
+                    }
+                for key, values in to_bulk_update.items():
+                    row[key] = values[index]
                 self._local_cache[timestamp] = row
-            rows.append(row)
-        await self.log_many(self.CACHE_TABLE, rows)
+                rows.append(row)
+            if can_just_insert_data:
+                await self.log_many(self.CACHE_TABLE, rows)
+            else:
+                await self._update_full_database()
+        except IndexError:
+            raise RuntimeError(f"Data to set are required to have the same length as the timestamps list. "
+                               f"Error on the {key} values")
+
+    async def _update_full_database(self):
+        # to be called to avoid multiple upsert / update which can be very slow: take full advantage of multiple inserts
+        # 1. recreate all database elements from self._local_cache
+        all_rows = []
+        for element in self._local_cache.values():
+            # remove artificial data if any
+            element.pop(self.UUID_KEY, None)
+            all_rows.append(element)
+        # 2. delete database content
+        await self.delete_all(self.CACHE_TABLE)
+        # 3. insert all local cache
+        await self.log_many(self.CACHE_TABLE, all_rows)
+        # 4. reset self._local_cache
+        await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, update=True)
 
     async def _timestamp_query(self, timestamp):
         return (await self._database.query_factory()).t == timestamp
