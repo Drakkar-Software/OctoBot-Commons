@@ -80,13 +80,15 @@ class CacheTimestampDatabase(bases.CacheDatabase):
         await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value)
         # 1. update values that exist already (can't be done all at once and is slower)
         handled_timestamps = set()
-        for timestamp, value in zip(timestamps, values):
+        serializable_values = [self.get_serializable_value(value) for value in values]
+        for timestamp, value in zip(timestamps, serializable_values):
             if timestamp in self._local_cache and name in self._local_cache[timestamp]:
                 await self.set(timestamp, value, name=name)
                 handled_timestamps.add(timestamp)
         # 2. use optimized multiple insert to speed up the database insert operation
         await self._set_non_existent_values(
-            ((timestamp, value) for timestamp, value in zip(timestamps, values) if timestamp not in handled_timestamps),
+            ((timestamp, value)
+             for timestamp, value in zip(timestamps, serializable_values) if timestamp not in handled_timestamps),
             name=name
         )
 
