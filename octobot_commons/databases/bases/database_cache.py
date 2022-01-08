@@ -20,8 +20,11 @@ class DatabaseCache:
     MAX_CACHE_SIZE = 512
 
     def __init__(self):
+        # used for select / contains methods
         self.rows_cache = {}
+        # used for cached_query() (used in upsert)
         self.query_cache = {}
+        # used for cached_uuid() (used in upsert)
         self.uuid_cache = {}
 
     def register(self, table, row, result=None, uuid=None):
