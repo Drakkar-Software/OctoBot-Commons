@@ -19,10 +19,11 @@ class TentacleRequirements:
     """
     Tree like structure used to keep track of tentacles nested requirements
     """
-    def __init__(self, tentacle, config_name):
+    def __init__(self, tentacle, config_name, tentacle_class=None):
         self.tentacle = tentacle
-        self.tentacle_class = self.tentacle.__class__
+        self.tentacle_class = tentacle_class or self.tentacle.__class__
         self.config_name = config_name
+        self.tentacle_config = None     # set when necessary by synchronize_tentacles_config()
         self.nested_requirements = []
 
     def get_requirement(self, tentacle_class, config_name):
@@ -32,13 +33,28 @@ class TentacleRequirements:
         return None
 
     def add_requirement(self, requirement):
+        """
+        Adds a requirement to nested_requirements
+        :param requirement: the requirement to add
+        :return: True if nested_requirements did not already contain requirement
+        """
         if self.get_requirement(requirement.tentacle_class, requirement.config_name) is None:
             self.nested_requirements.append(requirement)
+            return True
+        return False
 
     def get_all_required_tentacles(self, include_self):
         return [req.tentacle for req in self.get_all_nested_requirements(include_self)]
 
+    def synchronize_tentacles_config(self):
+        self.tentacle_config = self.tentacle.specific_config if hasattr(self.tentacle, "specific_config") \
+            else self.tentacle.trading_config
+        for nested_requirement in self.nested_requirements:
+            nested_requirement.synchronize_tentacles_config()
+
     def get_all_nested_requirements(self, include_self):
+        if self.tentacle is None:
+            raise RuntimeError(f"Impossible to call get_all_nested_requirements() when the tentacle attribute is None")
         requirements = [self] if include_self else []
         for nested_requirement in self.nested_requirements:
             requirements += nested_requirement.get_all_nested_requirements(True)
@@ -54,8 +70,9 @@ class TentacleRequirements:
         """
         Returns a clone of this tentacle requirement with your references to the tentacle instance
         """
-        summary_requirement = TentacleRequirements(self.tentacle, self.config_name)
+        summary_requirement = TentacleRequirements(self.tentacle, self.config_name, tentacle_class=self.tentacle_class)
         summary_requirement.tentacle = None
+        summary_requirement.tentacle_config = self.tentacle_config
         summary_requirement.nested_requirements = [req.summary() for req in self.nested_requirements]
         return summary_requirement
 

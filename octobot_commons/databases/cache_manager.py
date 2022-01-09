@@ -156,10 +156,13 @@ class CacheManager:
             return self.__class__.CACHES[tentacle_name][exchange][symbol][time_frame][identifier].get_path()
         except KeyError:
             sanitized_pair = symbol_util.merge_symbol(symbol) if symbol else symbol
-            # warning: very slow, should be called as rarely as possible
             required_tentacles = tentacles_requirements.get_all_required_tentacles(False) or \
                 self._get_linked_tentacles(tentacle, tentacles_setup_config)
+            # ensure tentacles requirements are snapshotting the configuration that was used to build the
+            # cache identifier
+            tentacles_requirements.synchronize_tentacles_config()
             identifying_tentacles = [tentacle] + required_tentacles
+            # warning: very slow, should be called as rarely as possible
             return os.path.join(common_constants.USER_FOLDER, common_constants.CACHE_FOLDER, tentacle_name,
                                 exchange, sanitized_pair, time_frame,
                                 self._code_hash(identifying_tentacles),
