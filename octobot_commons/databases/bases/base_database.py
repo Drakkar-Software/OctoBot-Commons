@@ -32,7 +32,7 @@ class BaseDatabase:
         self.cache = database_cache.DatabaseCache()
 
     def set_initialized_flags(self, value, keys=None):
-        self.are_data_initialized = False
+        self.are_data_initialized = value
         for key in keys or self.are_data_initialized_by_key.keys():
             self.are_data_initialized_by_key[key] = value
 
