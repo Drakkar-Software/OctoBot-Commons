@@ -55,8 +55,13 @@ class CacheManager:
                 if time_frame not in self.__class__.CACHES[tentacle_name][exchange_name][symbol]:
                     self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame] = {}
                 if tentacle is None:
-                    raise common_errors.UninitializedCache(f"No initialized cache for tentacle. The tentacle parameter "
-                                                           f"must be set to get the associated cache database path")
+                    config_names = list(self.__class__.CACHES[tentacle_name][exchange_name][symbol][time_frame])
+                    available_config_names = \
+                        f"Available configuration names: {config_names}. " if config_names else ""
+                    raise common_errors.UninitializedCache(
+                        f"No initialized cache for {tentacle_name} tentacle with config name: {config_name}. "
+                        f"{available_config_names}"
+                        f"The tentacle parameter must be set to get the associated cache database path")
                 cache = self._open_or_create_cache_database(tentacle, exchange_name, symbol, time_frame,
                                                             tentacle_name, identifier,
                                                             tentacles_setup_config, cache_type, tentacles_requirements)
