@@ -127,6 +127,7 @@ DEFAULT_EVALUATOR_PRIORITY = 0
 CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
 NESTED_TENTACLE_CONFIG = "nested_tentacle_configuration"
 CONFIG_ACTIVATION_TOPICS = "activation method"
+CONFIG_TRIGGER_TIMEFRAMES = "Trigger_timeframes"
 
 # terms of service
 CONFIG_ACCEPTED_TERMS = "accepted_terms"
