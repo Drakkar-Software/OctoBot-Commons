@@ -97,6 +97,24 @@ class EventTree:
         except KeyError:
             raise NodeExistsError
 
+    def delete_node(self, path, starting_node=None):
+        """
+        Delete the node at the specified path
+        :param path: the node path (as a list of string).
+        For example:
+        - If you created a first node with the path ["my-parent-node"]
+        - You can create a child node of my-parent-node by using ["my-parent-node", "my-new-child-node"] as `path`
+        :param starting_node: the node to start the relative path
+        :return: the deleted node or raise a NodeExistsError if the node doesn't exists
+        """
+        try:
+            deleted_node = self._delete_node(path, starting_node=starting_node)
+            if deleted_node is None:
+                raise NodeExistsError
+            return deleted_node
+        except KeyError:
+            raise NodeExistsError
+
     def get_or_create_node(self, path, starting_node=None):
         """
         Get the node at the specified path
@@ -125,6 +143,19 @@ class EventTree:
         for key in path:
             current_node = current_node.children[key]
         return current_node
+
+    def _delete_node(self, path, starting_node=None):
+        """
+        Return the node corresponding to the path
+        Can raise a KeyError if the path does not exists
+        :param path: the path (as a list of string) to the node
+        :param starting_node: the node to start the path, root if None
+        :return: EventTreeNode at path
+        """
+        current_node = self.root if starting_node is None else starting_node
+        for key in path[:-1]:
+            current_node = current_node.children[key]
+        return current_node.children.pop(path[-1], None)
 
     def _create_node_path(self, path, starting_node=None):
         """
