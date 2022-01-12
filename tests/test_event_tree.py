@@ -13,46 +13,35 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import asyncio
-from unittest.mock import patch
-
 import pytest
 
 from octobot_commons.event_tree import EventTree, NodeExistsError
-
-
-async def async_event_tree_set_node(tree, value, node_type, node):
-    tree.set_node(value, node_type, node)
 
 
 def test_event_tree_init():
     assert EventTree()
 
 
-@pytest.mark.asyncio
-async def test_event_tree_get_new_node():
+def test_event_tree_get_new_node():
     event_tree = EventTree()
     created_node = event_tree.get_or_create_node(["test"])
     assert event_tree.root.children == {"test": created_node}
 
 
-@pytest.mark.asyncio
-async def test_event_tree_get_existing_node():
+def test_event_tree_get_existing_node():
     event_tree = EventTree()
     created_node = event_tree.get_or_create_node(["test"])
     get_node_result = event_tree.get_or_create_node(["test"])
     assert created_node is get_node_result
 
 
-@pytest.mark.asyncio
-async def test_event_tree_get_not_existing_node():
+def test_event_tree_get_not_existing_node():
     event_tree = EventTree()
     with pytest.raises(NodeExistsError):
         assert event_tree.get_node(["test"]) is None
 
 
-@pytest.mark.asyncio
-async def test_event_tree_get_new_relative_node():
+def test_event_tree_get_new_relative_node():
     event_tree = EventTree()
     created_node = event_tree.get_or_create_node(["test"])
     relative_created_node = event_tree.get_or_create_node(["test-relative"], starting_node=created_node)
@@ -60,8 +49,7 @@ async def test_event_tree_get_new_relative_node():
     assert relative_created_node is get_node_result
 
 
-@pytest.mark.asyncio
-async def test_event_tree_get_relative_node():
+def test_event_tree_get_relative_node():
     event_tree = EventTree()
     created_node = event_tree.get_or_create_node(["test"])
     relative_created_node = event_tree.get_or_create_node(["test", "test-relative"])
@@ -69,8 +57,7 @@ async def test_event_tree_get_relative_node():
     assert relative_created_node is get_node_result
 
 
-@pytest.mark.asyncio
-async def test_event_tree_set_node():
+def test_event_tree_set_node():
     event_tree = EventTree()
     created_node = event_tree.get_or_create_node(["test"])
     event_tree.set_node(1, None, created_node)
@@ -82,8 +69,7 @@ async def test_event_tree_set_node():
     assert created_node.node_value_time == 10
 
 
-@pytest.mark.asyncio
-async def test_event_tree_set_node_at_path():
+def test_event_tree_set_node_at_path():
     event_tree = EventTree()
     event_tree.set_node_at_path("test-string", "test-type", ["test", "test2", "test3"])
     assert event_tree.get_or_create_node(["test"])
