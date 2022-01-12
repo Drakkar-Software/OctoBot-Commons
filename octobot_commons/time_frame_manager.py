@@ -21,7 +21,11 @@ LOGGER_TAG = "TimeFrameManager"
 
 
 def _sort_time_frames(time_frames, reverse=False):
-    return sorted(time_frames, key=enums.TimeFramesMinutes.__getitem__, reverse=reverse)
+    if time_frames:
+        time_frames = time_frames if isinstance(time_frames[0], enums.TimeFrames) \
+            else (enums.TimeFrames(tf) for tf in time_frames)
+        return sorted(time_frames, key=enums.TimeFramesMinutes.__getitem__, reverse=reverse)
+    return time_frames
 
 
 TimeFramesRank = _sort_time_frames(list(enums.TimeFramesMinutes))
