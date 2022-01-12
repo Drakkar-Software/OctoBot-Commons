@@ -79,3 +79,9 @@ class MissingDataError(Exception):
     """
     Raised when there is not enough available candles
     """
+
+
+class ExecutionAborted(Exception):
+    """
+    Raised when the current execution should be aborted
+    """
