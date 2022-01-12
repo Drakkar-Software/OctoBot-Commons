@@ -41,6 +41,21 @@ def test_event_tree_get_not_existing_node():
         assert event_tree.get_node(["test"]) is None
 
 
+def test_event_tree_delete_existing_node():
+    event_tree = EventTree()
+    created_node = event_tree.get_or_create_node(["test"])
+    delete_node_result = event_tree.delete_node(["test"])
+    assert created_node is delete_node_result
+    with pytest.raises(NodeExistsError):
+        event_tree.get_node(["test"])
+
+
+def test_event_tree_delete_not_existing_node():
+    event_tree = EventTree()
+    with pytest.raises(NodeExistsError):
+        event_tree.delete_node(["test"])
+
+
 def test_event_tree_get_new_relative_node():
     event_tree = EventTree()
     created_node = event_tree.get_or_create_node(["test"])
@@ -55,6 +70,17 @@ def test_event_tree_get_relative_node():
     relative_created_node = event_tree.get_or_create_node(["test", "test-relative"])
     get_node_result = event_tree.get_or_create_node(["test-relative"], starting_node=created_node)
     assert relative_created_node is get_node_result
+
+
+def test_event_tree_delete_relative_node():
+    event_tree = EventTree()
+    created_node = event_tree.get_or_create_node(["test"])
+    relative_created_node = event_tree.get_or_create_node(["test", "test-relative"])
+    delete_node_result = event_tree.delete_node(["test-relative"], starting_node=created_node)
+    assert relative_created_node is delete_node_result
+    assert event_tree.get_node(["test"]) is created_node
+    with pytest.raises(NodeExistsError):
+        event_tree.get_node(["test", "test-relative"])
 
 
 def test_event_tree_set_node():
