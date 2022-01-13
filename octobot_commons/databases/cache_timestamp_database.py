@@ -22,17 +22,11 @@ class CacheTimestampDatabase(bases.CacheDatabase):
     async def get(self, timestamp: float, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> dict:
         try:
             return await self._get_from_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name)
-        except KeyError:
-            try:
-                if self._is_empty_database:
-                    raise errors.NoCacheValue(f"No cache value associated to {timestamp}")
-                value = (await self._database.select(self.CACHE_TABLE, await self._timestamp_query(timestamp)))[0][name]
-                await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, update=True)
-                return value
-            except IndexError:
-                raise errors.NoCacheValue(f"No cache value associated to {timestamp}")
-            except KeyError:
-                raise errors.NoCacheValue(f"No {name} value associated to {timestamp} cache.")
+        except KeyError as e:
+            raise errors.NoCacheValue(
+                f"No cache value associated to {timestamp}" if e.args[0] == timestamp
+                else f"No {name} value associated to {timestamp} cache."
+            )
 
     async def get_values(self, timestamp: float, name: str = commons_enums.CacheDatabaseColumns.VALUE.value, limit=-1,
                          min_timestamp=0) -> list:
