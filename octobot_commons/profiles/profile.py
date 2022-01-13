@@ -123,6 +123,18 @@ class Profile:
         with open(self.config_file(), "w") as profile_file:
             json.dump(self.as_dict(), profile_file, indent=4, sort_keys=True)
 
+    def rename_folder(self, new_name) -> str:
+        """
+        rename the profile folder
+        :param new_name: name of the new folder
+        :return: the new profile path
+        """
+        new_path = os.path.join(os.path.split(self.path)[0], new_name)
+        if os.path.exists(new_path):
+            raise RuntimeError(f"Skipping folder renaming: a profile already exists at this path")
+            shutil.move(self.path, new_path)
+            self.path = new_path
+
     def duplicate(self, name: str = None, description: str = None):
         """
         Duplicates the current profile and associates it with a new profile_id
