@@ -169,6 +169,7 @@ CACHE_HASH_SIZE = 15
 CACHE_RELATED_DATA_SEPARATOR = "##"
 LOCAL_BOT_DATA = "local_bot_data"
 DO_NOT_CACHE = "do_not_cache"
+DO_NOT_OVERRIDE_CACHE = "do_not_override_cache"
 
 # Async settings
 DEFAULT_FUTURE_TIMEOUT = 120
