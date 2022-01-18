@@ -21,9 +21,10 @@ import octobot_commons.symbol_util as symbol_util
 
 
 class DatabaseManager:
-    def __init__(self, tentacle_class, database_adaptor=adaptors.TinyDBAdaptor, backtesting_id=None,
-                 optimizer_id=None, context=None):
+    def __init__(self, tentacle_class, optimization_campaign_name=None, database_adaptor=adaptors.TinyDBAdaptor,
+                 backtesting_id=None, optimizer_id=None, context=None):
         self.database_adaptor = database_adaptor
+        self.optimization_campaign_name = optimization_campaign_name
         self.backtesting_id = backtesting_id
         self.optimizer_id = optimizer_id
         self.tentacle_class = tentacle_class
@@ -59,7 +60,7 @@ class DatabaseManager:
         return self._merge_parts(self._base_folder(ignore_backtesting_id=True))
 
     def get_optimizer_runs_schedule_identifier(self) -> str:
-        return self._merge_parts(self.base_path, constants.OPTIMIZER,
+        return self._merge_parts(self.base_path, self.optimization_campaign_name, constants.OPTIMIZER,
                                  f"{constants.OPTIMIZER_RUNS_SCHEDULE_DB}{self.suffix}")
 
     async def generate_new_backtesting_id(self) -> int:
@@ -88,9 +89,20 @@ class DatabaseManager:
         raise RuntimeError(f"Reached maximum number of {'optimizer' if is_optimizer else 'backtesting'} runs "
                            f"({constants.MAX_BACKTESTING_RUNS}). Please remove some.")
 
+    async def get_optimization_campaign_names(self) -> list:
+        if self.database_adaptor == adaptors.TinyDBAdaptor:
+            optimization_campaign_folder = self._merge_parts(self.base_path)
+            if os.path.exists(optimization_campaign_folder):
+                return [self._parse_optimizer_id(folder.name)
+                        for folder in os.scandir(optimization_campaign_folder)
+                        if os.path.isdir(folder)]
+        return []
+
     async def get_optimizer_run_ids(self) -> list:
         if self.database_adaptor == adaptors.TinyDBAdaptor:
-            optimizer_runs_path = self._merge_parts(self.base_path, constants.OPTIMIZER)
+            optimizer_runs_path = self._merge_parts(
+                self.base_path, self.optimization_campaign_name, constants.OPTIMIZER
+            )
             if os.path.exists(optimizer_runs_path):
                 return [self._parse_optimizer_id(folder.name)
                         for folder in os.scandir(optimizer_runs_path)
@@ -105,6 +117,12 @@ class DatabaseManager:
         path = self.base_path
         backtesting_id = backtesting_id or self.backtesting_id
         optimizer_id = optimizer_id or self.optimizer_id
+        # when in optimizer or backtesting: wrap it into the current campaign
+        if backtesting_id is not None or optimizer_id is not None:
+            if self.optimization_campaign_name is None:
+                raise RuntimeError(f"optimization_campaign_name is required in {DatabaseManager} constructor while "
+                                   f"in a backtesting or optimizer context")
+            path = self._merge_parts(path, self.optimization_campaign_name)
         if optimizer_id is not None:
             if ignore_optimizer_id:
                 path = self._merge_parts(path, constants.OPTIMIZER)
