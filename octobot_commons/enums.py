@@ -135,6 +135,7 @@ class UserCommands(enum.Enum):
     CLEAR_PLOTTING_CACHE = "clear_plotting_cache"
     CLEAR_SIMULATED_ORDERS_CACHE = "clear_simulated_orders_cache"
     CLEAR_SIMULATED_TRADES_CACHE = "clear_simulated_trades_cache"
+    CLEAR_SIMULATED_TRANSACTIONS_CACHE = "clear_simulated_transactions_cache"
 
 
 class MultiprocessingLocks(enum.Enum):
