@@ -47,6 +47,9 @@ class DatabaseManager:
     def get_trades_db_identifier(self) -> str:
         return self._merge_parts(self._base_folder(), f"{constants.TRADES_DB}{self.suffix}")
 
+    def get_transactions_db_identifier(self) -> str:
+        return self._merge_parts(self._base_folder(), f"{constants.TRANSACTIONS_DB}{self.suffix}")
+
     def get_symbol_db_identifier(self, exchange, symbol) -> str:
         return self._merge_parts(self._base_folder(), exchange, f"{symbol_util.merge_symbol(symbol)}{self.suffix}")
 
