@@ -38,19 +38,25 @@ class MetaDatabase:
             self.run_db = self._get_db(self.database_manager.get_run_data_db_identifier())
         return self.run_db
 
-    def get_orders_db(self):
+    def get_orders_db(self, exchange=None):
         if self.orders_db is None:
-            self.orders_db = self._get_db(self.database_manager.get_orders_db_identifier())
+            self.orders_db = self._get_db(self.database_manager.get_orders_db_identifier(
+                exchange or self.database_manager.context.exchange_name
+            ))
         return self.orders_db
 
-    def get_trades_db(self):
+    def get_trades_db(self, exchange=None):
         if self.trades_db is None:
-            self.trades_db = self._get_db(self.database_manager.get_trades_db_identifier())
+            self.trades_db = self._get_db(self.database_manager.get_trades_db_identifier(
+                exchange or self.database_manager.context.exchange_name
+            ))
         return self.trades_db
 
-    def get_transactions_db(self):
+    def get_transactions_db(self, exchange=None):
         if self.transactions_db is None:
-            self.transactions_db = self._get_db(self.database_manager.get_transactions_db_identifier())
+            self.transactions_db = self._get_db(self.database_manager.get_transactions_db_identifier(
+                exchange or self.database_manager.context.exchange_name
+            ))
         return self.transactions_db
 
     def get_backtesting_metadata_db(self):
@@ -71,12 +77,12 @@ class MetaDatabase:
             self.symbol_dbs[key] = self._get_db(self.database_manager.get_symbol_db_identifier(exchange, symbol))
         return self.symbol_dbs[key]
 
-    def all_basic_db(self):
+    def all_basic_db(self, exchange=None):
         yield self.get_backtesting_metadata_db()
         yield self.get_run_db()
-        yield self.get_orders_db()
-        yield self.get_trades_db()
-        yield self.get_transactions_db()
+        yield self.get_orders_db(exchange)
+        yield self.get_trades_db(exchange)
+        yield self.get_transactions_db(exchange)
 
     def _get_symbol_db_key(self, exchange, symbol):
         return f"{exchange}{symbol}"

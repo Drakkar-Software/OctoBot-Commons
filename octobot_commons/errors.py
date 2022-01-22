@@ -81,6 +81,12 @@ class MissingDataError(Exception):
     """
 
 
+class MissingExchangeDataError(Exception):
+    """
+    Raised when there is no available data for this exchange
+    """
+
+
 class ExecutionAborted(Exception):
     """
     Raised when the current execution should be aborted

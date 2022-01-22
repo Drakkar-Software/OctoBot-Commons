@@ -41,20 +41,26 @@ class DatabaseManager:
     def get_run_data_db_identifier(self) -> str:
         return self._merge_parts(self._base_folder(), f"{constants.RUN_DATA_DB}{self.suffix}")
 
-    def get_orders_db_identifier(self) -> str:
-        return self._merge_parts(self._base_folder(), f"{constants.ORDERS_DB}{self.suffix}")
+    def get_orders_db_identifier(self, exchange) -> str:
+        return self._merge_parts(self._base_folder(), exchange, f"{constants.ORDERS_DB}{self.suffix}")
 
-    def get_trades_db_identifier(self) -> str:
-        return self._merge_parts(self._base_folder(), f"{constants.TRADES_DB}{self.suffix}")
+    def get_trades_db_identifier(self, exchange) -> str:
+        return self._merge_parts(self._base_folder(), exchange, f"{constants.TRADES_DB}{self.suffix}")
 
-    def get_transactions_db_identifier(self) -> str:
-        return self._merge_parts(self._base_folder(), f"{constants.TRANSACTIONS_DB}{self.suffix}")
+    def get_transactions_db_identifier(self, exchange) -> str:
+        return self._merge_parts(self._base_folder(), exchange, f"{constants.TRANSACTIONS_DB}{self.suffix}")
 
     def get_symbol_db_identifier(self, exchange, symbol) -> str:
         return self._merge_parts(self._base_folder(), exchange, f"{symbol_util.merge_symbol(symbol)}{self.suffix}")
 
     def get_backtesting_metadata_identifier(self) -> str:
         return self._merge_parts(self._base_folder(ignore_backtesting_id=True), f"{constants.METADATA}{self.suffix}")
+
+    def exchange_base_identifier_exists(self, exchange) -> bool:
+        identifier = self._merge_parts(self._base_folder(), exchange)
+        if self.database_adaptor == adaptors.TinyDBAdaptor:
+            return os.path.isdir(identifier)
+        return False
 
     def get_backtesting_run_folder(self) -> str:
         return self._base_folder()
