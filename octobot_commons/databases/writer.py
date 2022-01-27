@@ -16,6 +16,7 @@
 import octobot_commons.databases.bases.base_database as base_database
 import octobot_commons.databases.adaptors as adaptors
 import octobot_commons.errors as commons_errors
+import octobot_commons.logging as commons_logging
 
 
 class DBWriter(base_database.BaseDatabase):
@@ -73,8 +74,15 @@ class DBWriter(base_database.BaseDatabase):
         return await self._database.insert_many(table_name, rows)
 
     async def flush(self):
-        await self._flush_all_rows_buffers(cache=True)
-        await super().flush()
+        try:
+            await self._flush_all_rows_buffers(cache=True)
+            await super().flush()
+        except TypeError as e:
+            commons_logging.get_logger(str(self)).exception(
+                e,
+                True,
+                f"Error when writing database, this is probably due to a script that is saving a non json-serializable value: {e}"
+            )
 
     @staticmethod
     def get_value_from_array(array, index, multiplier=1):
