@@ -21,6 +21,7 @@ try:
 except ImportError:
     pass
 
+import octobot_commons.logging as commons_logging
 import octobot_commons.errors as errors
 import octobot_commons.databases.adaptors.abstract_database_adaptor as abstract_database_adaptor
 
@@ -174,3 +175,9 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         except AttributeError:
             # when self.database didn't open properly
             pass
+        except TypeError as e:
+            commons_logging.get_logger(str(self)).exception(
+                e,
+                True,
+                f"Error when writing database, this is probably due to a script that is saving a non json-serializable value: {e}"
+            )
