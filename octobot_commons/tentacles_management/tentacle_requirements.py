@@ -77,10 +77,15 @@ class TentacleRequirements:
         return summary_requirement
 
     def __eq__(self, other):
-        return other is not None and \
-               self.tentacle_class is other.tentacle_class and \
-               self.config_name == other.config_name and \
-               self.nested_requirements == other.nested_requirements
+        if other is None or \
+           self.tentacle_class is not other.tentacle_class or \
+           self.config_name != other.config_name:
+            return False
+        # ensure every requirement in self is contained in other's
+        for requirement in self.nested_requirements:
+            if requirement not in other.nested_requirements:
+                return False
+        return True
 
     def __str__(self):
         return f"{self.__class__.__name__} with tentacle: {self.tentacle_class.__name__}, " \
