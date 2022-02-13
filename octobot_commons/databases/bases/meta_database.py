@@ -77,8 +77,7 @@ class MetaDatabase:
             self.symbol_dbs[key] = self._get_db(self.database_manager.get_symbol_db_identifier(exchange, symbol))
         return self.symbol_dbs[key]
 
-    def all_basic_db(self, exchange=None):
-        yield self.get_backtesting_metadata_db()
+    def all_basic_run_db(self, exchange=None):
         yield self.get_run_db()
         yield self.get_orders_db(exchange)
         yield self.get_trades_db(exchange)
