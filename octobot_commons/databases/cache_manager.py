@@ -14,9 +14,6 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import os
-import json
-import inspect
-import hashlib
 
 import octobot_commons.logging as logging
 import octobot_commons.databases.adaptors as adaptors
@@ -167,33 +164,22 @@ class CacheManager:
             tentacles_requirements.synchronize_tentacles_config()
             identifying_tentacles = [tentacle] + required_tentacles
             # warning: very slow, should be called as rarely as possible
+            code_hash, config_hash = self._tentacles_hashes(identifying_tentacles, tentacles_setup_config)
             return os.path.join(common_constants.USER_FOLDER, common_constants.CACHE_FOLDER, tentacle_name,
                                 exchange, sanitized_pair, time_frame,
-                                self._code_hash(identifying_tentacles),
-                                self._config_hash(identifying_tentacles, tentacles_setup_config),
+                                code_hash, config_hash,
                                 common_constants.CACHE_FILE)
 
-    # TODO move in tentacles manager
-    def _code_hash(self, identifying_tentacles) -> str:
-        full_code = ""
-        for linked_tentacle in identifying_tentacles:
-            code_location = linked_tentacle.get_script() if hasattr(linked_tentacle, "get_script") \
-                else linked_tentacle.__class__
-            tentacle_code = inspect.getsource(code_location).replace(" ", "").replace("\n", "")
-            full_code = f"{full_code}{tentacle_code}"
-        return hashlib.sha256(full_code.encode()).hexdigest()[:common_constants.CACHE_HASH_SIZE]
-
-    # TODO move in tentacles manager
-    def _config_hash(self, identifying_tentacles, tentacles_setup_config) -> str:
+    @staticmethod
+    def _tentacles_hashes(identifying_tentacles, tentacles_setup_config) -> (str, str):
         try:
-            import octobot_tentacles_manager.api as tentacles_manager_api
-            full_config = ""
-            for linked_tentacle in identifying_tentacles:
-                config = linked_tentacle.specific_config if hasattr(linked_tentacle, "specific_config") \
-                    and linked_tentacle.specific_config else \
-                    tentacles_manager_api.get_tentacle_config(tentacles_setup_config, linked_tentacle.__class__)
-                full_config = f"{full_config}{json.dumps(config)}"
-            return hashlib.sha256(full_config.encode()).hexdigest()[:common_constants.CACHE_HASH_SIZE]
+            import octobot_tentacles_manager.api
+            return \
+                octobot_tentacles_manager.api.get_code_hash(identifying_tentacles)[:common_constants.CACHE_HASH_SIZE], \
+                octobot_tentacles_manager.api.get_config_hash(
+                    identifying_tentacles,
+                    tentacles_setup_config
+                )[:common_constants.CACHE_HASH_SIZE]
         except ImportError as e:
             raise ImportError("octobot_tentacles_manager is required to use cache") from e
 
