@@ -29,7 +29,6 @@ class CacheDatabase(writer.DBWriter):
         super().__init__(file_path, database_adaptor=database_adaptor, cache_size=cache_size, **kwargs)
         self._are_metadata_written = False
         self._local_cache = None
-        self._is_empty_database = False
         self.metadata = {
             enums.CacheDatabaseColumns.TYPE.value: self.__class__.__name__,
         }
@@ -53,8 +52,6 @@ class CacheDatabase(writer.DBWriter):
             for cache in await self.get_cache():
                 cache[self.UUID_KEY] = self._database.get_uuid(cache)
                 self._local_cache[cache[identifier_key]] = cache
-            if self._local_cache == {}:
-                self._is_empty_database = True
 
     async def get_metadata(self):
         return await self._database.select(self.CACHE_METADATA_TABLE, None, uuid=1)
