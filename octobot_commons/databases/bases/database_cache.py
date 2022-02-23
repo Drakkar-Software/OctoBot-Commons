@@ -86,15 +86,6 @@ class DatabaseCache:
             pass
         return False
 
-    def contains_x(self, table, x_val):
-        try:
-            for element in self.rows_cache[table]:
-                if element["x"] == x_val:
-                    return True
-        except KeyError:
-            pass
-        return False
-
     def clear(self):
         self.rows_cache = {}
         self.query_cache = {}

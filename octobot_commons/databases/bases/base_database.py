@@ -57,9 +57,6 @@ class BaseDatabase:
     async def clear(self):
         self.cache.clear()
 
-    def contains_x(self, table: str, x_val):
-        return self.cache.contains_x(table, x_val)
-
     async def contains_row(self, table: str, row: dict):
         if self.cache.contains_row(table, row):
             return True
