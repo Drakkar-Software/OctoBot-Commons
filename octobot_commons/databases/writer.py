@@ -46,9 +46,9 @@ class DBWriter(base_database.BaseDatabase):
         # Upsert with uuid is fast though, try to use it when possible
         if uuid is not None or cache_query is None:
             return await self._database.upsert(table_name, row, query, uuid=uuid)
-        elif uuid := self.cache.cached_uuid(table_name, str(cache_query)):
+        if uuid := self.cache.cached_uuid(table_name, str(cache_query)):
             return await self._database.upsert(table_name, row, query, uuid=uuid)
-        elif result := self.cache.cached_query(table_name, str(cache_query)):
+        if result := self.cache.cached_query(table_name, str(cache_query)):
             result.update(row)
         else:
             await self._buffer_row(table_name, row, cache_query=cache_query, cache=False)
