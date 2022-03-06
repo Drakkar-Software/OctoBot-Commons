@@ -126,6 +126,12 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("query_factory is not implemented")
 
+    async def hard_reset(self):
+        """
+        Completely reset the database
+        """
+        raise NotImplementedError("hard_reset is not implemented")
+
     async def flush(self):
         """
         Flushes the database cache

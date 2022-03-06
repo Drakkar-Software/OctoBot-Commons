@@ -129,6 +129,12 @@ class DocumentDatabase:
         """
         return await self.adaptor.query_factory()
 
+    async def hard_reset(self):
+        """
+        Completely reset the database
+        """
+        return await self.adaptor.hard_reset()
+
     async def flush(self):
         """
         Flushes the database cache
