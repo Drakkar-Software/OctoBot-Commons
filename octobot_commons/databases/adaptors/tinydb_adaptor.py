@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import os
+
 try:
     import tinydb
     import tinydb.storages
@@ -159,6 +161,14 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         Creates a new empty select query
         """
         return tinydb.Query()
+
+    async def hard_reset(self):
+        """
+        Completely reset the database
+        """
+        await self.close()
+        os.remove(self.db_path)
+        self.initialize()
 
     async def flush(self):
         """

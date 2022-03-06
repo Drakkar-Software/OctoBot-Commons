@@ -50,6 +50,9 @@ class BaseDatabase:
     async def flush(self):
         await self._database.flush()
 
+    async def hard_reset(self):
+        return await self._database.hard_reset()
+
     async def close(self):
         await self.flush()
         await self._database.close()
