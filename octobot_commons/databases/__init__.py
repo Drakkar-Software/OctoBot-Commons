@@ -15,12 +15,18 @@
 #  License along with this library.
 
 
+from octobot_commons.databases import database_caches
 from octobot_commons.databases import adaptors
 from octobot_commons.databases import bases
 from octobot_commons.databases import implementations
 
 from octobot_commons.databases import run_databases_identifier
 from octobot_commons.databases import cache_manager
+
+from octobot_commons.databases.database_caches import (
+    GenericDatabaseCache,
+    ChronologicalReadDatabaseCache,
+)
 
 from octobot_commons.databases.adaptors import (
     AbstractDatabaseAdaptor,
@@ -29,7 +35,6 @@ from octobot_commons.databases.adaptors import (
 
 from octobot_commons.databases.bases import (
     DocumentDatabase,
-    DatabaseCache,
     BaseDatabase,
 )
 
@@ -52,10 +57,11 @@ from octobot_commons.databases.cache_manager import (
 
 
 __all__ = [
+    "GenericDatabaseCache",
+    "ChronologicalReadDatabaseCache",
     "AbstractDatabaseAdaptor",
     "TinyDBAdaptor",
     "DocumentDatabase",
-    "DatabaseCache",
     "BaseDatabase",
     "MetaDatabase",
     "DBReader",

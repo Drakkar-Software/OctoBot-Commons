@@ -15,18 +15,18 @@
 #  License along with this library.
 
 
-from octobot_commons.databases.bases import document_database
-from octobot_commons.databases.bases import base_database
+from octobot_commons.databases.database_caches import generic_database_cache
+from octobot_commons.databases.database_caches import chronological_read_database_cache
 
-from octobot_commons.databases.bases.document_database import (
-    DocumentDatabase,
+from octobot_commons.databases.database_caches.generic_database_cache import (
+    GenericDatabaseCache,
 )
-from octobot_commons.databases.bases.base_database import (
-    BaseDatabase,
+from octobot_commons.databases.database_caches.chronological_read_database_cache import (
+    ChronologicalReadDatabaseCache,
 )
 
 
 __all__ = [
-    "DocumentDatabase",
-    "BaseDatabase",
+    "GenericDatabaseCache",
+    "ChronologicalReadDatabaseCache",
 ]

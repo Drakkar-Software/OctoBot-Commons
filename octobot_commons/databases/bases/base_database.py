@@ -18,7 +18,7 @@ import numpy
 
 import octobot_commons.databases.adaptors as adaptors
 import octobot_commons.databases.bases.document_database as document_database
-import octobot_commons.databases.bases.database_cache as database_cache
+import octobot_commons.databases.database_caches as database_cache
 
 
 class BaseDatabase:
@@ -29,7 +29,7 @@ class BaseDatabase:
             self._database.initialize()
         self.are_data_initialized = False
         self.are_data_initialized_by_key = {}
-        self.cache = database_cache.DatabaseCache()
+        self.cache = database_cache.GenericDatabaseCache()
 
     def set_initialized_flags(self, value, keys=None):
         self.are_data_initialized = value
