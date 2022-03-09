@@ -13,8 +13,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import octobot_commons.databases.writer as writer
-import octobot_commons.databases.reader as reader
+import octobot_commons.databases.implementations.writer as writer
+import octobot_commons.databases.implementations.reader as reader
 
 
 class DBWriterReader(writer.DBWriter, reader.DBReader):

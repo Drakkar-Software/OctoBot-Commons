@@ -17,12 +17,9 @@
 
 from octobot_commons.databases import adaptors
 from octobot_commons.databases import bases
+from octobot_commons.databases import implementations
 
-from octobot_commons.databases import reader
-from octobot_commons.databases import writer
-from octobot_commons.databases import writer_reader
-from octobot_commons.databases import cache_timestamp_database
-from octobot_commons.databases import database_manager
+from octobot_commons.databases import run_databases_identifier
 from octobot_commons.databases import cache_manager
 
 from octobot_commons.databases.adaptors import (
@@ -34,28 +31,19 @@ from octobot_commons.databases.bases import (
     DocumentDatabase,
     DatabaseCache,
     BaseDatabase,
-    CacheDatabase,
-    MetaDatabase,
 )
 
-from octobot_commons.databases.reader import (
+from octobot_commons.databases.implementations import (
     DBReader,
-)
-
-from octobot_commons.databases.writer import (
     DBWriter,
-)
-
-from octobot_commons.databases.writer_reader import (
     DBWriterReader,
-)
-
-from octobot_commons.databases.cache_timestamp_database import (
+    MetaDatabase,
+    CacheDatabase,
     CacheTimestampDatabase,
 )
 
-from octobot_commons.databases.database_manager import (
-    DatabaseManager,
+from octobot_commons.databases.run_databases_identifier import (
+    RunDatabasesIdentifier,
 )
 
 from octobot_commons.databases.cache_manager import (
@@ -69,12 +57,12 @@ __all__ = [
     "DocumentDatabase",
     "DatabaseCache",
     "BaseDatabase",
-    "CacheDatabase",
     "MetaDatabase",
     "DBReader",
     "DBWriter",
     "DBWriterReader",
+    "CacheDatabase",
     "CacheTimestampDatabase",
-    "DatabaseManager",
+    "RunDatabasesIdentifier",
     "CacheManager",
 ]
