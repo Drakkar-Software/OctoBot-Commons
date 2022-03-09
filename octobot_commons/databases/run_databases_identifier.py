@@ -20,7 +20,7 @@ import octobot_commons.constants as constants
 import octobot_commons.symbol_util as symbol_util
 
 
-class DatabaseManager:
+class RunDatabasesIdentifier:
     def __init__(self, tentacle_class, optimization_campaign_name=None, database_adaptor=adaptors.TinyDBAdaptor,
                  backtesting_id=None, optimizer_id=None, context=None):
         self.database_adaptor = database_adaptor
@@ -129,7 +129,7 @@ class DatabaseManager:
         # when in optimizer or backtesting: wrap it into the current campaign
         if backtesting_id is not None or optimizer_id is not None:
             if self.optimization_campaign_name is None:
-                raise RuntimeError(f"optimization_campaign_name is required in {DatabaseManager} constructor while "
+                raise RuntimeError(f"optimization_campaign_name is required in {RunDatabasesIdentifier} constructor while "
                                    f"in a backtesting or optimizer context")
             path = self._merge_parts(path, self.optimization_campaign_name)
         if optimizer_id is not None:

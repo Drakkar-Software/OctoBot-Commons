@@ -16,7 +16,7 @@
 import copy
 
 import octobot_commons.enums as enums
-import octobot_commons.databases.writer as writer
+import octobot_commons.databases.implementations.writer as writer
 import octobot_commons.databases.adaptors as adaptors
 
 

@@ -13,12 +13,12 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import octobot_commons.databases.bases as bases
+import octobot_commons.databases.implementations.cache_database as cache_database
 import octobot_commons.enums as commons_enums
 import octobot_commons.errors as errors
 
 
-class CacheTimestampDatabase(bases.CacheDatabase):
+class CacheTimestampDatabase(cache_database.CacheDatabase):
     async def get(self, timestamp: float, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> dict:
         try:
             return await self._get_from_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name)
