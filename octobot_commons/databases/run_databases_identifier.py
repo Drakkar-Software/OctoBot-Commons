@@ -30,10 +30,10 @@ class RunDatabasesIdentifier:
         self.tentacle_class = tentacle_class
         self.context = context
         self.base_path = self._merge_parts(constants.USER_FOLDER, tentacle_class.__name__)
-        self.suffix = constants.TINYDB_EXT if self.database_adaptor == adaptors.TinyDBAdaptor else ""
+        self.suffix = self.database_adaptor.get_db_file_ext() if self.database_adaptor.is_file_system_based() else ""
 
     async def initialize(self, exchange=None):
-        if self.database_adaptor == adaptors.TinyDBAdaptor:
+        if self.database_adaptor.is_file_system_based():
             deepest_path = self._base_folder() if exchange is None else self._merge_parts(self._base_folder(), exchange)
             if not os.path.exists(deepest_path):
                 os.makedirs(deepest_path)
@@ -58,7 +58,7 @@ class RunDatabasesIdentifier:
 
     def exchange_base_identifier_exists(self, exchange) -> bool:
         identifier = self._merge_parts(self._base_folder(), exchange)
-        if self.database_adaptor == adaptors.TinyDBAdaptor:
+        if self.database_adaptor.is_file_system_based():
             return os.path.isdir(identifier)
         return False
 
@@ -88,18 +88,15 @@ class RunDatabasesIdentifier:
                 continue
             name_candidate = self._base_folder(optimizer_id=index) if is_optimizer\
                 else self._base_folder(backtesting_id=index)
-            if self.database_adaptor == adaptors.TinyDBAdaptor:
-                if self._exists(name_candidate):
-                    index += 1
-                else:
-                    return index
+            if self._exists(name_candidate):
+                index += 1
             else:
-                raise RuntimeError(f"Unsupported database adaptor runs ({self.database_adaptor}).")
+                return index
         raise RuntimeError(f"Reached maximum number of {'optimizer' if is_optimizer else 'backtesting'} runs "
                            f"({constants.MAX_BACKTESTING_RUNS}). Please remove some.")
 
     async def get_optimization_campaign_names(self) -> list:
-        if self.database_adaptor == adaptors.TinyDBAdaptor:
+        if self.database_adaptor.is_file_system_based():
             optimization_campaign_folder = self._merge_parts(self.base_path)
             if os.path.exists(optimization_campaign_folder):
                 return [self._parse_optimizer_id(folder.name)
@@ -108,7 +105,7 @@ class RunDatabasesIdentifier:
         return []
 
     async def get_optimizer_run_ids(self) -> list:
-        if self.database_adaptor == adaptors.TinyDBAdaptor:
+        if self.database_adaptor.is_file_system_based():
             optimizer_runs_path = self._merge_parts(
                 self.base_path, self.optimization_campaign_name, constants.OPTIMIZER
             )
@@ -154,10 +151,10 @@ class RunDatabasesIdentifier:
 
     def _merge_parts(self, *parts):
         return os.path.join(*parts) \
-            if self.database_adaptor == adaptors.TinyDBAdaptor \
+            if self.database_adaptor.is_file_system_based() \
             else constants.DB_SEPARATOR.join(*parts)
 
     def _exists(self, identifier):
-        if self.database_adaptor == adaptors.TinyDBAdaptor:
+        if self.database_adaptor.is_file_system_based():
             return os.path.exists(identifier)
         raise RuntimeError(f"Unhandled database_adaptor {self.database_adaptor}")
