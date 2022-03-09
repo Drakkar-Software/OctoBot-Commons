@@ -37,6 +37,21 @@ class AbstractDatabaseAdaptor:
         """
         raise NotImplementedError("initialize is not implemented")
 
+    @staticmethod
+    def is_file_system_based() -> bool:
+        """
+        Returns True when this database is identified as a file in the current file system,
+        False when it's managed by a database server
+        """
+        raise NotImplementedError("is_file_system_based is not implemented")
+
+    @staticmethod
+    def get_db_file_ext() -> str:
+        """
+        Returns the database file extension. Implemented in file system based databases
+        """
+        raise NotImplementedError("get_db_file_ext")
+
     def get_uuid(self, document) -> int:
         """
         Returns the uuid of the document

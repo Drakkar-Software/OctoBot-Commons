@@ -24,6 +24,7 @@ except ImportError:
     pass
 
 import octobot_commons.logging as commons_logging
+import octobot_commons.constants as constants
 import octobot_commons.errors as errors
 import octobot_commons.databases.adaptors.abstract_database_adaptor as abstract_database_adaptor
 
@@ -58,6 +59,21 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
             self.database = tinydb.TinyDB(self.db_path, storage=middleware)
         except FileNotFoundError as e:
             raise errors.DatabaseNotFoundError(f"Can't open database at \"{self.db_path}\"") from e
+
+    @staticmethod
+    def is_file_system_based() -> bool:
+        """
+        Returns True when this database is identified as a file in the current file system,
+        False when it's managed by a database server
+        """
+        return True
+
+    @staticmethod
+    def get_db_file_ext() -> str:
+        """
+        Returns the database file extension. Implemented in file system based databases
+        """
+        return constants.TINYDB_EXT
 
     def get_uuid(self, document) -> int:
         """
