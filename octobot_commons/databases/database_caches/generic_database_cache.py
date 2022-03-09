@@ -16,7 +16,7 @@
 import octobot_commons.errors as errors
 
 
-class DatabaseCache:
+class GenericDatabaseCache:
     MAX_CACHE_SIZE = 512
 
     def __init__(self):
