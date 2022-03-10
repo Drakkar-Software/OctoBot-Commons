@@ -38,8 +38,8 @@ class DBWriter(base_database.BaseDatabase):
         else:
             await self._database.insert(table_name, row)
 
-    async def update(self, table_name: str, row: dict, query):
-        return await self._database.update(table_name, row, query)
+    async def update(self, table_name: str, row: dict, query, uuid=None):
+        return await self._database.update(table_name, row, query, uuid=uuid)
 
     async def upsert(self, table_name: str, row: dict, query, uuid=None, cache_query=None):
         # Upsert can be a very slow operation: avoid is as much as possible
@@ -72,6 +72,10 @@ class DBWriter(base_database.BaseDatabase):
                     # can pass here since row will be inserted anyway
                     pass
         return await self._database.insert_many(table_name, rows)
+
+    async def replace_all(self, table_name, rows: list, cache=True):
+        await self.delete_all(table_name)
+        await self.log_many(table_name, rows, cache=cache)
 
     async def flush(self):
         try:

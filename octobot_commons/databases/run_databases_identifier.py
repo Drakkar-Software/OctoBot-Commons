@@ -29,17 +29,26 @@ class RunDatabasesIdentifier:
         self.optimizer_id = optimizer_id
         self.tentacle_class = tentacle_class
         self.context = context
-        self.base_path = self._merge_parts(constants.USER_FOLDER, tentacle_class.__name__)
+        self.data_path = self._merge_parts(constants.USER_FOLDER, constants.DATA_FOLDER)
+        self.base_path = self._merge_parts(self.data_path, tentacle_class.__name__)
         self.suffix = self.database_adaptor.get_db_file_ext() if self.database_adaptor.is_file_system_based() else ""
 
-    async def initialize(self, exchange=None):
+    async def initialize(self, exchange=None, from_global_history=False):
+        # global history is a live only feature
+        from_global_history = from_global_history and self.backtesting_id is None
         if self.database_adaptor.is_file_system_based():
-            deepest_path = self._base_folder() if exchange is None else self._merge_parts(self._base_folder(), exchange)
+            deepest_path = self._base_folder(from_global_history=from_global_history) \
+                if exchange is None else self._merge_parts(self._base_folder(from_global_history=from_global_history),
+                                                           exchange)
             if not os.path.exists(deepest_path):
                 os.makedirs(deepest_path)
 
     def get_run_data_db_identifier(self) -> str:
         return self._merge_parts(self._base_folder(), f"{constants.RUN_DATA_DB}{self.suffix}")
+
+    def get_historical_portfolio_value_db_identifier(self, exchange, portfolio_type_suffix) -> str:
+        return self._merge_parts(self._base_folder(from_global_history=self.backtesting_id is None), exchange,
+                                 f"{constants.PORTFOLIO_VALUE_DB}{portfolio_type_suffix}{self.suffix}")
 
     def get_orders_db_identifier(self, exchange) -> str:
         return self._merge_parts(self._base_folder(), exchange, f"{constants.ORDERS_DB}{self.suffix}")
@@ -118,16 +127,22 @@ class RunDatabasesIdentifier:
     def _parse_optimizer_id(self, identifier) -> str:
         return identifier.split(constants.DB_SEPARATOR)[-1]
 
+    def _get_base_path(self, from_global_history, backtesting_id, optimizer_id):
+        if from_global_history and (backtesting_id is None and optimizer_id is None):
+            # in live global history, use self.data_path as it's not related to a trading mode
+            return self.data_path
+        return self.base_path
+
     def _base_folder(self, ignore_backtesting_id=False, backtesting_id=None,
-                     ignore_optimizer_id=False, optimizer_id=None) -> str:
-        path = self.base_path
+                     ignore_optimizer_id=False, optimizer_id=None, from_global_history=False) -> str:
+        path = self._get_base_path(from_global_history, backtesting_id, optimizer_id)
         backtesting_id = backtesting_id or self.backtesting_id
         optimizer_id = optimizer_id or self.optimizer_id
         # when in optimizer or backtesting: wrap it into the current campaign
         if backtesting_id is not None or optimizer_id is not None:
             if self.optimization_campaign_name is None:
-                raise RuntimeError(f"optimization_campaign_name is required in {RunDatabasesIdentifier} constructor while "
-                                   f"in a backtesting or optimizer context")
+                raise RuntimeError(f"optimization_campaign_name is required in {RunDatabasesIdentifier} "
+                                   f"constructor while in a backtesting or optimizer context")
             path = self._merge_parts(path, self.optimization_campaign_name)
         if optimizer_id is not None:
             if ignore_optimizer_id:

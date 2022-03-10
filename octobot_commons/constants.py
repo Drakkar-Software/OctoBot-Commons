@@ -47,6 +47,7 @@ CONFIG_FILE_SCHEMA = f"{CONFIG_FOLDER}/config_{SCHEMA}.json"
 CONFIG_REFRESH_RATE = "refresh_rate_seconds"
 CONFIG_OPTIMIZER_ID = "optimizer_id"
 CONFIG_BACKTESTING_ID = "backtesting_id"
+CONFIG_SAVED_HISTORICAL_TIMEFRAMES = "saved_historical_timeframes"
 
 # profiles
 PROFILES_FOLDER = "profiles"
@@ -184,11 +185,14 @@ GITHUB_ORGANISATION = "Drakkar-Software"
 EXTERNAL_RESOURCE_URL = "https://raw.githubusercontent.com/Drakkar-Software/OctoBot/assets/external_resources.json"
 
 # Run databases
+DATA_FOLDER = "data"
+HISTORY = "history"
 LIVE = "live"
 BACKTESTING = "backtesting"
 OPTIMIZER = "optimizer"
 OPTIMIZER_RUNS_SCHEDULE_DB = "runs_schedule"
 RUN_DATA_DB = "run_data"
+PORTFOLIO_VALUE_DB = "portfolio_value"
 ORDERS_DB = "orders"
 TRADES_DB = "trades"
 TRANSACTIONS_DB = "transactions"
