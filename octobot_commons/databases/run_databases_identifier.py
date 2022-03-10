@@ -101,7 +101,7 @@ class RunDatabasesIdentifier:
             if os.path.exists(optimization_campaign_folder):
                 return [self._parse_optimizer_id(folder.name)
                         for folder in os.scandir(optimization_campaign_folder)
-                        if os.path.isdir(folder)]
+                        if os.path.isdir(folder) and folder.name != constants.LIVE]
         return []
 
     async def get_optimizer_run_ids(self) -> list:
