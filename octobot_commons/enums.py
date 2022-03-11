@@ -159,3 +159,16 @@ class ActivationTopics(enum.Enum):
     IN_CONSTRUCTION_CANDLES = "once per second (Live Price)"
     RECENT_TRADES = "recent trades"
     EVALUATORS = "after evaluators"
+
+
+class DataBaseOrderBy(enum.Enum):
+    ASC = "ASC"
+    DESC = "DESC"
+
+
+class DataBaseOperations(enum.Enum):
+    SUP = ">"
+    INF = "<"
+    EQUALS = "="
+    INF_EQUALS = f"{INF}{EQUALS}"
+    SUP_EQUALS = f"{SUP}{EQUALS}"

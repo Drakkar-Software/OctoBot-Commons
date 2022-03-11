@@ -15,21 +15,21 @@
 #  License along with this library.
 
 
-from octobot_commons.databases.implementations import reader
-from octobot_commons.databases.implementations import writer
-from octobot_commons.databases.implementations import writer_reader
+from octobot_commons.databases.implementations import db_reader
+from octobot_commons.databases.implementations import db_writer
+from octobot_commons.databases.implementations import db_writer_reader
 from octobot_commons.databases.implementations import meta_database
 from octobot_commons.databases.implementations import cache_database
 from octobot_commons.databases.implementations import cache_timestamp_database
 
 
-from octobot_commons.databases.implementations.reader import (
+from octobot_commons.databases.implementations.db_reader import (
     DBReader,
 )
-from octobot_commons.databases.implementations.writer import (
+from octobot_commons.databases.implementations.db_writer import (
     DBWriter,
 )
-from octobot_commons.databases.implementations.writer_reader import (
+from octobot_commons.databases.implementations.db_writer_reader import (
     DBWriterReader,
 )
 from octobot_commons.databases.implementations.meta_database import (

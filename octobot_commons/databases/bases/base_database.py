@@ -16,7 +16,7 @@
 import contextlib
 import numpy
 
-import octobot_commons.databases.adaptors as adaptors
+import octobot_commons.databases.document_database_adaptors as adaptors
 import octobot_commons.databases.bases.document_database as document_database
 import octobot_commons.databases.database_caches as database_cache
 

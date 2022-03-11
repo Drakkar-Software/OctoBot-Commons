@@ -16,9 +16,10 @@
 
 
 from octobot_commons.databases import database_caches
-from octobot_commons.databases import adaptors
+from octobot_commons.databases import document_database_adaptors
 from octobot_commons.databases import bases
 from octobot_commons.databases import implementations
+from octobot_commons.databases import relational_databases
 
 from octobot_commons.databases import run_databases_identifier
 from octobot_commons.databases import cache_manager
@@ -28,8 +29,8 @@ from octobot_commons.databases.database_caches import (
     ChronologicalReadDatabaseCache,
 )
 
-from octobot_commons.databases.adaptors import (
-    AbstractDatabaseAdaptor,
+from octobot_commons.databases.document_database_adaptors import (
+    AbstractDocumentDatabaseAdaptor,
     TinyDBAdaptor,
 )
 
@@ -47,6 +48,10 @@ from octobot_commons.databases.implementations import (
     CacheTimestampDatabase,
 )
 
+from octobot_commons.databases.relational_databases import (
+    SQLiteDatabase
+)
+
 from octobot_commons.databases.run_databases_identifier import (
     RunDatabasesIdentifier,
 )
@@ -59,7 +64,7 @@ from octobot_commons.databases.cache_manager import (
 __all__ = [
     "GenericDatabaseCache",
     "ChronologicalReadDatabaseCache",
-    "AbstractDatabaseAdaptor",
+    "AbstractDocumentDatabaseAdaptor",
     "TinyDBAdaptor",
     "DocumentDatabase",
     "BaseDatabase",
@@ -69,6 +74,7 @@ __all__ = [
     "DBWriterReader",
     "CacheDatabase",
     "CacheTimestampDatabase",
+    "SQLiteDatabase",
     "RunDatabasesIdentifier",
     "CacheManager",
 ]

@@ -15,7 +15,7 @@
 #  License along with this library.
 import os
 
-import octobot_commons.databases.adaptors as adaptors
+import octobot_commons.databases.document_database_adaptors as adaptors
 import octobot_commons.constants as constants
 import octobot_commons.symbol_util as symbol_util
 

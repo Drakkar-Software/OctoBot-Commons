@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import octobot_commons.databases.bases.base_database as base_database
-import octobot_commons.databases.adaptors as adaptors
+import octobot_commons.databases.document_database_adaptors as adaptors
 import octobot_commons.errors as commons_errors
 import octobot_commons.logging as commons_logging
 

@@ -16,8 +16,8 @@
 import copy
 
 import octobot_commons.enums as enums
-import octobot_commons.databases.implementations.writer as writer
-import octobot_commons.databases.adaptors as adaptors
+import octobot_commons.databases.implementations.db_writer as writer
+import octobot_commons.databases.document_database_adaptors as adaptors
 
 
 class CacheDatabase(writer.DBWriter):
