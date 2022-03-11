@@ -1,3 +1,4 @@
+# pylint: disable=W0613
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -13,52 +14,28 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import os
-
-try:
-    import tinydb
-    import tinydb.storages
-    import tinydb.middlewares
-    import tinydb.table
-except ImportError:
-    pass
-
-import octobot_commons.logging as commons_logging
-import octobot_commons.constants as constants
-import octobot_commons.errors as errors
-import octobot_commons.databases.adaptors.abstract_database_adaptor as abstract_database_adaptor
+import octobot_commons.multiprocessing_util as multiprocessing_util
+import octobot_commons.enums as commons_enums
 
 
-class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
+class AbstractDocumentDatabaseAdaptor:
     """
-    TinyDBAdaptor is an AbstractDatabaseAdaptor implemented using tinydb: a minimal python only
-    local document database.
-    Warning: loads the whole file in RAM and must be closed to ensure writing
+    AbstractDatabaseAdaptor is an interface listing document databases public methods
     """
 
-    DEFAULT_WRITE_CACHE_SIZE = 5000
-
-    def __init__(self, file_path: str, cache_size: int = None, **kwargs):
+    def __init__(self, db_path: str, **kwargs):
         """
-        TinyDBAdaptor constructor.
-        :param file_path: path to the database file
-        :param cache_size: size of the in memory cache (number of operations before updating the file
-        :param kwargs: unused
+        TinyDBAdaptor constructor
+        :param db_path: database path
+        :param kwargs: kwargs to pass to the underlying db driver constructor
         """
-        super().__init__(file_path)
-        self.database = None
-        self.cache_size = cache_size
+        self.db_path = db_path
 
     def initialize(self):
         """
-        Initialize the database: opens the database file.
+        Initialize the database.
         """
-        middleware = tinydb.middlewares.CachingMiddleware(tinydb.storages.JSONStorage)
-        middleware.WRITE_CACHE_SIZE = self.cache_size or self.DEFAULT_WRITE_CACHE_SIZE
-        try:
-            self.database = tinydb.TinyDB(self.db_path, storage=middleware)
-        except FileNotFoundError as e:
-            raise errors.DatabaseNotFoundError(f"Can't open database at \"{self.db_path}\"") from e
+        raise NotImplementedError("initialize is not implemented")
 
     @staticmethod
     def is_file_system_based() -> bool:
@@ -66,21 +43,21 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         Returns True when this database is identified as a file in the current file system,
         False when it's managed by a database server
         """
-        return True
+        raise NotImplementedError("is_file_system_based is not implemented")
 
     @staticmethod
     def get_db_file_ext() -> str:
         """
         Returns the database file extension. Implemented in file system based databases
         """
-        return constants.TINYDB_EXT
+        raise NotImplementedError("get_db_file_ext")
 
     def get_uuid(self, document) -> int:
         """
         Returns the uuid of the document
         :param document: the document
         """
-        return document.doc_id
+        raise NotImplementedError("get_uuid is not implemented")
 
     async def select(self, table_name: str, query, uuid=None) -> list:
         """
@@ -89,19 +66,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param query: select query
         :param uuid: id of the document
         """
-        if uuid is None:
-            return (
-                self.database.table(table_name).search(query)
-                if query
-                else self.database.table(table_name).all()
-            )
-        return self.database.table(table_name).get(doc_id=uuid)
-
-    async def tables(self) -> list:
-        """
-        Select tables
-        """
-        return list(self.database.tables())
+        raise NotImplementedError("select is not implemented")
 
     async def insert(self, table_name: str, row: dict) -> int:
         """
@@ -109,7 +74,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param table_name: name of the table
         :param row: data to insert
         """
-        return self.database.table(table_name).insert(row)
+        raise NotImplementedError("insert is not implemented")
 
     async def upsert(self, table_name: str, row: dict, query, uuid=None) -> int:
         """
@@ -119,9 +84,13 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param query: select query
         :param uuid: id of the document
         """
-        if uuid is None:
-            return self.database.table(table_name).upsert(row, query)
-        return self.database.table(table_name).upsert(tinydb.table.Document(row, doc_id=uuid))
+        raise NotImplementedError("upsert is not implemented")
+
+    async def tables(self) -> list:
+        """
+        Select tables
+        """
+        raise NotImplementedError("tables is not implemented")
 
     async def insert_many(self, table_name: str, rows: list) -> list:
         """
@@ -129,7 +98,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param table_name: name of the table
         :param rows: data to insert
         """
-        return self.database.table(table_name).insert_multiple(rows)
+        raise NotImplementedError("insert_many is not implemented")
 
     async def update(self, table_name: str, row: dict, query, uuid=None) -> list:
         """
@@ -139,9 +108,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param query: select query
         :param uuid: id of the document
         """
-        if uuid is None:
-            return self.database.table(table_name).update(row, query)
-        return self.database.table(table_name).update(tinydb.table.Document(row, doc_id=uuid))
+        raise NotImplementedError("update is not implemented")
 
     async def update_many(self, table_name: str, update_values: list) -> list:
         """
@@ -149,7 +116,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param table_name: name of the table
         :param update_values: values to update
         """
-        return self.database.table(table_name).update_multiple(update_values)
+        raise NotImplementedError("update_many is not implemented")
 
     async def delete(self, table_name: str, query, uuid=None) -> list:
         """
@@ -158,11 +125,7 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param query: select query
         :param uuid: id of the document
         """
-        if uuid is None:
-            if query is None:
-                return self.database.drop_table(table_name)
-            return self.database.table(table_name).remove(query)
-        return self.database.table(table_name).remove(doc_ids=(uuid,))
+        raise NotImplementedError("delete is not implemented")
 
     async def count(self, table_name: str, query) -> int:
         """
@@ -170,40 +133,59 @@ class TinyDBAdaptor(abstract_database_adaptor.AbstractDatabaseAdaptor):
         :param table_name: name of the table
         :param query: select query
         """
-        return self.database.table(table_name).count(query)
+        raise NotImplementedError("count is not implemented")
 
     async def query_factory(self):
         """
         Creates a new empty select query
         """
-        return tinydb.Query()
+        raise NotImplementedError("query_factory is not implemented")
 
     async def hard_reset(self):
         """
         Completely reset the database
         """
-        await self.close()
-        os.remove(self.db_path)
-        self.initialize()
+        raise NotImplementedError("hard_reset is not implemented")
 
     async def flush(self):
         """
         Flushes the database cache
         """
-        return self.database.storage.flush()
+        raise NotImplementedError("flush is not implemented")
 
     async def close(self):
         """
         Closes the database
         """
+        raise NotImplementedError("close is not implemented")
+
+    def __str__(self):
+        return f"{self.__class__.__name__} [{self.db_path}]"
+
+    @staticmethod
+    def is_multiprocessing():
+        """
+        Returns True if the current process is run in a multiprocessing context using the multiprocessing_util module.
+        """
         try:
-            return self.database.close()
-        except AttributeError:
-            # when self.database didn't open properly
-            pass
-        except TypeError as e:
-            commons_logging.get_logger(str(self)).exception(
-                e,
-                True,
-                f"Error when writing database, this is probably due to a script that is saving a non json-serializable value: {e}"
-            )
+            multiprocessing_util.get_lock(commons_enums.MultiprocessingLocks.DBLock.value)
+            return True
+        except KeyError:
+            # no lock to acquire: we are not in a multiprocessing context
+            return False
+
+    @staticmethod
+    def _get_lock():
+        return multiprocessing_util.get_lock(commons_enums.MultiprocessingLocks.DBLock.value)
+
+    async def acquire(self):
+        """
+        Acquires the database lock.
+        """
+        self._get_lock().acquire()
+
+    async def release(self):
+        """
+        Releases the database lock.
+        """
+        self._get_lock().release()

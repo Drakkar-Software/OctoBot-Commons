@@ -1,4 +1,5 @@
-#  Drakkar-Software OctoBot-Commons
+# cython: language_level=3
+#  Drakkar-Software OctoBot-Backtesting
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -9,13 +10,11 @@
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+#  Lesser General License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import octobot_commons.databases.implementations.writer as writer
-import octobot_commons.databases.implementations.reader as reader
 
-
-class DBWriterReader(writer.DBWriter, reader.DBReader):
-    pass
+cdef class CursorPool:
+    cdef object _db_connection
+    cdef list _cursors

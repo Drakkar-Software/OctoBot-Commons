@@ -16,7 +16,7 @@
 import os
 
 import octobot_commons.logging as logging
-import octobot_commons.databases.adaptors as adaptors
+import octobot_commons.databases.document_database_adaptors as adaptors
 import octobot_commons.databases.implementations.cache_timestamp_database as cache_timestamp_database
 import octobot_commons.constants as common_constants
 import octobot_commons.symbol_util as symbol_util

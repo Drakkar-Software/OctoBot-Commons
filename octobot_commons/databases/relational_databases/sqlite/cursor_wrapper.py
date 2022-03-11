@@ -1,4 +1,4 @@
-#  Drakkar-Software OctoBot-Commons
+#  Drakkar-Software OctoBot-Backtesting
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -15,19 +15,10 @@
 #  License along with this library.
 
 
-from octobot_commons.databases.adaptors import abstract_database_adaptor
-from octobot_commons.databases.adaptors import tinydb_adaptor
+class CursorWrapper:
+    def __init__(self, cursor):
+        self.cursor = cursor
+        self.idle = True
 
-
-from octobot_commons.databases.adaptors.abstract_database_adaptor import (
-    AbstractDatabaseAdaptor,
-)
-from octobot_commons.databases.adaptors.tinydb_adaptor import (
-    TinyDBAdaptor,
-)
-
-
-__all__ = [
-    "AbstractDatabaseAdaptor",
-    "TinyDBAdaptor",
-]
+    async def close(self):
+        await self.cursor.close()
