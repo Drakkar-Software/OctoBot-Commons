@@ -187,18 +187,6 @@ EXTERNAL_RESOURCE_URL = "https://raw.githubusercontent.com/Drakkar-Software/Octo
 
 # Run databases
 DATA_FOLDER = "data"
-HISTORY = "history"
-LIVE = "live"
-BACKTESTING = "backtesting"
-OPTIMIZER = "optimizer"
-OPTIMIZER_RUNS_SCHEDULE_DB = "runs_schedule"
-RUN_DATA_DB = "run_data"
-PORTFOLIO_VALUE_DB = "portfolio_value"
-ORDERS_DB = "orders"
-TRADES_DB = "trades"
-TRANSACTIONS_DB = "transactions"
-EXCHANGES = "exchanges"
-METADATA = "metadata"
 DB_SEPARATOR = "_"
 TINYDB_EXT = ".json"
 MAX_BACKTESTING_RUNS = 50000
