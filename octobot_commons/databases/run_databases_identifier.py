@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import os
+import shutil
 
 import octobot_commons.databases.document_database_adaptors as adaptors
 import octobot_commons.constants as constants
@@ -94,6 +95,14 @@ class RunDatabasesIdentifier:
 
     async def generate_new_optimizer_id(self, back_list) -> int:
         return await self._generate_new_id(back_list=back_list, is_optimizer=True)
+
+    def remove_all(self):
+        identifier = self._base_folder()
+        if self.database_adaptor.is_file_system_based():
+            if os.path.isdir(identifier):
+                shutil.rmtree(identifier)
+            return
+        raise RuntimeError(f"Unhandled database_adaptor {self.database_adaptor}")
 
     async def _generate_new_id(self, back_list=None, is_optimizer=False):
         back_list = back_list or []
