@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import octobot_commons.constants as constants
 
 
 class ChronologicalReadDatabaseCache:
@@ -36,14 +37,14 @@ class ChronologicalReadDatabaseCache:
 
     def get(self, inferior_timestamp, superior_timestamp, identifiers):
         cache_data = self._get_cache_data(identifiers)
-        # if one timestamp is -1, return every available data from/up to this timestamp
-        if inferior_timestamp == -1:
-            if superior_timestamp == -1:
+        # if one timestamp is constants.DEFAULT_IGNORED_VALUE, return every available data from/up to this timestamp
+        if inferior_timestamp == constants.DEFAULT_IGNORED_VALUE:
+            if superior_timestamp == constants.DEFAULT_IGNORED_VALUE:
                 return cache_data[self.DATA_KEY]
             return [element
                     for element in cache_data[self.DATA_KEY]
                     if element[cache_data[self.DATA_SORT_KEY]] <= superior_timestamp]
-        if superior_timestamp == -1:
+        if superior_timestamp == constants.DEFAULT_IGNORED_VALUE:
             return [element
                     for element in cache_data[self.DATA_KEY]
                     if element[cache_data[self.DATA_SORT_KEY]] >= inferior_timestamp]
