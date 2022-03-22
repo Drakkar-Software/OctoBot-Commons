@@ -17,6 +17,7 @@ import os
 
 import octobot_commons.databases.document_database_adaptors as adaptors
 import octobot_commons.constants as constants
+import octobot_commons.enums as enums
 import octobot_commons.symbol_util as symbol_util
 
 
@@ -44,26 +45,31 @@ class RunDatabasesIdentifier:
                 os.makedirs(deepest_path)
 
     def get_run_data_db_identifier(self) -> str:
-        return self._merge_parts(self._base_folder(), f"{constants.RUN_DATA_DB}{self.suffix}")
-
-    def get_historical_portfolio_value_db_identifier(self, exchange, portfolio_type_suffix) -> str:
-        return self._merge_parts(self._base_folder(from_global_history=self.backtesting_id is None), exchange,
-                                 f"{constants.PORTFOLIO_VALUE_DB}{portfolio_type_suffix}{self.suffix}")
+        return self._get_db_identifier(enums.RunDatabases.RUN_DATA_DB.value, None)
 
     def get_orders_db_identifier(self, exchange) -> str:
-        return self._merge_parts(self._base_folder(), exchange, f"{constants.ORDERS_DB}{self.suffix}")
+        return self._get_db_identifier(enums.RunDatabases.ORDERS_DB.value, exchange)
 
     def get_trades_db_identifier(self, exchange) -> str:
-        return self._merge_parts(self._base_folder(), exchange, f"{constants.TRADES_DB}{self.suffix}")
+        return self._get_db_identifier(enums.RunDatabases.TRADES_DB.value, exchange)
 
     def get_transactions_db_identifier(self, exchange) -> str:
-        return self._merge_parts(self._base_folder(), exchange, f"{constants.TRANSACTIONS_DB}{self.suffix}")
+        return self._get_db_identifier(enums.RunDatabases.TRANSACTIONS_DB.value, exchange)
 
     def get_symbol_db_identifier(self, exchange, symbol) -> str:
-        return self._merge_parts(self._base_folder(), exchange, f"{symbol_util.merge_symbol(symbol)}{self.suffix}")
+        return self._get_db_identifier(symbol_util.merge_symbol(symbol), exchange)
+
+    def get_historical_portfolio_value_db_identifier(self, exchange, portfolio_type_suffix) -> str:
+        return self._get_db_identifier(f"{enums.RunDatabases.PORTFOLIO_VALUE_DB.value}{portfolio_type_suffix}",
+                                       exchange, from_global_history=self.backtesting_id is None)
 
     def get_backtesting_metadata_identifier(self) -> str:
-        return self._merge_parts(self._base_folder(ignore_backtesting_id=True), f"{constants.METADATA}{self.suffix}")
+        return self._get_db_identifier(f"{enums.RunDatabases.METADATA.value}", None, ignore_backtesting_id=True)
+
+    def _get_db_identifier(self, run_database_name, exchange, **base_folder_kwargs):
+        if exchange is None:
+            return self._merge_parts(self._base_folder(**base_folder_kwargs), f"{run_database_name}{self.suffix}")
+        return self._merge_parts(self._base_folder(**base_folder_kwargs), exchange, f"{run_database_name}{self.suffix}")
 
     def exchange_base_identifier_exists(self, exchange) -> bool:
         identifier = self._merge_parts(self._base_folder(), exchange)
@@ -78,8 +84,10 @@ class RunDatabasesIdentifier:
         return self._merge_parts(self._base_folder(ignore_backtesting_id=True))
 
     def get_optimizer_runs_schedule_identifier(self) -> str:
-        return self._merge_parts(self.base_path, self.optimization_campaign_name, constants.OPTIMIZER,
-                                 f"{constants.OPTIMIZER_RUNS_SCHEDULE_DB}{self.suffix}")
+        return self._merge_parts(self.base_path, self.optimization_campaign_name,
+                                 enums.RunDatabases.OPTIMIZER.value,
+                                 f"{enums.RunDatabases.OPTIMIZER_RUNS_SCHEDULE_DB.value}"
+                                 f"{self.suffix}")
 
     async def generate_new_backtesting_id(self) -> int:
         return await self._generate_new_id(is_optimizer=False)
@@ -110,13 +118,13 @@ class RunDatabasesIdentifier:
             if os.path.exists(optimization_campaign_folder):
                 return [self._parse_optimizer_id(folder.name)
                         for folder in os.scandir(optimization_campaign_folder)
-                        if os.path.isdir(folder) and folder.name != constants.LIVE]
+                        if os.path.isdir(folder) and folder.name != enums.RunDatabases.LIVE.value]
         return []
 
     async def get_optimizer_run_ids(self) -> list:
         if self.database_adaptor.is_file_system_based():
             optimizer_runs_path = self._merge_parts(
-                self.base_path, self.optimization_campaign_name, constants.OPTIMIZER
+                self.base_path, self.optimization_campaign_name, enums.RunDatabases.OPTIMIZER.value
             )
             if os.path.exists(optimizer_runs_path):
                 return [self._parse_optimizer_id(folder.name)
@@ -146,22 +154,23 @@ class RunDatabasesIdentifier:
             path = self._merge_parts(path, self.optimization_campaign_name)
         if optimizer_id is not None:
             if ignore_optimizer_id:
-                path = self._merge_parts(path, constants.OPTIMIZER)
+                path = self._merge_parts(path, enums.RunDatabases.OPTIMIZER.value)
             else:
                 path = self._merge_parts(
                     path,
-                    constants.OPTIMIZER,
-                    f"{constants.OPTIMIZER}{constants.DB_SEPARATOR}{optimizer_id}"
+                    enums.RunDatabases.OPTIMIZER.value,
+                    f"{enums.RunDatabases.OPTIMIZER.value}{constants.DB_SEPARATOR}{optimizer_id}"
                 )
         if backtesting_id is not None:
             if optimizer_id is None:
-                path = self._merge_parts(path, constants.BACKTESTING)
+                path = self._merge_parts(path, enums.RunDatabases.BACKTESTING.value)
             if ignore_backtesting_id:
                 return path
-            return self._merge_parts(path, f"{constants.BACKTESTING}{constants.DB_SEPARATOR}{backtesting_id}")
+            return self._merge_parts(path, f"{enums.RunDatabases.BACKTESTING.value}"
+                                           f"{constants.DB_SEPARATOR}{backtesting_id}")
         if optimizer_id is None:
             # live mode
-            return self._merge_parts(path, constants.LIVE)
+            return self._merge_parts(path, enums.RunDatabases.LIVE.value)
         return path
 
     def _merge_parts(self, *parts):
