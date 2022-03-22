@@ -18,6 +18,7 @@ import os
 import octobot_commons.logging as logging
 import octobot_commons.databases.document_database_adaptors as adaptors
 import octobot_commons.databases.implementations.cache_timestamp_database as cache_timestamp_database
+import octobot_commons.databases.databases_util as databases_util
 import octobot_commons.constants as common_constants
 import octobot_commons.symbol_util as symbol_util
 import octobot_commons.errors as common_errors
@@ -149,7 +150,7 @@ class CacheManager:
         Override to use another cache database or adaptor
         :return: the cache database class
         """
-        return _CacheWrapper(file_path, cache_type, self.database_adaptor, tentacles_requirements)
+        return databases_util.CacheWrapper(file_path, cache_type, self.database_adaptor, tentacles_requirements)
 
     def get_cache_or_build_path(self, tentacle, exchange, symbol, time_frame, tentacle_name, config_name,
                                 tentacles_setup_config, tentacles_requirements):
@@ -182,42 +183,3 @@ class CacheManager:
                 )[:common_constants.CACHE_HASH_SIZE]
         except ImportError as e:
             raise ImportError("octobot_tentacles_manager is required to use cache") from e
-
-
-class _CacheWrapper:
-    def __init__(self, file_path, cache_type, database_adaptor, tentacles_requirements, **kwargs):
-        self.file_path = file_path
-        self.cache_type = cache_type
-        self.database_adaptor = database_adaptor
-        self.db_kwargs = kwargs
-        self._cache_database = None
-        self._db_path = None
-        self.previous_db_metadata = None
-        self.tentacles_requirements = tentacles_requirements.summary()
-
-    def get_database(self) -> tuple:
-        created = False
-        if self._cache_database is None:
-            self._cache_database = self.cache_type(self.file_path,
-                                                   database_adaptor=self.database_adaptor,
-                                                   **self.db_kwargs)
-            self._db_path = self._cache_database.get_db_path()
-            created = True
-        return self._cache_database, created
-
-    def is_open(self):
-        return self._cache_database is not None
-
-    async def close(self):
-        if self.is_open():
-            self.previous_db_metadata = self._cache_database.get_non_default_metadata()
-            await self._cache_database.close()
-            self._cache_database = None
-            return True
-        return False
-
-    async def clear(self):
-        await self._cache_database.clear()
-
-    def get_path(self):
-        return self._db_path
