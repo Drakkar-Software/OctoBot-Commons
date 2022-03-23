@@ -30,6 +30,7 @@ class MetaDatabase:
         self.orders_db: implementations.DBWriterReader = None
         self.trades_db: implementations.DBWriterReader = None
         self.transactions_db: implementations.DBWriterReader = None
+        self.historical_portfolio_value_db : implementations.DBWriterReader = None
         self.backtesting_metadata_db: implementations.DBWriterReader = None
         self.symbol_dbs: dict = {}
 
@@ -58,6 +59,13 @@ class MetaDatabase:
                 exchange or self.run_dbs_identifier.context.exchange_name
             ))
         return self.transactions_db
+
+    def get_historical_portfolio_value_db(self, exchange, portfolio_type_suffix):
+        if self.historical_portfolio_value_db is None:
+            self.historical_portfolio_value_db = self._get_db(self.run_dbs_identifier.get_historical_portfolio_value_db_identifier(
+                exchange, portfolio_type_suffix
+            ))
+        return self.historical_portfolio_value_db
 
     def get_backtesting_metadata_db(self):
         if self.backtesting_metadata_db is None:
@@ -95,7 +103,8 @@ class MetaDatabase:
             *(
                 db.close()
                 for db in (self.run_db, self.orders_db, self.trades_db, self.transactions_db,
-                           self.backtesting_metadata_db, *self.symbol_dbs.values())
+                           self.historical_portfolio_value_db, self.backtesting_metadata_db,
+                           *self.symbol_dbs.values())
                 if db is not None
             )
         )
