@@ -106,3 +106,43 @@ def test_event_tree_set_node_at_path():
     assert not event_tree.get_or_create_node(["test", "test2", "test3"]).children
     assert event_tree.get_or_create_node(["test", "test2", "test3"]).node_value == "test-string"
     assert event_tree.get_or_create_node(["test", "test2", "test3"]).node_type == "test-type"
+
+
+def test_get_children_keys():
+    event_tree = EventTree()
+    event_tree.set_node_at_path("test-string", "test-type", ["test", "test2", "test3"])
+    event_tree.set_node_at_path("test-string_2", None, ["test", "test2", "test3_2"])
+    event_tree.set_node_at_path("test-string_3", None, ["test", "test2"])
+    event_tree.set_node_at_path("test-string_4", None, ["test", "test3"])
+    assert event_tree.get_children_keys([]) == ["test"]
+    assert event_tree.get_children_keys(["test"]) == ["test2", "test3"]
+    assert event_tree.get_children_keys(["test", "test2"]) == ["test3", "test3_2"]
+    with pytest.raises(NodeExistsError):
+        assert event_tree.get_children_keys(["test", "testXXXX"]) == ["test3"]
+
+
+def test_get_nested_children_with_path():
+    event_tree = EventTree()
+    event_tree.set_node_at_path("test-string", "test-type", ["test", "test2", "test3"])
+    event_tree.set_node_at_path("test-string_2", None, ["test", "test2", "test3_2"])
+    event_tree.set_node_at_path("test-string_3", None, ["test", "test2"])
+    event_tree.set_node_at_path("test-string_4", None, ["test", "test3"])
+    assert [(n.node_value, p) for n, p in event_tree.get_nested_children_with_path()] == [
+        ("test-string", ["test", "test2", "test3"]),
+        ("test-string_2", ["test", "test2", "test3_2"]),
+        ("test-string_4", ["test", "test3"])
+    ]
+    assert [(n.node_value, p) for n, p in event_tree.get_nested_children_with_path(leaves_only=False)] == [
+        (None, []),
+        (None, ['test']),
+        ("test-string_3", ["test", "test2"]),
+        ("test-string", ["test", "test2", "test3"]),
+        ("test-string_2", ["test", "test2", "test3_2"]),
+        ("test-string_4", ["test", "test3"])
+    ]
+    assert [(n.node_value, p) for n, p in event_tree.get_nested_children_with_path(path=["test", "test2"],
+                                                                                   leaves_only=False)] == [
+        ("test-string_3", ["test", "test2"]),
+        ("test-string", ["test", "test2", "test3"]),
+        ("test-string_2", ["test", "test2", "test3_2"])
+    ]

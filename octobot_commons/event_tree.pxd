@@ -33,6 +33,7 @@ cdef class EventTree:
     cpdef EventTreeNode get_node(self, list path, EventTreeNode starting_node=*)
     cpdef EventTreeNode delete_node(self, list path, EventTreeNode starting_node=*)
     cpdef EventTreeNode get_or_create_node(self, list path, EventTreeNode starting_node=*)
+    cpdef list get_children_keys(self, list path)
 
     cdef EventTreeNode _get_node(self, list path, EventTreeNode starting_node=*)
     cdef EventTreeNode _delete_node(self, list path, EventTreeNode starting_node=*)

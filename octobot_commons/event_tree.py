@@ -131,6 +131,23 @@ class EventTree:
         except KeyError:
             return self._create_node_path(path, starting_node=starting_node)
 
+    def get_nested_children_with_path(self, path=None, leaves_only=True):
+        path = path or []
+        return self._get_nested_children_with_path(path, leaves_only)
+
+    def _get_nested_children_with_path(self, parent_path, leaves_only):
+        children_keys = self.get_children_keys(parent_path)
+        node = self.get_node(parent_path)
+        if not children_keys or not leaves_only:
+            yield node, parent_path
+        for key in children_keys:
+            path = list(parent_path)
+            path.append(key)
+            yield from self._get_nested_children_with_path(path, leaves_only)
+
+    def get_children_keys(self, path):
+        return list(self.get_node(path).children)
+
     def _get_node(self, path, starting_node=None):
         """
         Return the node corresponding to the path
