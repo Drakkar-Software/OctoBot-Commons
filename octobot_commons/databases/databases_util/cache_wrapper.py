@@ -48,7 +48,8 @@ class CacheWrapper:
         return False
 
     async def clear(self):
-        await self._cache_database.clear()
+        if self._cache_database is not None:
+            await self._cache_database.clear()
 
     def get_path(self):
         return self._db_path
