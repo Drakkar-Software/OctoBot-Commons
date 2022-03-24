@@ -187,3 +187,12 @@ class RunDatabases(enum.Enum):
     TRANSACTIONS_DB = "transactions"
     EXCHANGES = "exchanges"
     METADATA = "metadata"
+
+
+class LogicalOperators(enum.Enum):
+    LOWER_THAN = "lower_than"
+    HIGHER_THAN = "higher_than"
+    LOWER_OR_EQUAL_TO = "lower_or_equal_to"
+    HIGHER_OR_EQUAL_TO = "higher_or_equal_to"
+    EQUAL_TO = "equal_to"
+    DIFFERENT_FROM = "different_from"
