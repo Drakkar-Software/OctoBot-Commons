@@ -19,19 +19,33 @@ import octobot_commons.errors as errors
 
 
 class CacheTimestampDatabase(cache_database.CacheDatabase):
-    async def get(self, timestamp: float, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> dict:
+    async def get(
+        self,
+        timestamp: float,
+        name: str = commons_enums.CacheDatabaseColumns.VALUE.value,
+    ) -> dict:
         try:
-            return await self._get_from_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name)
+            return await self._get_from_local_cache(
+                commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name
+            )
         except KeyError as e:
             raise errors.NoCacheValue(
-                f"No cache value associated to {timestamp}" if e.args[0] == timestamp
+                f"No cache value associated to {timestamp}"
+                if e.args[0] == timestamp
                 else f"No {name} value associated to {timestamp} cache."
             )
 
-    async def get_values(self, timestamp: float, name: str = commons_enums.CacheDatabaseColumns.VALUE.value, limit=-1,
-                         min_timestamp=0) -> list:
+    async def get_values(
+        self,
+        timestamp: float,
+        name: str = commons_enums.CacheDatabaseColumns.VALUE.value,
+        limit=-1,
+        min_timestamp=0,
+    ) -> list:
         try:
-            await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value)
+            await self._ensure_local_cache(
+                commons_enums.CacheDatabaseColumns.TIMESTAMP.value
+            )
             values = [
                 values[name]
                 for value_timestamp, values in self._local_cache.items()
@@ -45,10 +59,20 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
         except KeyError:
             raise errors.NoCacheValue(f"No {name} value associated to {name} cache.")
 
-    async def set(self, timestamp: float, value, name: str = commons_enums.CacheDatabaseColumns.VALUE.value) -> None:
+    async def set(
+        self,
+        timestamp: float,
+        value,
+        name: str = commons_enums.CacheDatabaseColumns.VALUE.value,
+    ) -> None:
         await self._ensure_metadata()
         saved_value = self.get_serializable_value(value)
-        if await self._needs_update(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name, saved_value):
+        if await self._needs_update(
+            commons_enums.CacheDatabaseColumns.TIMESTAMP.value,
+            timestamp,
+            name,
+            saved_value,
+        ):
             uuid = None
             set_value = {
                 commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp,
@@ -57,7 +81,9 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
             if timestamp in self._local_cache:
                 # set uuid in case this value already exist in db
                 uuid = self._local_cache[timestamp].get(self.UUID_KEY)
-                self._local_cache[timestamp][commons_enums.CacheDatabaseColumns.TIMESTAMP.value] = timestamp
+                self._local_cache[timestamp][
+                    commons_enums.CacheDatabaseColumns.TIMESTAMP.value
+                ] = timestamp
                 self._local_cache[timestamp][name] = saved_value
             else:
                 self._local_cache[timestamp] = set_value
@@ -68,20 +94,29 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
                 uuid=uuid,
                 cache_query={
                     commons_enums.CacheDatabaseColumns.TIMESTAMP.value: timestamp
-                }
+                },
             )
 
-    async def set_values(self, timestamps, values, name: str = commons_enums.CacheDatabaseColumns.VALUE.value,
-                         additional_values_by_key: dict = None) -> None:
-        await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value)
+    async def set_values(
+        self,
+        timestamps,
+        values,
+        name: str = commons_enums.CacheDatabaseColumns.VALUE.value,
+        additional_values_by_key: dict = None,
+    ) -> None:
+        await self._ensure_local_cache(
+            commons_enums.CacheDatabaseColumns.TIMESTAMP.value
+        )
         to_bulk_update = {
             name: [self.get_serializable_value(value) for value in values]
         }
         if additional_values_by_key:
-            to_bulk_update.update({
-                key: [self.get_serializable_value(value) for value in values]
-                for key, values in additional_values_by_key.items()
-            })
+            to_bulk_update.update(
+                {
+                    key: [self.get_serializable_value(value) for value in values]
+                    for key, values in additional_values_by_key.items()
+                }
+            )
         # use optimized multiple insert to speed up the database insert operation
         await self._bulk_update_values(timestamps, to_bulk_update)
 
@@ -110,8 +145,10 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
             else:
                 await self._update_full_database()
         except IndexError:
-            raise RuntimeError(f"Data to set are required to have the same length as the timestamps list. "
-                               f"Error on the {key} values")
+            raise RuntimeError(
+                f"Data to set are required to have the same length as the timestamps list. "
+                f"Error on the {key} values"
+            )
 
     async def _update_full_database(self):
         # to be called to avoid multiple upsert / update which can be very slow: take full advantage of multiple inserts
@@ -126,12 +163,16 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
         # 3. insert all local cache
         await self.log_many(self.CACHE_TABLE, all_rows)
         # 4. reset self._local_cache
-        await self._ensure_local_cache(commons_enums.CacheDatabaseColumns.TIMESTAMP.value, update=True)
+        await self._ensure_local_cache(
+            commons_enums.CacheDatabaseColumns.TIMESTAMP.value, update=True
+        )
 
     async def _timestamp_query(self, timestamp):
         return (await self._database.query_factory()).t == timestamp
 
     async def get_cache(self):
         # relies on the fact that python dicts keep order
-        return sorted(await self._database.select(self.CACHE_TABLE, None),
-                      key=lambda x: x[commons_enums.CacheDatabaseColumns.TIMESTAMP.value])
+        return sorted(
+            await self._database.select(self.CACHE_TABLE, None),
+            key=lambda x: x[commons_enums.CacheDatabaseColumns.TIMESTAMP.value],
+        )

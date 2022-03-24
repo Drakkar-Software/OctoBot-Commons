@@ -17,7 +17,6 @@ import octobot_commons.errors as errors
 import octobot_commons.dict_util as dict_util
 
 
-
 class GenericDatabaseCache:
     MAX_CACHE_SIZE = 512
 
@@ -53,7 +52,9 @@ class GenericDatabaseCache:
     def _add_to_rows_cache(self, table, row):
         try:
             if len(self.rows_cache[table]) >= self.MAX_CACHE_SIZE:
-                self.rows_cache[table] = self.rows_cache[table][self.MAX_CACHE_SIZE // 2:]
+                self.rows_cache[table] = self.rows_cache[table][
+                    self.MAX_CACHE_SIZE // 2 :
+                ]
             self.rows_cache[table].append(row)
         except KeyError:
             self.rows_cache[table] = [row]

@@ -41,14 +41,20 @@ class ChronologicalReadDatabaseCache:
         if inferior_timestamp == constants.DEFAULT_IGNORED_VALUE:
             if superior_timestamp == constants.DEFAULT_IGNORED_VALUE:
                 return cache_data[self.DATA_KEY]
-            return [element
-                    for element in cache_data[self.DATA_KEY]
-                    if element[cache_data[self.DATA_SORT_KEY]] <= superior_timestamp]
+            return [
+                element
+                for element in cache_data[self.DATA_KEY]
+                if element[cache_data[self.DATA_SORT_KEY]] <= superior_timestamp
+            ]
         if superior_timestamp == constants.DEFAULT_IGNORED_VALUE:
-            return [element
-                    for element in cache_data[self.DATA_KEY]
-                    if element[cache_data[self.DATA_SORT_KEY]] >= inferior_timestamp]
-        return self._get_from_time_window(cache_data, inferior_timestamp, superior_timestamp)
+            return [
+                element
+                for element in cache_data[self.DATA_KEY]
+                if element[cache_data[self.DATA_SORT_KEY]] >= inferior_timestamp
+            ]
+        return self._get_from_time_window(
+            cache_data, inferior_timestamp, superior_timestamp
+        )
 
     def _get_from_time_window(self, cache_data, inferior_timestamp, superior_timestamp):
         data = cache_data[self.DATA_KEY]

@@ -15,7 +15,9 @@
 #  License along with this library.
 
 
-from octobot_commons.databases.document_database_adaptors import abstract_document_database_adaptor
+from octobot_commons.databases.document_database_adaptors import (
+    abstract_document_database_adaptor,
+)
 from octobot_commons.databases.document_database_adaptors import tinydb_adaptor
 
 

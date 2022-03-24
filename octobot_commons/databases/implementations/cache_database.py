@@ -25,8 +25,19 @@ class CacheDatabase(writer.DBWriter):
     CACHE_METADATA_TABLE = enums.CacheDatabaseTables.METADATA.value
     UUID_KEY = "uuid"
 
-    def __init__(self, file_path: str, database_adaptor=adaptors.TinyDBAdaptor, cache_size=None, **kwargs):
-        super().__init__(file_path, database_adaptor=database_adaptor, cache_size=cache_size, **kwargs)
+    def __init__(
+        self,
+        file_path: str,
+        database_adaptor=adaptors.TinyDBAdaptor,
+        cache_size=None,
+        **kwargs
+    ):
+        super().__init__(
+            file_path,
+            database_adaptor=database_adaptor,
+            cache_size=cache_size,
+            **kwargs
+        )
         self._are_metadata_written = False
         self._local_cache = None
         self.metadata = {
@@ -43,7 +54,9 @@ class CacheDatabase(writer.DBWriter):
 
     async def _ensure_metadata(self):
         if not self._are_metadata_written:
-            await self._database.upsert(self.CACHE_METADATA_TABLE, self.metadata, None, uuid=1)
+            await self._database.upsert(
+                self.CACHE_METADATA_TABLE, self.metadata, None, uuid=1
+            )
             self._are_metadata_written = True
 
     async def _ensure_local_cache(self, identifier_key, update=False):
@@ -73,8 +86,15 @@ class CacheDatabase(writer.DBWriter):
         await self._ensure_local_cache(identifier_key)
         return self._local_cache[identifier_value][sub_key]
 
-    async def _needs_update(self, identifier_key, identifier_value, sub_key, value) -> bool:
+    async def _needs_update(
+        self, identifier_key, identifier_value, sub_key, value
+    ) -> bool:
         try:
-            return await self._get_from_local_cache(identifier_key, identifier_value, sub_key) != value
+            return (
+                await self._get_from_local_cache(
+                    identifier_key, identifier_value, sub_key
+                )
+                != value
+            )
         except KeyError:
             return True

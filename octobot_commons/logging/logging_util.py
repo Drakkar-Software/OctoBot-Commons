@@ -202,7 +202,9 @@ class BotLogger:
         if publish_error_if_necessary:
             message = error_message
             if message is None:
-                message = str(exception) if str(exception) else exception.__class__.__name__
+                message = (
+                    str(exception) if str(exception) else exception.__class__.__name__
+                )
             elif include_exception_name:
                 message = f"{message} ({exception.__class__.__name__})"
             self.error(message, skip_post_callback=True)
