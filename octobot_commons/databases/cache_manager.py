@@ -32,7 +32,6 @@ class CacheManager:
 
     CACHES = event_tree.EventTree()
     DEFAULT_CONFIG_IDENTIFIER = "default"
-    UNPROVIDED_CACHE_IDENTIFIER = "_unprovided"
 
     def __init__(self, database_adaptor=adaptors.TinyDBAdaptor):
         self.database_adaptor = database_adaptor
@@ -82,10 +81,10 @@ class CacheManager:
 
     async def clear_cache(self,
                           tentacle_name,
-                          exchange_name=UNPROVIDED_CACHE_IDENTIFIER,
-                          symbol=UNPROVIDED_CACHE_IDENTIFIER,
-                          time_frame=UNPROVIDED_CACHE_IDENTIFIER,
-                          config_name=UNPROVIDED_CACHE_IDENTIFIER):
+                          exchange_name=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
+                          symbol=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
+                          time_frame=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
+                          config_name=common_constants.UNPROVIDED_CACHE_IDENTIFIER):
         try:
             for cache, _ in self._caches(tentacle_name, exchange_name, symbol, time_frame, config_name):
                 await cache.node_value.clear()
@@ -100,10 +99,10 @@ class CacheManager:
 
     async def close_cache(self,
                           tentacle_name,
-                          exchange_name=UNPROVIDED_CACHE_IDENTIFIER,
-                          symbol=UNPROVIDED_CACHE_IDENTIFIER,
-                          time_frame=UNPROVIDED_CACHE_IDENTIFIER,
-                          config_name=UNPROVIDED_CACHE_IDENTIFIER,
+                          exchange_name=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
+                          symbol=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
+                          time_frame=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
+                          config_name=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
                           reset_cache_db_ids=False):
         try:
             to_remove_caches = []
@@ -126,14 +125,14 @@ class CacheManager:
         self.__class__.CACHES = event_tree.EventTree()
 
     def _caches(self,
-                tentacle_name=UNPROVIDED_CACHE_IDENTIFIER,
-                exchange_name=UNPROVIDED_CACHE_IDENTIFIER,
-                symbol=UNPROVIDED_CACHE_IDENTIFIER,
-                time_frame=UNPROVIDED_CACHE_IDENTIFIER,
-                config_name=UNPROVIDED_CACHE_IDENTIFIER):
+                tentacle_name=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
+                exchange_name=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
+                symbol=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
+                time_frame=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
+                config_name=common_constants.UNPROVIDED_CACHE_IDENTIFIER):
         path = []
         for element in (tentacle_name, exchange_name, symbol, time_frame, config_name):
-            if element == self.UNPROVIDED_CACHE_IDENTIFIER:
+            if element == common_constants.UNPROVIDED_CACHE_IDENTIFIER:
                 break
             else:
                 path.append(element)

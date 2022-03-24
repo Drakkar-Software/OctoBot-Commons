@@ -137,7 +137,8 @@ class RunDatabasesIdentifier:
                         if os.path.isdir(folder)]
         return []
 
-    def _parse_optimizer_id(self, identifier) -> str:
+    @staticmethod
+    def _parse_optimizer_id(identifier) -> str:
         return identifier.split(constants.DB_SEPARATOR)[-1]
 
     def _get_base_path(self, from_global_history, backtesting_id, optimizer_id):
