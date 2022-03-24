@@ -27,14 +27,13 @@ class CacheWrapper:
         self.tentacles_requirements = tentacles_requirements.summary()
 
     def get_database(self) -> tuple:
-        created = False
         if self._cache_database is None:
             self._cache_database = self.cache_type(self.file_path,
                                                    database_adaptor=self.database_adaptor,
                                                    **self.db_kwargs)
             self._db_path = self._cache_database.get_db_path()
-            created = True
-        return self._cache_database, created
+            return self._cache_database, True
+        return self._cache_database, False
 
     def is_open(self):
         return self._cache_database is not None

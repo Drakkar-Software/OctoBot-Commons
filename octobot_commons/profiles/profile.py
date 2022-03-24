@@ -132,8 +132,6 @@ class Profile:
         new_path = os.path.join(os.path.split(self.path)[0], new_name)
         if os.path.exists(new_path):
             raise RuntimeError(f"Skipping folder renaming: a profile already exists at this path")
-            shutil.move(self.path, new_path)
-            self.path = new_path
 
     def duplicate(self, name: str = None, description: str = None):
         """

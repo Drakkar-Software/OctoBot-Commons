@@ -110,6 +110,9 @@ CONFIG_SIMULATOR_FEES_MAKER = "maker"
 CONFIG_SIMULATOR_FEES_TAKER = "taker"
 CONFIG_SIMULATOR_FEES_WITHDRAW = "withdraw"
 
+# Optimization campaigns
+DEFAULT_CAMPAIGN = "default_campaign"
+
 # Optimizer
 OPTIMIZER_RUNS_FOLDER = "optimizer"
 
@@ -149,7 +152,6 @@ METRICS_ROUTE_COMMUNITY = f"{METRICS_ROUTE}/community"
 METRICS_ROUTE_UPTIME = f"{METRICS_ROUTE}/uptime"
 METRICS_ROUTE_REGISTER = f"{METRICS_ROUTE}/register"
 COMMUNITY_TOPS_COUNT = 1000
-PLATFORM_DATA_SEPARATOR = ":"
 
 # default values in config files and interfaces
 DEFAULT_API_KEY = "your-api-key-here"
