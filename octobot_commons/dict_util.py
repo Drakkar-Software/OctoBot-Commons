@@ -76,3 +76,13 @@ def check_and_merge_values_from_reference(
             check_and_merge_values_from_reference(
                 current_dict[key], val, exception_list, logger=logger
             )
+
+
+def contains_each_element(element, val_by_keys_to_find):
+    try:
+        for key, val in val_by_keys_to_find.items():
+            if element[key] != val:
+                return False
+        return True
+    except KeyError:
+        return False

@@ -14,6 +14,8 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import octobot_commons.errors as errors
+import octobot_commons.dict_util as dict_util
+
 
 
 class GenericDatabaseCache:
@@ -46,12 +48,15 @@ class GenericDatabaseCache:
             # might happen when row can't be hashed: impossible to cache it in this case
             raise errors.UncachableValue(f"Unhashable row: {row}") from e
         if not cached:
-            try:
-                if len(self.rows_cache[table]) >= self.MAX_CACHE_SIZE:
-                    self.rows_cache[table] = self.rows_cache[table][self.MAX_CACHE_SIZE // 2:]
-                self.rows_cache[table].append(row)
-            except KeyError:
-                self.rows_cache[table] = [row]
+            self._add_to_rows_cache(table, row)
+
+    def _add_to_rows_cache(self, table, row):
+        try:
+            if len(self.rows_cache[table]) >= self.MAX_CACHE_SIZE:
+                self.rows_cache[table] = self.rows_cache[table][self.MAX_CACHE_SIZE // 2:]
+            self.rows_cache[table].append(row)
+        except KeyError:
+            self.rows_cache[table] = [row]
 
     def has(self, table):
         return table in self.rows_cache
@@ -72,16 +77,8 @@ class GenericDatabaseCache:
         # Should check the real database in case this returns false
         try:
             for element in self.rows_cache[table]:
-                try:
-                    found = True
-                    for key, val in val_by_keys.items():
-                        if element[key] != val:
-                            found = False
-                            break
-                    if found:
-                        return True
-                except KeyError:
-                    pass
+                if dict_util.contains_each_element(element, val_by_keys):
+                    return True
         except KeyError:
             pass
         return False
