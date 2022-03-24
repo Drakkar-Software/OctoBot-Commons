@@ -175,6 +175,7 @@ LOCAL_BOT_DATA = "local_bot_data"
 DO_NOT_CACHE = "do_not_cache"
 DO_NOT_OVERRIDE_CACHE = "do_not_override_cache"
 DEFAULT_IGNORED_VALUE = -1
+UNPROVIDED_CACHE_IDENTIFIER = "_unprovided"
 
 # Async settings
 DEFAULT_FUTURE_TIMEOUT = 120
