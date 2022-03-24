@@ -131,21 +131,34 @@ class EventTree:
         except KeyError:
             return self._create_node_path(path, starting_node=starting_node)
 
-    def get_nested_children_with_path(self, path=None, leaves_only=True):
+    def get_nested_children_with_path(self, path=None, select_leaves_only=True):
+        """
+        Returns a generator iterating over the nodes children, including nested children. Children are yielded
+        together with their node path using a depth-first search (the most nested children are returned first)
+        :param path: the path (as a list of string) to the node
+        :param select_leaves_only: when True (default), only nodes that don't have children are returned
+        :return: a generator of (node, path) tuples
+        """
         path = path or []
-        return self._get_nested_children_with_path(path, leaves_only)
+        return self._get_nested_children_with_path(path, select_leaves_only)
 
-    def _get_nested_children_with_path(self, parent_path, leaves_only):
+    def _get_nested_children_with_path(self, parent_path, select_leaves_only):
         children_keys = self.get_children_keys(parent_path)
         node = self.get_node(parent_path)
-        if not children_keys or not leaves_only:
+        if not children_keys or not select_leaves_only:
             yield node, parent_path
         for key in children_keys:
             path = list(parent_path)
             path.append(key)
-            yield from self._get_nested_children_with_path(path, leaves_only)
+            yield from self._get_nested_children_with_path(path, select_leaves_only)
 
     def get_children_keys(self, path):
+        """
+        Return the node's children keys
+        Can raise a KeyError if the path does not exists
+        :param path: the path (as a list of string) to the node
+        :return: children keys as a list
+        """
         return list(self.get_node(path).children)
 
     def _get_node(self, path, starting_node=None):

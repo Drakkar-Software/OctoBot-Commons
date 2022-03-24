@@ -107,16 +107,12 @@ class RunDatabasesIdentifier:
     async def _generate_new_id(self, back_list=None, is_optimizer=False):
         back_list = back_list or []
         max_runs = constants.MAX_OPTIMIZER_RUNS if is_optimizer else constants.MAX_BACKTESTING_RUNS
-        index = 1
-        while index < max_runs:
+        for index in range(1, max_runs + 1):
             if index in back_list:
-                index += 1
                 continue
             name_candidate = self._base_folder(optimizer_id=index) if is_optimizer\
                 else self._base_folder(backtesting_id=index)
-            if self._exists(name_candidate):
-                index += 1
-            else:
+            if not self._exists(name_candidate):
                 return index
         raise RuntimeError(f"Reached maximum number of {'optimizer' if is_optimizer else 'backtesting'} runs "
                            f"({constants.MAX_BACKTESTING_RUNS}). Please remove some.")

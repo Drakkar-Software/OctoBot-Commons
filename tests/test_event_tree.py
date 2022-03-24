@@ -132,7 +132,7 @@ def test_get_nested_children_with_path():
         ("test-string_2", ["test", "test2", "test3_2"]),
         ("test-string_4", ["test", "test3"])
     ]
-    assert [(n.node_value, p) for n, p in event_tree.get_nested_children_with_path(leaves_only=False)] == [
+    assert [(n.node_value, p) for n, p in event_tree.get_nested_children_with_path(select_leaves_only=False)] == [
         (None, []),
         (None, ['test']),
         ("test-string_3", ["test", "test2"]),
@@ -141,7 +141,7 @@ def test_get_nested_children_with_path():
         ("test-string_4", ["test", "test3"])
     ]
     assert [(n.node_value, p) for n, p in event_tree.get_nested_children_with_path(path=["test", "test2"],
-                                                                                   leaves_only=False)] == [
+                                                                                   select_leaves_only=False)] == [
         ("test-string_3", ["test", "test2"]),
         ("test-string", ["test", "test2", "test3"]),
         ("test-string_2", ["test", "test2", "test3_2"])
