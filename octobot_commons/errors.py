@@ -91,3 +91,9 @@ class ExecutionAborted(Exception):
     """
     Raised when the current execution should be aborted
     """
+
+
+class LogicalOperatorError(Exception):
+    """
+    Raised when a logical operation is invalid
+    """
