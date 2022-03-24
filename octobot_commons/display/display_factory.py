@@ -23,4 +23,6 @@ def display_translator_factory(**kwargs):
     :param kwargs: kwargs to pass to the construction
     :return: the created instance
     """
-    return tentacles_management.get_single_deepest_child_class(display_translator.DisplayTranslator)(**kwargs)
+    return tentacles_management.get_single_deepest_child_class(
+        display_translator.DisplayTranslator
+    )(**kwargs)

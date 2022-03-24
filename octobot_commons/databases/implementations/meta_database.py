@@ -30,59 +30,75 @@ class MetaDatabase:
         self.orders_db: implementations.DBWriterReader = None
         self.trades_db: implementations.DBWriterReader = None
         self.transactions_db: implementations.DBWriterReader = None
-        self.historical_portfolio_value_db : implementations.DBWriterReader = None
+        self.historical_portfolio_value_db: implementations.DBWriterReader = None
         self.backtesting_metadata_db: implementations.DBWriterReader = None
         self.symbol_dbs: dict = {}
 
     def get_run_db(self):
         if self.run_db is None:
-            self.run_db = self._get_db(self.run_dbs_identifier.get_run_data_db_identifier())
+            self.run_db = self._get_db(
+                self.run_dbs_identifier.get_run_data_db_identifier()
+            )
         return self.run_db
 
     def get_orders_db(self, exchange=None):
         if self.orders_db is None:
-            self.orders_db = self._get_db(self.run_dbs_identifier.get_orders_db_identifier(
-                exchange or self.run_dbs_identifier.context.exchange_name
-            ))
+            self.orders_db = self._get_db(
+                self.run_dbs_identifier.get_orders_db_identifier(
+                    exchange or self.run_dbs_identifier.context.exchange_name
+                )
+            )
         return self.orders_db
 
     def get_trades_db(self, exchange=None):
         if self.trades_db is None:
-            self.trades_db = self._get_db(self.run_dbs_identifier.get_trades_db_identifier(
-                exchange or self.run_dbs_identifier.context.exchange_name
-            ))
+            self.trades_db = self._get_db(
+                self.run_dbs_identifier.get_trades_db_identifier(
+                    exchange or self.run_dbs_identifier.context.exchange_name
+                )
+            )
         return self.trades_db
 
     def get_transactions_db(self, exchange=None):
         if self.transactions_db is None:
-            self.transactions_db = self._get_db(self.run_dbs_identifier.get_transactions_db_identifier(
-                exchange or self.run_dbs_identifier.context.exchange_name
-            ))
+            self.transactions_db = self._get_db(
+                self.run_dbs_identifier.get_transactions_db_identifier(
+                    exchange or self.run_dbs_identifier.context.exchange_name
+                )
+            )
         return self.transactions_db
 
     def get_historical_portfolio_value_db(self, exchange, portfolio_type_suffix):
         if self.historical_portfolio_value_db is None:
-            self.historical_portfolio_value_db = self._get_db(self.run_dbs_identifier.get_historical_portfolio_value_db_identifier(
-                exchange, portfolio_type_suffix
-            ))
+            self.historical_portfolio_value_db = self._get_db(
+                self.run_dbs_identifier.get_historical_portfolio_value_db_identifier(
+                    exchange, portfolio_type_suffix
+                )
+            )
         return self.historical_portfolio_value_db
 
     def get_backtesting_metadata_db(self):
         if self.backtesting_metadata_db is None:
-            self.backtesting_metadata_db = self._get_db(self.run_dbs_identifier.get_backtesting_metadata_identifier())
+            self.backtesting_metadata_db = self._get_db(
+                self.run_dbs_identifier.get_backtesting_metadata_identifier()
+            )
         return self.backtesting_metadata_db
 
     async def get_backtesting_metadata_from_run(self):
         db = self.get_backtesting_metadata_db()
-        return (await db.select(
-            enums.CacheDatabaseTables.METADATA.value,
-            (await db.search()).id == self.run_dbs_identifier.backtesting_id
-        ))[0]
+        return (
+            await db.select(
+                enums.CacheDatabaseTables.METADATA.value,
+                (await db.search()).id == self.run_dbs_identifier.backtesting_id,
+            )
+        )[0]
 
     def get_symbol_db(self, exchange, symbol):
         key = self._get_symbol_db_key(exchange, symbol)
         if key not in self.symbol_dbs:
-            self.symbol_dbs[key] = self._get_db(self.run_dbs_identifier.get_symbol_db_identifier(exchange, symbol))
+            self.symbol_dbs[key] = self._get_db(
+                self.run_dbs_identifier.get_symbol_db_identifier(exchange, symbol)
+            )
         return self.symbol_dbs[key]
 
     def all_basic_run_db(self, exchange=None):
@@ -95,16 +111,26 @@ class MetaDatabase:
         return f"{exchange}{symbol}"
 
     def _get_db(self, db_identifier):
-        return implementations.DBWriterReader(db_identifier, with_lock=self.with_lock, cache_size=self.cache_size,
-                                              database_adaptor=self.database_adaptor)
+        return implementations.DBWriterReader(
+            db_identifier,
+            with_lock=self.with_lock,
+            cache_size=self.cache_size,
+            database_adaptor=self.database_adaptor,
+        )
 
     async def close(self):
         await asyncio.gather(
             *(
                 db.close()
-                for db in (self.run_db, self.orders_db, self.trades_db, self.transactions_db,
-                           self.historical_portfolio_value_db, self.backtesting_metadata_db,
-                           *self.symbol_dbs.values())
+                for db in (
+                    self.run_db,
+                    self.orders_db,
+                    self.trades_db,
+                    self.transactions_db,
+                    self.historical_portfolio_value_db,
+                    self.backtesting_metadata_db,
+                    *self.symbol_dbs.values(),
+                )
                 if db is not None
             )
         )
@@ -114,7 +140,9 @@ class MetaDatabase:
     async def database(cls, database_manager, with_lock=False, cache_size=None):
         meta_db = None
         try:
-            meta_db = MetaDatabase(database_manager, with_lock=with_lock, cache_size=cache_size)
+            meta_db = MetaDatabase(
+                database_manager, with_lock=with_lock, cache_size=cache_size
+            )
             yield meta_db
         finally:
             if meta_db is not None:

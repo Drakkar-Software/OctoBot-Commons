@@ -26,8 +26,7 @@ except ImportError:
 import octobot_commons.logging as commons_logging
 import octobot_commons.constants as constants
 import octobot_commons.errors as errors
-import octobot_commons.databases.document_database_adaptors.abstract_document_database_adaptor \
-    as abstract_document_database_adaptor
+import octobot_commons.databases.document_database_adaptors.abstract_document_database_adaptor as abstract_document_database_adaptor
 
 
 class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseAdaptor):
@@ -59,7 +58,9 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
         try:
             self.database = tinydb.TinyDB(self.db_path, storage=middleware)
         except FileNotFoundError as e:
-            raise errors.DatabaseNotFoundError(f"Can't open database at \"{self.db_path}\"") from e
+            raise errors.DatabaseNotFoundError(
+                f'Can\'t open database at "{self.db_path}"'
+            ) from e
 
     @staticmethod
     def is_file_system_based() -> bool:
@@ -122,7 +123,9 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
         """
         if uuid is None:
             return self.database.table(table_name).upsert(row, query)
-        return self.database.table(table_name).upsert(tinydb.table.Document(row, doc_id=uuid))
+        return self.database.table(table_name).upsert(
+            tinydb.table.Document(row, doc_id=uuid)
+        )
 
     async def insert_many(self, table_name: str, rows: list) -> list:
         """
@@ -142,7 +145,9 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
         """
         if uuid is None:
             return self.database.table(table_name).update(row, query)
-        return self.database.table(table_name).update(tinydb.table.Document(row, doc_id=uuid))
+        return self.database.table(table_name).update(
+            tinydb.table.Document(row, doc_id=uuid)
+        )
 
     async def update_many(self, table_name: str, update_values: list) -> list:
         """
@@ -206,5 +211,5 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
             commons_logging.get_logger(str(self)).exception(
                 e,
                 True,
-                f"Error when writing database, this is probably due to a script that is saving a non json-serializable value: {e}"
+                f"Error when writing database, this is probably due to a script that is saving a non json-serializable value: {e}",
             )

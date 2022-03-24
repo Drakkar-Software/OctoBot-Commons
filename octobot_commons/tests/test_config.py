@@ -57,8 +57,10 @@ def load_test_config(dict_only=True, test_folder=TEST_FOLDER):
     Return the complete default test configs
     :return: the complete default test config
     """
-    config = configuration.Configuration(get_test_config(test_folder=test_folder),
-                                         get_test_profile(test_folder=test_folder))
+    config = configuration.Configuration(
+        get_test_config(test_folder=test_folder),
+        get_test_profile(test_folder=test_folder),
+    )
     config.read()
     init_config_time_frame_for_tests(config.config)
     return config.config if dict_only else config

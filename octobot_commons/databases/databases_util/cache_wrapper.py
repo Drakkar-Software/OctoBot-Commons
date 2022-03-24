@@ -16,7 +16,9 @@
 
 
 class CacheWrapper:
-    def __init__(self, file_path, cache_type, database_adaptor, tentacles_requirements, **kwargs):
+    def __init__(
+        self, file_path, cache_type, database_adaptor, tentacles_requirements, **kwargs
+    ):
         self.file_path = file_path
         self.cache_type = cache_type
         self.database_adaptor = database_adaptor
@@ -28,9 +30,9 @@ class CacheWrapper:
 
     def get_database(self) -> tuple:
         if self._cache_database is None:
-            self._cache_database = self.cache_type(self.file_path,
-                                                   database_adaptor=self.database_adaptor,
-                                                   **self.db_kwargs)
+            self._cache_database = self.cache_type(
+                self.file_path, database_adaptor=self.database_adaptor, **self.db_kwargs
+            )
             self._db_path = self._cache_database.get_db_path()
             return self._cache_database, True
         return self._cache_database, False

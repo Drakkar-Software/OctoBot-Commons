@@ -22,10 +22,17 @@ import octobot_commons.databases.database_caches as database_cache
 
 
 class BaseDatabase:
-    def __init__(self, file_path: str, database_adaptor=adaptors.TinyDBAdaptor, cache_size=None, **kwargs):
+    def __init__(
+        self,
+        file_path: str,
+        database_adaptor=adaptors.TinyDBAdaptor,
+        cache_size=None,
+        **kwargs,
+    ):
         if database_adaptor is not None:
-            self._database = document_database.DocumentDatabase(database_adaptor(file_path, cache_size=cache_size,
-                                                                                 **kwargs))
+            self._database = document_database.DocumentDatabase(
+                database_adaptor(file_path, cache_size=cache_size, **kwargs)
+            )
             self._database.initialize()
         self.are_data_initialized = False
         self.are_data_initialized_by_key = {}
@@ -69,22 +76,46 @@ class BaseDatabase:
         return f"{self.__class__.__name__}, database: {self._database}"
 
     @classmethod
-    def _create_database(cls, *args, required_adaptor=False, cache_size=None, database_adaptor=None, **kwargs):
+    def _create_database(
+        cls,
+        *args,
+        required_adaptor=False,
+        cache_size=None,
+        database_adaptor=None,
+        **kwargs,
+    ):
         if required_adaptor:
             adaptor = kwargs.pop("database_adaptor", adaptors.TinyDBAdaptor)
             if adaptor is None:
                 raise RuntimeError("database_adaptor parameter required")
             adaptor_instance = adaptor(*args, cache_size=cache_size, **kwargs)
-            return cls(*args, database_adaptor=database_adaptor, cache_size=cache_size, **kwargs), adaptor_instance
+            return (
+                cls(
+                    *args,
+                    database_adaptor=database_adaptor,
+                    cache_size=cache_size,
+                    **kwargs,
+                ),
+                adaptor_instance,
+            )
         return cls(*args, cache_size=cache_size, **kwargs), None
 
     @classmethod
     @contextlib.asynccontextmanager
-    async def database(cls, *args, with_lock=False, cache_size=None, database_adaptor=None, **kwargs):
-        database, adaptor_instance = cls._create_database(*args, required_adaptor=with_lock, cache_size=cache_size,
-                                                          database_adaptor=database_adaptor, **kwargs)
+    async def database(
+        cls, *args, with_lock=False, cache_size=None, database_adaptor=None, **kwargs
+    ):
+        database, adaptor_instance = cls._create_database(
+            *args,
+            required_adaptor=with_lock,
+            cache_size=cache_size,
+            database_adaptor=database_adaptor,
+            **kwargs,
+        )
         if with_lock:
-            async with document_database.DocumentDatabase.locked_database(adaptor_instance) as db:
+            async with document_database.DocumentDatabase.locked_database(
+                adaptor_instance
+            ) as db:
                 database._database = db
                 yield database
                 # context manager is taking care of closing the database

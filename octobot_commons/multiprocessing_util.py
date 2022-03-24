@@ -21,12 +21,16 @@ _LOCKS = {}
 _ELEMENTS = {}
 
 
-def register_lock_and_shared_elements(name: str, lock: multiprocessing.RLock, shared_elements: dict):
+def register_lock_and_shared_elements(
+    name: str, lock: multiprocessing.RLock, shared_elements: dict
+):
     _LOCKS[name] = lock
     _ELEMENTS.update(shared_elements)
 
 
-def unregister_lock_and_shared_elements(name: str, shared_elements=None) -> multiprocessing.RLock:
+def unregister_lock_and_shared_elements(
+    name: str, shared_elements=None
+) -> multiprocessing.RLock:
     if shared_elements is None:
         _ELEMENTS.clear()
     else:
@@ -36,7 +40,9 @@ def unregister_lock_and_shared_elements(name: str, shared_elements=None) -> mult
 
 
 @contextlib.contextmanager
-def registered_lock_and_shared_elements(name: str, lock: multiprocessing.RLock, shared_elements: dict):
+def registered_lock_and_shared_elements(
+    name: str, lock: multiprocessing.RLock, shared_elements: dict
+):
     try:
         register_lock_and_shared_elements(name, lock, shared_elements)
         yield lock

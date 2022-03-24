@@ -25,7 +25,4 @@ from octobot_commons.display.display_factory import (
 )
 
 
-__all__ = [
-    "DisplayTranslator",
-    "display_translator_factory"
-]
+__all__ = ["DisplayTranslator", "display_translator_factory"]

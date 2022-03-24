@@ -168,7 +168,9 @@ class AbstractDocumentDatabaseAdaptor:
         Returns True if the current process is run in a multiprocessing context using the multiprocessing_util module.
         """
         try:
-            multiprocessing_util.get_lock(commons_enums.MultiprocessingLocks.DBLock.value)
+            multiprocessing_util.get_lock(
+                commons_enums.MultiprocessingLocks.DBLock.value
+            )
             return True
         except KeyError:
             # no lock to acquire: we are not in a multiprocessing context
@@ -176,7 +178,9 @@ class AbstractDocumentDatabaseAdaptor:
 
     @staticmethod
     def _get_lock():
-        return multiprocessing_util.get_lock(commons_enums.MultiprocessingLocks.DBLock.value)
+        return multiprocessing_util.get_lock(
+            commons_enums.MultiprocessingLocks.DBLock.value
+        )
 
     async def acquire(self):
         """

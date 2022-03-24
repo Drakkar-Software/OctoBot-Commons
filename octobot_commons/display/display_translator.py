@@ -21,6 +21,7 @@ class DisplayTranslator:
     """
     Interface for simplifying displayed elements translation
     """
+
     def __init__(self):
         self.logger = logging.get_logger(self.__class__.__name__)
 

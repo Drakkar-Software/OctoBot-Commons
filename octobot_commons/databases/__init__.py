@@ -49,9 +49,7 @@ from octobot_commons.databases.implementations import (
     CacheTimestampDatabase,
 )
 
-from octobot_commons.databases.relational_databases import (
-    SQLiteDatabase
-)
+from octobot_commons.databases.relational_databases import SQLiteDatabase
 
 from octobot_commons.databases.run_databases_identifier import (
     RunDatabasesIdentifier,
