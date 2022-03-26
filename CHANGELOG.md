@@ -4,9 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.6.20] - 2021-01-08
+## [1.7.0] - 2022-03-26
 ### Added
-- [PrettyPrinter] Assets support
+- [Databases] Document and relational databases
+- DisplayTranslator, logical operators, multiprocessing_utils, optimization_campaigns
+
+## [1.6.20] - 2021-01-08
+### Updated
+- Bump requirements
 
 ## [1.6.19] - 2021-12-19
 ### Added
