@@ -1,3 +1,4 @@
+# pylint: disable=C0301
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -26,8 +27,7 @@ except ImportError:
 import octobot_commons.logging as commons_logging
 import octobot_commons.constants as constants
 import octobot_commons.errors as errors
-import octobot_commons.databases.document_database_adaptors.abstract_document_database_adaptor as \
-    abstract_document_database_adaptor
+import octobot_commons.databases.document_database_adaptors.abstract_document_database_adaptor as abstract_document_database_adaptor
 
 
 class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseAdaptor):
