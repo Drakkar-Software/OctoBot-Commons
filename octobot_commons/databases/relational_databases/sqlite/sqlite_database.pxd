@@ -15,7 +15,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-cdef class DataBase:
+cdef class SQLiteDatabase:
     cdef str file_name
 
     cdef object logger

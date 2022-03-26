@@ -18,9 +18,11 @@
 from octobot_commons.databases.relational_databases.sqlite import sqlite_database
 from octobot_commons.databases.relational_databases.sqlite.sqlite_database import (
     SQLiteDatabase,
+    new_sqlite_database,
 )
 
 
 __all__ = [
     "SQLiteDatabase",
+    "new_sqlite_database",
 ]

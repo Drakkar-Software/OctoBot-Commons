@@ -1,3 +1,4 @@
+# pylint: disable=R0801
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -18,9 +19,11 @@
 from octobot_commons.databases.relational_databases import sqlite
 from octobot_commons.databases.relational_databases.sqlite import (
     SQLiteDatabase,
+    new_sqlite_database,
 )
 
 
 __all__ = [
     "SQLiteDatabase",
+    "new_sqlite_database",
 ]
