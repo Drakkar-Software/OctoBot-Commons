@@ -26,6 +26,9 @@ class CursorPool:
 
     @contextlib.asynccontextmanager
     async def idle_cursor(self) -> cursor_wrapper.CursorWrapper:
+        """
+        Yields an idle cursor, creates a new one if necessary
+        """
         cursor = None
         try:
             cursor = await self._get_or_create_idle_cursor()
@@ -36,6 +39,9 @@ class CursorPool:
                 cursor.idle = True
 
     async def close(self):
+        """
+        Close every cursor
+        """
         await asyncio.gather(*(cursor.close() for cursor in self._cursors))
 
     async def _get_or_create_idle_cursor(self) -> cursor_wrapper.CursorWrapper:

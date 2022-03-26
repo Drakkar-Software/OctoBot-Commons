@@ -1,3 +1,4 @@
+# pylint: disable=R0913,R0914,C0415
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -50,6 +51,23 @@ class CacheManager:
         cache_type=cache_timestamp_database.CacheTimestampDatabase,
         open_if_missing=True,
     ) -> tuple:
+        """
+        Returns the cache database associated to the given arguments. Creates/opens it if missing
+        :param tentacle: tentacle to read configuration from to when creating/opening the associated database.
+        Can be None when the database is open
+        :param tentacle_name: name of the tentacle. Used to identify the database
+        :param exchange_name: name of the exchange. Used to identify the database
+        :param symbol: symbol. Used to identify the database
+        :param time_frame: name of the timeframe. Used to identify the database
+        :param config_name: name of the configuration (used in nested contexts). Used to identify the database
+        :param tentacles_setup_config: the used tentacles_setup_config. Used to read configuration from to when
+        creating/opening the associated database if the given tentacle instance doesn't already have its configuration
+        :param tentacles_requirements: TentacleRequirementsTree associated to the given tentacle. Used to take
+        nested calls into account when creating/opening databases
+        :param cache_type: Type of the cache database. Used when creating/opening databases
+        :param open_if_missing: When True, if the database is missing when asked for then it is created.
+        :return: the cache database
+        """
         identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         cache_path = [tentacle_name, exchange_name, symbol, time_frame, identifier]
         try:
@@ -91,6 +109,14 @@ class CacheManager:
     def has_cache(
         self, tentacle_name, exchange_name, symbol, time_frame, config_name=None
     ):
+        """
+        Returns True if a cache database is open according to the given parameters
+        :param tentacle_name: name of the tentacle
+        :param exchange_name: name of the exchange
+        :param symbol: associated symbol
+        :param time_frame: name of the time frame
+        :param config_name: name of the configuration
+        """
         identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         try:
             return bool(
@@ -104,6 +130,14 @@ class CacheManager:
     def get_cache_registered_requirements(
         self, tentacle_name, exchange_name, symbol, time_frame, config_name=None
     ):
+        """
+        Returns the TentacleRequirementsTree associated to the found cache database
+        :param tentacle_name: name of the tentacle
+        :param exchange_name: name of the exchange
+        :param symbol: associated symbol
+        :param time_frame: name of the time frame
+        :param config_name: name of the configuration
+        """
         identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         return self.__class__.CACHES.get_node(
             [tentacle_name, exchange_name, symbol, time_frame, identifier]
@@ -112,6 +146,15 @@ class CacheManager:
     def get_cache_previous_db_metadata(
         self, tentacle_name, exchange_name, symbol, time_frame, config_name=None
     ):
+        """
+        Returns the metadata associated of the previous cache database. Mostly used when including
+        new dependencies to ensure metadata are preserved throughout databases
+        :param tentacle_name: name of the tentacle
+        :param exchange_name: name of the exchange
+        :param symbol: associated symbol
+        :param time_frame: name of the time frame
+        :param config_name: name of the configuration
+        """
         identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         return self.__class__.CACHES.get_node(
             [tentacle_name, exchange_name, symbol, time_frame, identifier]
@@ -125,6 +168,14 @@ class CacheManager:
         time_frame=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
         config_name=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
     ):
+        """
+        Delete all the content of cache databases
+        :param tentacle_name: name of the tentacle
+        :param exchange_name: name of the exchange, all of them if left unspecified
+        :param symbol: associated symbol, all of them if left unspecified
+        :param time_frame: name of the time frame, all of them if left unspecified
+        :param config_name: name of the configuration, all of them if left unspecified
+        """
         try:
             for cache, _ in self._caches(
                 tentacle_name, exchange_name, symbol, time_frame, config_name
@@ -137,6 +188,14 @@ class CacheManager:
     async def reset_cache(
         self, tentacle_name, exchange_name, symbol, time_frame, config_name
     ):
+        """
+        Removes a cache database from cache manager. Closes but does not clear the database
+        :param tentacle_name: name of the tentacle
+        :param exchange_name: name of the exchange
+        :param symbol: associated symbol
+        :param time_frame: name of the time frame
+        :param config_name: name of the configuration
+        """
         identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         cache = self.__class__.CACHES.delete_node(
             [tentacle_name, exchange_name, symbol, time_frame, identifier]
@@ -152,6 +211,16 @@ class CacheManager:
         config_name=common_constants.UNPROVIDED_CACHE_IDENTIFIER,
         reset_cache_db_ids=False,
     ):
+        """
+        Closes but does not clear the associated databases. Removes cache databases from cache manager if
+        reset_cache_db_ids
+        :param tentacle_name: name of the tentacle
+        :param exchange_name: name of the exchange, all of them if left unspecified
+        :param symbol: associated symbol, all of them if left unspecified
+        :param time_frame: name of the time frame, all of them if left unspecified
+        :param config_name: name of the configuration, all of them if left unspecified
+        :param reset_cache_db_ids: When True, removes the database from cache manager
+        """
         try:
             to_remove_caches = []
             for cache, identifiers in self._caches(
@@ -169,6 +238,9 @@ class CacheManager:
             return False
 
     async def reset(self):
+        """
+        Completely resets the cache manager closing and unregistering every cache
+        """
         for cache, _ in self._caches():
             if cache.node_value.is_open():
                 await cache.node_value.close()
@@ -186,8 +258,7 @@ class CacheManager:
         for element in (tentacle_name, exchange_name, symbol, time_frame, config_name):
             if element == common_constants.UNPROVIDED_CACHE_IDENTIFIER:
                 break
-            else:
-                path.append(element)
+            path.append(element)
         if self.__class__.CACHES.get_children_keys(path):
             return self.__class__.CACHES.get_nested_children_with_path(path)
         # no cache value
@@ -234,7 +305,7 @@ class CacheManager:
     def get_cache_or_build_path(
         self,
         tentacle,
-        exchange,
+        exchange_name,
         symbol,
         time_frame,
         tentacle_name,
@@ -242,10 +313,24 @@ class CacheManager:
         tentacles_setup_config,
         tentacles_requirements,
     ):
+        """
+        Returns the cache path associated to the given arguments. Use local cache when available otherwise
+        recompute the whole path (time consuming)
+        :param tentacle: tentacle use to build the path. Required if path is not in cache already
+        :param tentacle_name: name of the tentacle
+        :param exchange_name: name of the exchange
+        :param symbol: associated symbol, all of them if left unspecified
+        :param time_frame: name of the time frame, all of them if left unspecified
+        :param config_name: name of the configuration, all of them if left unspecified
+        :param tentacles_setup_config: the used tentacles_setup_config. Used to read configuration from to when
+        creating/opening the associated database if the given tentacle instance doesn't already have its configuration
+        :param tentacles_requirements: TentacleRequirementsTree associated to the given tentacle. Used to take
+        nested calls into account when creating/opening databases
+        """
         identifier = config_name or self.DEFAULT_CONFIG_IDENTIFIER
         try:
             return self.__class__.CACHES.get_node(
-                [tentacle_name, exchange, symbol, time_frame, identifier]
+                [tentacle_name, exchange_name, symbol, time_frame, identifier]
             ).node_value.get_path()
         except event_tree.NodeExistsError:
             sanitized_pair = symbol_util.merge_symbol(symbol) if symbol else symbol
@@ -264,7 +349,7 @@ class CacheManager:
                 common_constants.USER_FOLDER,
                 common_constants.CACHE_FOLDER,
                 tentacle_name,
-                exchange,
+                exchange_name,
                 sanitized_pair,
                 time_frame,
                 code_hash,
@@ -285,7 +370,7 @@ class CacheManager:
                     identifying_tentacles, tentacles_setup_config
                 )[: common_constants.CACHE_HASH_SIZE],
             )
-        except ImportError as e:
+        except ImportError as err:
             raise ImportError(
                 "octobot_tentacles_manager is required to use cache"
-            ) from e
+            ) from err

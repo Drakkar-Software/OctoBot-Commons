@@ -18,10 +18,22 @@ import octobot_commons.databases.bases.base_database as base_database
 
 class DBReader(base_database.BaseDatabase):
     async def select(self, table_name: str, query: str) -> list:
+        """
+        :param table_name: table to select data from
+        :param query: select query
+        :return: list of selected results
+        """
         return await self._database.select(table_name, query)
 
     async def tables(self) -> list:
+        """
+        :return: list of tables contained in the database
+        """
         return await self._database.tables()
 
     async def all(self, table_name: str) -> list:
+        """
+        :param table_name: table to select data from
+        :return: all data of the selected table
+        """
         return await self._database.select(table_name, None)

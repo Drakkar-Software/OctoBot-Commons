@@ -25,6 +25,12 @@ class ChronologicalReadDatabaseCache:
         self.timestamped_sorted_data = {}
 
     def set(self, values, sort_key, identifiers):
+        """
+        Set whole cache to later be able to efficiently select it
+        :param values: cache values to set
+        :param sort_key: key in the values dict to use to chronologically order data
+        :param identifiers: identifiers of the given cache. Used to store multiple cache sets
+        """
         nested_cache = self.timestamped_sorted_data
         for identifier in identifiers:
             if identifier not in nested_cache:
@@ -36,6 +42,12 @@ class ChronologicalReadDatabaseCache:
         data[self.CHRONO_INDEX_KEY] = 0
 
     def get(self, inferior_timestamp, superior_timestamp, identifiers):
+        """
+        Returns a cache values
+        :param inferior_timestamp: timestamp to start selecting from. Use constants.DEFAULT_IGNORED_VALUE to select all
+        :param superior_timestamp: timestamp to stop selecting at. Use constants.DEFAULT_IGNORED_VALUE to select all
+        :param identifiers: identifiers of the cache to look into. Used to store multiple cache sets
+        """
         cache_data = self._get_cache_data(identifiers)
         # if one timestamp is constants.DEFAULT_IGNORED_VALUE, return every available data from/up to this timestamp
         if inferior_timestamp == constants.DEFAULT_IGNORED_VALUE:
@@ -79,6 +91,10 @@ class ChronologicalReadDatabaseCache:
         return data[min_index:]
 
     def has(self, identifiers):
+        """
+        :param identifiers: identifiers of the cache to look for.
+        :return: True if the current identifiers are related to a registered cache
+        """
         try:
             self._get_cache_data(identifiers)
             return True
@@ -92,4 +108,7 @@ class ChronologicalReadDatabaseCache:
         return found_data
 
     def clear(self):
+        """
+        Resets the cache database
+        """
         self.timestamped_sorted_data = {}

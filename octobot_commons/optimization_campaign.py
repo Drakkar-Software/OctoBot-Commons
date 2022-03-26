@@ -1,3 +1,4 @@
+# pylint: disable=C0103,W0603
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -22,6 +23,10 @@ class OptimizationCampaign:
 
     @classmethod
     def get_campaign_name(cls, *args):
+        """
+        Returns the name of the current optimization campaign
+        :param args: arguments passed to the optimization_campaign_name_proxy
+        """
         return _optimization_name_proxy(*args)
 
 
@@ -37,5 +42,9 @@ def _optimization_name_proxy(*args):
 
 
 def register_optimization_campaign_name_proxy(new_proxy):
+    """
+    Registers a new campaign name provider as a proxy function
+    :param new_proxy: the proxy function to be called by OptimizationCampaign.get_campaign_name
+    """
     global _name_proxy
     _name_proxy = new_proxy

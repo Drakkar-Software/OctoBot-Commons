@@ -24,14 +24,19 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
         timestamp: float,
         name: str = commons_enums.CacheDatabaseColumns.VALUE.value,
     ) -> dict:
+        """
+        Returns the value associated to the given timestamp
+        :param timestamp: timestamp to get data for
+        :param name: identifier of the value to get, default is commons_enums.CacheDatabaseColumns.VALUE.value
+        """
         try:
             return await self._get_from_local_cache(
                 commons_enums.CacheDatabaseColumns.TIMESTAMP.value, timestamp, name
             )
-        except KeyError as e:
+        except KeyError as err:
             raise errors.NoCacheValue(
                 f"No cache value associated to {timestamp}"
-                if e.args[0] == timestamp
+                if err.args[0] == timestamp
                 else f"No {name} value associated to {timestamp} cache."
             )
 
@@ -42,6 +47,13 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
         limit=-1,
         min_timestamp=0,
     ) -> list:
+        """
+        Returns all the values up to the given timestamp
+        :param timestamp: last timestamp to read get data to
+        :param name: identifier of the value to get, default is commons_enums.CacheDatabaseColumns.VALUE.value
+        :param limit: maximum number of elements to return
+        :param min_timestamp: timestamp to start returning data from
+        """
         try:
             await self._ensure_local_cache(
                 commons_enums.CacheDatabaseColumns.TIMESTAMP.value
@@ -65,6 +77,12 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
         value,
         name: str = commons_enums.CacheDatabaseColumns.VALUE.value,
     ) -> None:
+        """
+        Sets a value at the given timestamp associated to the given identifier
+        :param timestamp: timestamp to set data to
+        :param value: value to set
+        :param name: identifier of the value to set, default is commons_enums.CacheDatabaseColumns.VALUE.value
+        """
         await self._ensure_metadata()
         saved_value = self.get_serializable_value(value)
         if await self._needs_update(
@@ -104,6 +122,13 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
         name: str = commons_enums.CacheDatabaseColumns.VALUE.value,
         additional_values_by_key: dict = None,
     ) -> None:
+        """
+        Sets values at the given timestamps associated to the given identifiers
+        :param timestamps: timestamps to set data to
+        :param values: value to set
+        :param name: identifier of the values to set, default is commons_enums.CacheDatabaseColumns.VALUE.value
+        :param additional_values_by_key: other key/values to set a these timestamps
+        """
         await self._ensure_local_cache(
             commons_enums.CacheDatabaseColumns.TIMESTAMP.value
         )
@@ -171,6 +196,9 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
         return (await self._database.query_factory()).t == timestamp
 
     async def get_cache(self):
+        """
+        :return: the sorted read cache values
+        """
         # relies on the fact that python dicts keep order
         return sorted(
             await self._database.select(self.CACHE_TABLE, None),

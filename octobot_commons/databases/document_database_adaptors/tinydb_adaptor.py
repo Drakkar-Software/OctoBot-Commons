@@ -26,7 +26,8 @@ except ImportError:
 import octobot_commons.logging as commons_logging
 import octobot_commons.constants as constants
 import octobot_commons.errors as errors
-import octobot_commons.databases.document_database_adaptors.abstract_document_database_adaptor as abstract_document_database_adaptor
+import octobot_commons.databases.document_database_adaptors.abstract_document_database_adaptor as \
+    abstract_document_database_adaptor
 
 
 class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseAdaptor):
@@ -57,10 +58,10 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
         middleware.WRITE_CACHE_SIZE = self.cache_size or self.DEFAULT_WRITE_CACHE_SIZE
         try:
             self.database = tinydb.TinyDB(self.db_path, storage=middleware)
-        except FileNotFoundError as e:
+        except FileNotFoundError as err:
             raise errors.DatabaseNotFoundError(
                 f'Can\'t open database at "{self.db_path}"'
-            ) from e
+            ) from err
 
     @staticmethod
     def is_file_system_based() -> bool:
@@ -207,9 +208,10 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
         except AttributeError:
             # when self.database didn't open properly
             pass
-        except TypeError as e:
+        except TypeError as err:
             commons_logging.get_logger(str(self)).exception(
-                e,
+                err,
                 True,
-                f"Error when writing database, this is probably due to a script that is saving a non json-serializable value: {e}",
+                f"Error when writing database, this is probably due to a script that "
+                f"is saving a non json-serializable value: {err}",
             )

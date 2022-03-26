@@ -1,3 +1,4 @@
+# pylint: disable=R0902
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -29,6 +30,9 @@ class CacheWrapper:
         self.tentacles_requirements = tentacles_requirements.summary()
 
     def get_database(self) -> tuple:
+        """
+        Returns the database, creates it if messing
+        """
         if self._cache_database is None:
             self._cache_database = self.cache_type(
                 self.file_path, database_adaptor=self.database_adaptor, **self.db_kwargs
@@ -38,9 +42,15 @@ class CacheWrapper:
         return self._cache_database, False
 
     def is_open(self):
+        """
+        :return: True if a database is open
+        """
         return self._cache_database is not None
 
     async def close(self):
+        """
+        Closes the current database. Stores its metadata into self.previous_db_metadata
+        """
         if self.is_open():
             self.previous_db_metadata = self._cache_database.get_non_default_metadata()
             await self._cache_database.close()
@@ -49,8 +59,14 @@ class CacheWrapper:
         return False
 
     async def clear(self):
+        """
+        Clears the database, deleting its data
+        """
         if self._cache_database is not None:
             await self._cache_database.clear()
 
     def get_path(self):
+        """
+        :return: the database path
+        """
         return self._db_path

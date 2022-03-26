@@ -1,3 +1,4 @@
+# pylint: disable=R0902,R0913
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -47,6 +48,12 @@ class RunDatabasesIdentifier:
         )
 
     async def initialize(self, exchange=None, from_global_history=False):
+        """
+        Initializes the necessary elements for these run databases. Creates necessary folder on file system databases
+        :param exchange: name of the associated exchange
+        :param from_global_history: When True, initializes the run databases as not related to a specific trading mode.
+        Used for live trading cross trading mode stats (such as profitability)
+        """
         # global history is a live only feature
         from_global_history = from_global_history and self.backtesting_id is None
         if self.database_adaptor.is_file_system_based():
@@ -61,25 +68,50 @@ class RunDatabasesIdentifier:
                 os.makedirs(deepest_path)
 
     def get_run_data_db_identifier(self) -> str:
+        """
+        :return: the database identifier associated to the run database
+        """
         return self._get_db_identifier(enums.RunDatabases.RUN_DATA_DB.value, None)
 
     def get_orders_db_identifier(self, exchange) -> str:
+        """
+        :return: the database identifier associated to this exchange's orders
+        :param exchange: name of the associated exchange
+        """
         return self._get_db_identifier(enums.RunDatabases.ORDERS_DB.value, exchange)
 
     def get_trades_db_identifier(self, exchange) -> str:
+        """
+        :return: the database identifier associated to this exchange's trades
+        :param exchange: name of the associated exchange
+        """
         return self._get_db_identifier(enums.RunDatabases.TRADES_DB.value, exchange)
 
     def get_transactions_db_identifier(self, exchange) -> str:
+        """
+        :return: the database identifier associated to this exchange's transactions
+        :param exchange: name of the associated exchange
+        """
         return self._get_db_identifier(
             enums.RunDatabases.TRANSACTIONS_DB.value, exchange
         )
 
     def get_symbol_db_identifier(self, exchange, symbol) -> str:
+        """
+        :return: the database identifier associated to this exchange's symbol data
+        :param exchange: name of the associated exchange
+        :param symbol: the associated symbol
+        """
         return self._get_db_identifier(symbol_util.merge_symbol(symbol), exchange)
 
     def get_historical_portfolio_value_db_identifier(
         self, exchange, portfolio_type_suffix
     ) -> str:
+        """
+        :return: the database identifier associated to this exchange's historical portfolio value
+        :param exchange: name of the associated exchange
+        :param portfolio_type_suffix: a suffix identifying the type of portfolio (future / sandbox etc)
+        """
         return self._get_db_identifier(
             f"{enums.RunDatabases.PORTFOLIO_VALUE_DB.value}{portfolio_type_suffix}",
             exchange,
@@ -87,6 +119,9 @@ class RunDatabasesIdentifier:
         )
 
     def get_backtesting_metadata_identifier(self) -> str:
+        """
+        :return: the database identifier associated to backtesting metadata
+        """
         return self._get_db_identifier(
             f"{enums.RunDatabases.METADATA.value}", None, ignore_backtesting_id=True
         )
@@ -104,18 +139,24 @@ class RunDatabasesIdentifier:
         )
 
     def exchange_base_identifier_exists(self, exchange) -> bool:
+        """
+        :return: True if there are data under this exchange name
+        """
         identifier = self._merge_parts(self._base_folder(), exchange)
         if self.database_adaptor.is_file_system_based():
             return os.path.isdir(identifier)
         return False
 
     def get_backtesting_run_folder(self) -> str:
+        """
+        :return: base folder associated to a backtesting run
+        """
         return self._base_folder()
 
-    def get_optimizer_runs_identifier(self) -> str:
-        return self._merge_parts(self._base_folder(ignore_backtesting_id=True))
-
     def get_optimizer_runs_schedule_identifier(self) -> str:
+        """
+        :return: the identifier associated to the optimizer run schedule database
+        """
         return self._merge_parts(
             self.base_path,
             self.optimization_campaign_name,
@@ -124,12 +165,21 @@ class RunDatabasesIdentifier:
         )
 
     async def generate_new_backtesting_id(self) -> int:
+        """
+        :return: a new unique backtesting id
+        """
         return await self._generate_new_id(is_optimizer=False)
 
     async def generate_new_optimizer_id(self, back_list) -> int:
+        """
+        :return: a new unique optimizer id
+        """
         return await self._generate_new_id(back_list=back_list, is_optimizer=True)
 
     def remove_all(self):
+        """
+        Clears every data from a backtesting run
+        """
         identifier = self._base_folder()
         if self.database_adaptor.is_file_system_based():
             if os.path.isdir(identifier):
@@ -160,6 +210,9 @@ class RunDatabasesIdentifier:
         )
 
     async def get_optimization_campaign_names(self) -> list:
+        """
+        :return: a list of every existing campaign name
+        """
         if self.database_adaptor.is_file_system_based():
             optimization_campaign_folder = self._merge_parts(self.base_path)
             if os.path.exists(optimization_campaign_folder):
@@ -172,6 +225,9 @@ class RunDatabasesIdentifier:
         return []
 
     async def get_optimizer_run_ids(self) -> list:
+        """
+        :return: a list of every optimizer id in the current campaign
+        """
         if self.database_adaptor.is_file_system_based():
             optimizer_runs_path = self._merge_parts(
                 self.base_path,

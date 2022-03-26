@@ -29,6 +29,13 @@ class GenericDatabaseCache:
         self.uuid_cache = {}
 
     def register(self, table, row, result=None, uuid=None):
+        """
+        Saves the given row/query in local cache
+        :param table: the associated table
+        :param row: the row/query to save
+        :param result: select result to save
+        :param uuid: uuid to save
+        """
         cached = False
         try:
             if uuid is not None:
@@ -43,9 +50,9 @@ class GenericDatabaseCache:
                     self.query_cache[table][row] = result
                 except KeyError:
                     self.query_cache[table] = {row: result}
-        except TypeError as e:
+        except TypeError as err:
             # might happen when row can't be hashed: impossible to cache it in this case
-            raise errors.UncachableValue(f"Unhashable row: {row}") from e
+            raise errors.UncachableValue(f"Unhashable row: {row}") from err
         if not cached:
             self._add_to_rows_cache(table, row)
 
@@ -60,21 +67,40 @@ class GenericDatabaseCache:
             self.rows_cache[table] = [row]
 
     def has(self, table):
+        """
+        :param table: table name
+        :return: True if the given table is in rows_cache
+        """
         return table in self.rows_cache
 
     def cached_uuid(self, table, identifier):
+        """
+        :param table: table name
+        :param identifier: identifier of to look for
+        :return: the cached uuid of the given identifier
+        """
         try:
             return self.uuid_cache[table][identifier]
         except KeyError:
             return None
 
     def cached_query(self, table, identifier):
+        """
+        :param table: table name
+        :param identifier: identifier of to look for
+        :return: the cached query of the given identifier
+        """
         try:
             return self.query_cache[table][identifier]
         except KeyError:
             return None
 
     def contains_row(self, table, val_by_keys):
+        """
+        :param table: table name
+        :param val_by_keys: dict to look for
+        :return: True if a row of the local cache contains every value of the given dict
+        """
         # Should check the real database in case this returns false
         try:
             for element in self.rows_cache[table]:
@@ -85,6 +111,9 @@ class GenericDatabaseCache:
         return False
 
     def clear(self):
+        """
+        Resets the current cache
+        """
         self.rows_cache = {}
         self.query_cache = {}
         self.uuid_cache = {}
