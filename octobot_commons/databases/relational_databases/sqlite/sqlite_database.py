@@ -341,12 +341,12 @@ class SQLiteDatabase:
                 self.connection = None
                 await conn.close()
 
-    @staticmethod
-    @contextlib.asynccontextmanager
-    async def new_database(file_path):
-        local_database = SQLiteDatabase(file_path)
-        try:
-            await local_database.initialize()
-            yield local_database
-        finally:
-            await local_database.stop()
+
+@contextlib.asynccontextmanager
+async def new_sqlite_database(file_path):
+    local_database = SQLiteDatabase(file_path)
+    try:
+        await local_database.initialize()
+        yield local_database
+    finally:
+        await local_database.stop()

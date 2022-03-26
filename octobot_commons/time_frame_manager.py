@@ -25,7 +25,7 @@ def _sort_time_frames(time_frames, reverse=False):
         time_frames = (
             time_frames
             if isinstance(time_frames[0], enums.TimeFrames)
-            else (enums.TimeFrames(tf) for tf in time_frames)
+            else [enums.TimeFrames(tf) for tf in time_frames]
         )
         return sorted(
             time_frames, key=enums.TimeFramesMinutes.__getitem__, reverse=reverse

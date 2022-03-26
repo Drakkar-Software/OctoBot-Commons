@@ -49,7 +49,10 @@ from octobot_commons.databases.implementations import (
     CacheTimestampDatabase,
 )
 
-from octobot_commons.databases.relational_databases import SQLiteDatabase
+from octobot_commons.databases.relational_databases import (
+    SQLiteDatabase,
+    new_sqlite_database,
+)
 
 from octobot_commons.databases.run_databases_identifier import (
     RunDatabasesIdentifier,
@@ -78,6 +81,7 @@ __all__ = [
     "CacheDatabase",
     "CacheTimestampDatabase",
     "SQLiteDatabase",
+    "new_sqlite_database",
     "RunDatabasesIdentifier",
     "CacheManager",
     "CacheWrapper",

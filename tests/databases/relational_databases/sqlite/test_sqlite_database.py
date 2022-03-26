@@ -38,7 +38,7 @@ KLINE = mock.Mock(value="kline")
 # use context manager instead of fixture to prevent pytest threads issues
 @contextlib.asynccontextmanager
 async def get_database(data_file=DATA_FILE1):
-    async with databases.SQLiteDatabase.new_database(os.path.join("tests", "static", data_file)) as db:
+    async with databases.new_sqlite_database(os.path.join("tests", "static", data_file)) as db:
         yield db
     # prevent "generator didn't stop after athrow(), see https://github.com/python-trio/trio/issues/2081"
     await asyncio_tools.wait_asyncio_next_cycle()
@@ -49,7 +49,7 @@ async def get_database(data_file=DATA_FILE1):
 async def get_temp_empty_database():
     database_name = "temp_empty_database"
     try:
-        async with databases.SQLiteDatabase.new_database(database_name) as db:
+        async with databases.new_sqlite_database(database_name) as db:
             yield db
     finally:
         # prevent "generator didn't stop after athrow(), see https://github.com/python-trio/trio/issues/2081"
