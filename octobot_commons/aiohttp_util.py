@@ -19,7 +19,7 @@ async def download_stream_file(
     output_file,
     file_url,
     aiohttp_session,
-    data_chunk_size=5 * 2 ** 20,
+    data_chunk_size=5 * 2**20,
     is_aiofiles_output_file=False,
 ):
     """
