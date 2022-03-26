@@ -1,3 +1,4 @@
+# pylint: disable=C0103
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -130,6 +131,10 @@ class OctoBotChannelSubjects(enum.Enum):
 
 
 class UserCommands(enum.Enum):
+    """
+    Allowed user commands
+    """
+
     RELOAD_SCRIPT = "reload_script"
     CLEAR_ALL_CACHE = "clear_all_cache"
     CLEAR_PLOTTING_CACHE = "clear_plotting_cache"
@@ -139,15 +144,27 @@ class UserCommands(enum.Enum):
 
 
 class MultiprocessingLocks(enum.Enum):
+    """
+    Keys to multiprocessing lock
+    """
+
     DBLock = "db_lock"
 
 
 class CacheDatabaseTables(enum.Enum):
+    """
+    Tables in cache databases
+    """
+
     CACHE = "cache"
     METADATA = "metadata"
 
 
 class CacheDatabaseColumns(enum.Enum):
+    """
+    Keys/columns in cache databases tables
+    """
+
     TIMESTAMP = "t"
     VALUE = "v"
     TYPE = "ty"
@@ -155,6 +172,10 @@ class CacheDatabaseColumns(enum.Enum):
 
 
 class ActivationTopics(enum.Enum):
+    """
+    Events that can trigger actions
+    """
+
     FULL_CANDLES = "once per bar close"
     IN_CONSTRUCTION_CANDLES = "once per second (Live Price)"
     RECENT_TRADES = "recent trades"
@@ -162,11 +183,19 @@ class ActivationTopics(enum.Enum):
 
 
 class DataBaseOrderBy(enum.Enum):
+    """
+    Database orders
+    """
+
     ASC = "ASC"
     DESC = "DESC"
 
 
 class DataBaseOperations(enum.Enum):
+    """
+    Database operators
+    """
+
     SUP = ">"
     INF = "<"
     EQUALS = "="
@@ -175,6 +204,10 @@ class DataBaseOperations(enum.Enum):
 
 
 class RunDatabases(enum.Enum):
+    """
+    Database identifiers
+    """
+
     HISTORY = "history"
     LIVE = "live"
     BACKTESTING = "backtesting"
@@ -190,6 +223,10 @@ class RunDatabases(enum.Enum):
 
 
 class LogicalOperators(enum.Enum):
+    """
+    Logical operators
+    """
+
     LOWER_THAN = "lower_than"
     HIGHER_THAN = "higher_than"
     LOWER_OR_EQUAL_TO = "lower_or_equal_to"

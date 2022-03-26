@@ -1,3 +1,4 @@
+# pylint: disable=C0116,W0511,R0201,R0913
 #  Drakkar-Software OctoBot-Backtesting
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -14,11 +15,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import contextlib
-
-try:
-    import sqlite3
-except ImportError:
-    pass
+import sqlite3
 import aiosqlite
 
 import octobot_commons.logging as logging
@@ -52,8 +49,8 @@ class SQLiteDatabase:
             self.connection = await aiosqlite.connect(self.file_name)
             self._cursor_pool = cursor_pool.CursorPool(self.connection)
             await self.__init_tables_list()
-        except (sqlite3.OperationalError, sqlite3.DatabaseError) as e:
-            raise errors.DatabaseNotFoundError(e)
+        except (sqlite3.OperationalError, sqlite3.DatabaseError) as err:
+            raise errors.DatabaseNotFoundError(err)
 
     async def create_index(self, table, columns):
         await self.__execute_index_creation(
@@ -189,7 +186,6 @@ class SQLiteDatabase:
         size=DEFAULT_SIZE,
         order_by=DEFAULT_ORDER_BY,
         sort=DEFAULT_SORT,
-        use_cache=False,
         **kwargs,
     ):
         timestamps_where_clauses = self.__where_clauses_from_operations(
@@ -287,10 +283,10 @@ class SQLiteDatabase:
                     f"{additional_clauses} {limit_clause} {group_by}"
                 )
                 return await cursor.fetchall()
-        except sqlite3.OperationalError as e:
+        except sqlite3.OperationalError as err:
             if not await self.check_table_exists(table):
-                raise errors.DatabaseNotFoundError(e)
-            self.logger.error(f"An error occurred when executing select : {e}")
+                raise errors.DatabaseNotFoundError(err)
+            self.logger.error(f"An error occurred when executing select : {err}")
         return []
 
     async def check_table_exists(self, table) -> bool:
@@ -313,7 +309,8 @@ class SQLiteDatabase:
             columns: list = list(kwargs.keys())
             async with self.aio_cursor() as cursor:
                 await cursor.execute(
-                    f"CREATE TABLE {table.value} ({self.TIMESTAMP_COLUMN} datetime, {' text, '.join([col for col in columns])})"
+                    f"CREATE TABLE {table.value} ({self.TIMESTAMP_COLUMN} datetime, "
+                    f"{' text, '.join(col for col in columns)})"
                 )
 
             if with_index_on_timestamp:
@@ -332,7 +329,7 @@ class SQLiteDatabase:
 
     async def __init_tables_list(self):
         async with self.aio_cursor() as cursor:
-            await cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table'")
+            await cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
             self.tables = [res[0] for res in await cursor.fetchall()]
 
     async def stop(self):

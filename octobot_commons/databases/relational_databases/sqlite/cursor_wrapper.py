@@ -21,4 +21,7 @@ class CursorWrapper:
         self.idle = True
 
     async def close(self):
+        """
+        Close the underlying cursor
+        """
         await self.cursor.close()

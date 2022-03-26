@@ -79,6 +79,11 @@ def check_and_merge_values_from_reference(
 
 
 def contains_each_element(element, val_by_keys_to_find):
+    """
+     Check if each element in val_by_keys_to_find is in element
+    :param element: the dict to look into
+    :param val_by_keys_to_find: the dict of elements to find
+    """
     try:
         for key, val in val_by_keys_to_find.items():
             if element[key] != val:

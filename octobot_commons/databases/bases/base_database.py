@@ -39,35 +39,69 @@ class BaseDatabase:
         self.cache = database_cache.GenericDatabaseCache()
 
     def set_initialized_flags(self, value, keys=None):
+        """
+        Updates the initialized values of the given keys
+        :param value: the updated initialized value
+        :param keys: keys to update. Updated every key if left to None
+        """
         self.are_data_initialized = value
         for key in keys or self.are_data_initialized_by_key.keys():
             self.are_data_initialized_by_key[key] = value
 
     def get_db_path(self):
+        """
+        :return: the path to the current database's path
+        """
         return self._database.get_db_path()
 
     async def search(self, dict_query: dict = None):
+        """
+        :param dict_query: initialization dict for the query
+        :return: a search query
+        """
         if dict_query is None:
             return await self._database.query_factory()
         return (await self._database.query_factory()).fragment(dict_query)
 
     async def count(self, table_name: str, query) -> int:
+        """
+        :param table_name: the table to count data from
+        :param query: the query to count results from
+        :return: the number of elements that match the given query
+        """
         return await self._database.count(table_name, query)
 
     async def flush(self):
+        """
+        Flushes the database, "committing" operations into the database
+        """
         await self._database.flush()
 
     async def hard_reset(self):
+        """
+        Completely resets the database as if it just was created
+        """
         return await self._database.hard_reset()
 
     async def close(self):
+        """
+        Closes the database, flushes it first
+        """
         await self.flush()
         await self._database.close()
 
     async def clear(self):
+        """
+        Clears the database, removing everything from it
+        """
         self.cache.clear()
 
     async def contains_row(self, table: str, row: dict):
+        """
+        Returns true if the given rows are included in the given table, also looking into internal cache
+        :param table: the table to look into
+        :param row: the row to find
+        """
         if self.cache.contains_row(table, row):
             return True
         return await self.count(table, await self.search(row)) > 0
@@ -105,6 +139,14 @@ class BaseDatabase:
     async def database(
         cls, *args, with_lock=False, cache_size=None, database_adaptor=None, **kwargs
     ):
+        """
+        Yields a database and closes it when exiting the context manager
+        :param args: arguments to pass to the database constructor
+        :param with_lock: When True, creating a lock synchronized database
+        :param cache_size: size of the internal database cache
+        :param database_adaptor: Database class to use
+        :param kwargs: keyword arguments to pass to the database constructor
+        """
         database, adaptor_instance = cls._create_database(
             *args,
             required_adaptor=with_lock,
@@ -115,8 +157,8 @@ class BaseDatabase:
         if with_lock:
             async with document_database.DocumentDatabase.locked_database(
                 adaptor_instance
-            ) as db:
-                database._database = db
+            ) as locked_db:
+                database._database = locked_db
                 yield database
                 # context manager is taking care of closing the database
             return
@@ -127,4 +169,8 @@ class BaseDatabase:
 
     @staticmethod
     def get_serializable_value(value):
+        """
+        Returns a json serializable value of the given element. Mostly used to serialize numpy types
+        :param value: the element
+        """
         return value.item() if isinstance(value, numpy.generic) else value
