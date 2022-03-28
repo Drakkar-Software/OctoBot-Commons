@@ -260,7 +260,10 @@ class CacheManager:
                 break
             path.append(element)
         if self.__class__.CACHES.get_children_keys(path):
-            return self.__class__.CACHES.get_nested_children_with_path(path)
+            for cache, identifiers in self.__class__.CACHES.get_nested_children_with_path(path):
+                # avoid caches that have no node value (might be remains of already cleared caches)
+                if cache.node_value is not None:
+                    yield cache, identifiers
         # no cache value
         return []
 
