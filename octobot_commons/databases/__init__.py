@@ -24,6 +24,7 @@ from octobot_commons.databases import relational_databases
 from octobot_commons.databases import run_databases_identifier
 from octobot_commons.databases import cache_manager
 from octobot_commons.databases import databases_util
+from octobot_commons.databases import cache_client
 
 from octobot_commons.databases.database_caches import (
     GenericDatabaseCache,
@@ -66,6 +67,10 @@ from octobot_commons.databases.databases_util import (
     CacheWrapper,
 )
 
+from octobot_commons.databases.cache_client import (
+    CacheClient,
+)
+
 
 __all__ = [
     "GenericDatabaseCache",
@@ -85,4 +90,5 @@ __all__ = [
     "RunDatabasesIdentifier",
     "CacheManager",
     "CacheWrapper",
+    "CacheClient",
 ]
