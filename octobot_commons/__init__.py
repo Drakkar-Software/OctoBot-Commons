@@ -16,7 +16,7 @@
 #  License along with this library.
 
 PROJECT_NAME = "OctoBot-Commons"
-VERSION = "1.7.0"  # major.minor.revision
+VERSION = "1.7.1"  # major.minor.revision
 
 MARKET_SEPARATOR = "/"
 DICT_BULLET_TOKEN_STR = "\n "
