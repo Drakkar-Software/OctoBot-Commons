@@ -15,8 +15,8 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-from octobot_commons.databases.relational_databases.sqlite cimport database
-from octobot_commons.databases.relational_databases.sqlite.database cimport (
+from octobot_commons.databases.relational_databases.sqlite cimport sqlite_database
+from octobot_commons.databases.relational_databases.sqlite.sqlite_database cimport (
     SQLiteDatabase,
 )
 
