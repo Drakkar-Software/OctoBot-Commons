@@ -1,5 +1,5 @@
 # cython: language_level=3
-#  Drakkar-Software OctoBot-Commons
+#  Drakkar-Software OctoBot-Backtesting
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -15,26 +15,11 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-from octobot_commons.logging cimport logging_util
-
-from octobot_commons.logging.logging_util cimport (
-    BotLogger,
-    set_global_logger_level,
-    get_global_logger_level,
-    get_logger,
-    set_logging_level,
-    get_backtesting_errors_count,
-    reset_backtesting_errors,
-    set_error_publication_enabled,
+from octobot_commons.databases cimport relational_databases
+from octobot_commons.databases.relational_databases cimport (
+    SQLiteDatabase,
 )
 
 __all__ = [
-    "BotLogger",
-    "set_global_logger_level",
-    "get_global_logger_level",
-    "get_logger",
-    "set_logging_level",
-    "get_backtesting_errors_count",
-    "reset_backtesting_errors",
-    "set_error_publication_enabled",
+    "SQLiteDatabase",
 ]
