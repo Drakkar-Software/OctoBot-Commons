@@ -97,3 +97,9 @@ class LogicalOperatorError(Exception):
     """
     Raised when a logical operation is invalid
     """
+
+
+class UnsupportedError(Exception):
+    """
+    Raised when an unsupported message is received
+    """

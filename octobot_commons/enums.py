@@ -233,3 +233,17 @@ class LogicalOperators(enum.Enum):
     HIGHER_OR_EQUAL_TO = "higher_or_equal_to"
     EQUAL_TO = "equal_to"
     DIFFERENT_FROM = "different_from"
+
+
+class CommunityFeedAttrs(enum.Enum):
+    ID = "u"
+    STREAM_ID = "i"
+    VALUE = "s"
+    VERSION = "v"
+    TIMESTAMP = "d"
+    CHANNEL_TYPE = "t"
+
+
+class CommunityChannelTypes(enum.Enum):
+    SIGNAL = "t"    # TODO
+    ALERT = "alert"

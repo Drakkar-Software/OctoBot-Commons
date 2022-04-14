@@ -49,6 +49,14 @@ class OctoBotBacktestingChannelsName(enum.Enum):
     TIME_CHANNEL = "Time"
 
 
+class OctoBotCommunityChannelsName(enum.Enum):
+    """
+    OctoBot community channel names
+    """
+
+    REMOTE_TRADING_SIGNALS_CHANNEL = "RemoteTradingSignals"
+
+
 class OctoBotTradingChannelsName(enum.Enum):
     """
     OctoBot-Trading channel names
