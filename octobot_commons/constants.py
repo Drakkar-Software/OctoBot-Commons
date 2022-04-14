@@ -133,6 +133,8 @@ CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
 NESTED_TENTACLE_CONFIG = "nested_tentacle_configuration"
 CONFIG_ACTIVATION_TOPICS = "activation method"
 CONFIG_TRIGGER_TIMEFRAMES = "Trigger_timeframes"
+CONFIG_EMIT_TRADING_SIGNALS = "emit_trading_signals"
+CONFIG_TRADING_SIGNALS_STRATEGY = "trading_strategy"
 
 # terms of service
 CONFIG_ACCEPTED_TERMS = "accepted_terms"

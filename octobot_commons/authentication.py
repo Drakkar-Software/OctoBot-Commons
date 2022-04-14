@@ -31,6 +31,7 @@ class Authenticator:
         )
         self.initialized_event: asyncio.Event = None
         self.supports: None
+        self.feed_callbacks = {}
 
     @abc.abstractmethod
     def login(self, username, password):
@@ -70,6 +71,29 @@ class Authenticator:
         """
         Called before @authenticated methods to ensure authentication
         :return:
+        """
+        raise NotImplementedError
+
+    async def register_feed_callback(self, topic, callback):
+        """
+        Registers a feed callback
+        """
+        raise NotImplementedError
+
+    async def register_feed_callback(self, channel_type, callback, identifier=None):
+        """
+        Registers a feed callback
+        """
+        try:
+            self.feed_callbacks[channel_type][identifier].append(callback)
+        except KeyError:
+            if channel_type not in self.feed_callbacks:
+                self.feed_callbacks[channel_type] = {}
+            self.feed_callbacks[channel_type][identifier] = [callback]
+
+    async def send_signal(self, signal_stream_id, signal_version, signal_content):
+        """
+        Sends a signal
         """
         raise NotImplementedError
 
