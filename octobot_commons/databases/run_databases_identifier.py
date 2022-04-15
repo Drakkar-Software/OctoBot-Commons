@@ -147,6 +147,30 @@ class RunDatabasesIdentifier:
             return os.path.isdir(identifier)
         return False
 
+    def get_single_existing_exchange(self) -> str:
+        """
+        :return: the name of the only exchange the backtesting happened on if it only ran on a single exchange,
+        None otherwise
+        """
+        if self.database_adaptor.is_file_system_based():
+            exchange_folders = [
+                folder.name
+                for folder in os.scandir(self._base_folder())
+                if os.path.isdir(folder) and folder.name != enums.RunDatabases.LIVE.value
+            ]
+            return exchange_folders[0] if len(exchange_folders) == 1 else None
+        raise RuntimeError(f"Unhandled database_adaptor {self.database_adaptor}")
+
+    def symbol_base_identifier_exists(self, exchange, symbol) -> bool:
+        """
+        :return: True if there are data under this exchange name
+        """
+        identifier = self._merge_parts(self._base_folder(), exchange,
+                                       f"{symbol_util.merge_symbol(symbol)}{self.suffix}")
+        if self.database_adaptor.is_file_system_based():
+            return os.path.isfile(identifier)
+        return False
+
     def get_backtesting_run_folder(self) -> str:
         """
         :return: base folder associated to a backtesting run
