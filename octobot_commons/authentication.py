@@ -18,9 +18,10 @@ import functools
 import asyncio
 
 import octobot_commons.logging as bot_logging
+import octobot_commons.singleton as singleton
 
 
-class Authenticator:
+class Authenticator(singleton.Singleton):
     """
     Abstract class to be implemented when using authenticated requests
     """
@@ -32,6 +33,8 @@ class Authenticator:
         self.initialized_event: asyncio.Event = None
         self.supports: None
         self.feed_callbacks = {}
+        # also register this instance for the base Authenticator class ion singleton
+        singleton.Singleton._instances[Authenticator] = self
 
     @abc.abstractmethod
     def login(self, username, password):
