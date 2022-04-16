@@ -245,5 +245,5 @@ class CommunityFeedAttrs(enum.Enum):
 
 
 class CommunityChannelTypes(enum.Enum):
-    SIGNAL = "t"    # TODO
+    SIGNAL = "t"  # to check
     ALERT = "alert"
