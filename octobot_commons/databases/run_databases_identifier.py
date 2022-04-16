@@ -156,7 +156,8 @@ class RunDatabasesIdentifier:
             exchange_folders = [
                 folder.name
                 for folder in os.scandir(self._base_folder())
-                if os.path.isdir(folder) and folder.name != enums.RunDatabases.LIVE.value
+                if os.path.isdir(folder)
+                and folder.name != enums.RunDatabases.LIVE.value
             ]
             return exchange_folders[0] if len(exchange_folders) == 1 else None
         raise RuntimeError(f"Unhandled database_adaptor {self.database_adaptor}")
@@ -165,8 +166,11 @@ class RunDatabasesIdentifier:
         """
         :return: True if there are data under this exchange name
         """
-        identifier = self._merge_parts(self._base_folder(), exchange,
-                                       f"{symbol_util.merge_symbol(symbol)}{self.suffix}")
+        identifier = self._merge_parts(
+            self._base_folder(),
+            exchange,
+            f"{symbol_util.merge_symbol(symbol)}{self.suffix}",
+        )
         if self.database_adaptor.is_file_system_based():
             return os.path.isfile(identifier)
         return False
