@@ -33,7 +33,7 @@ class Authenticator(singleton.Singleton):
         self.initialized_event: asyncio.Event = None
         self.supports: None
         self.feed_callbacks = {}
-        # also register this instance for the base Authenticator class ion singleton
+        # also register this instance for the base Authenticator class in singleton
         singleton.Singleton._instances[Authenticator] = self
 
     @abc.abstractmethod

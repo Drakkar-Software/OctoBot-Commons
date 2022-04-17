@@ -1,4 +1,4 @@
-# pylint: disable=C0301
+# pylint: disable=C0301, R0904
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -77,6 +77,59 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
         Returns the database file extension. Implemented in file system based databases
         """
         return constants.TINYDB_EXT
+
+    @staticmethod
+    async def create_identifier(identifier):
+        """
+        Initialize the identifier by creating it in the database
+        """
+        if not os.path.exists(identifier):
+            os.makedirs(identifier)
+
+    @staticmethod
+    async def identifier_exists(identifier, is_full_identifier) -> bool:
+        """
+        Returns True when the given identifier is part of an existing database identifier
+        :param identifier: the identifier to look into
+        :param is_full_identifier: when True, only check identifiers that don't have sub identifiers.
+        When False, only check identifiers that have sub identifiers
+        """
+        return (
+            os.path.isfile(identifier)
+            if is_full_identifier
+            else os.path.isdir(identifier)
+        )
+
+    @staticmethod
+    async def get_sub_identifiers(identifier, ignored_identifiers):
+        """
+        Returns an iterable over the existing sub-identifiers under the given identifier
+        """
+        for folder in os.scandir(identifier):
+            if (
+                await TinyDBAdaptor.identifier_exists(folder, False)
+                and folder.name not in ignored_identifiers
+            ):
+                yield folder.name
+        # return (
+        #     folder.name
+        #     for folder in os.scandir(identifier)
+        #     if await TinyDBAdaptor.identifier_exists(folder, False)
+        #     and folder.name not in ignored_identifiers
+        # )
+
+    @staticmethod
+    async def get_single_sub_identifier(identifier, ignored_identifiers) -> str:
+        """
+        Returns the name of the only sub-identifier at a given parent identifier, None otherwise
+        example use: get the name of the only exchange the backtesting happened on if it only ran on a single exchange,
+        """
+        exchange_folders = [
+            folder.name
+            for folder in os.scandir(identifier)
+            if os.path.isdir(folder) and folder.name not in ignored_identifiers
+        ]
+        return exchange_folders[0] if len(exchange_folders) == 1 else None
 
     def get_uuid(self, document) -> int:
         """

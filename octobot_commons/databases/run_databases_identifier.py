@@ -56,16 +56,14 @@ class RunDatabasesIdentifier:
         """
         # global history is a live only feature
         from_global_history = from_global_history and self.backtesting_id is None
-        if self.database_adaptor.is_file_system_based():
-            deepest_path = (
-                self._base_folder(from_global_history=from_global_history)
-                if exchange is None
-                else self._merge_parts(
-                    self._base_folder(from_global_history=from_global_history), exchange
-                )
+        deepest_identifier = (
+            self._base_folder(from_global_history=from_global_history)
+            if exchange is None
+            else self._merge_parts(
+                self._base_folder(from_global_history=from_global_history), exchange
             )
-            if not os.path.exists(deepest_path):
-                os.makedirs(deepest_path)
+        )
+        await self.database_adaptor.create_identifier(deepest_identifier)
 
     def get_run_data_db_identifier(self) -> str:
         """
@@ -138,31 +136,23 @@ class RunDatabasesIdentifier:
             f"{run_database_name}{self.suffix}",
         )
 
-    def exchange_base_identifier_exists(self, exchange) -> bool:
+    async def exchange_base_identifier_exists(self, exchange) -> bool:
         """
         :return: True if there are data under this exchange name
         """
         identifier = self._merge_parts(self._base_folder(), exchange)
-        if self.database_adaptor.is_file_system_based():
-            return os.path.isdir(identifier)
-        return False
+        return await self.database_adaptor.identifier_exists(identifier, False)
 
-    def get_single_existing_exchange(self) -> str:
+    async def get_single_existing_exchange(self) -> str:
         """
         :return: the name of the only exchange the backtesting happened on if it only ran on a single exchange,
         None otherwise
         """
-        if self.database_adaptor.is_file_system_based():
-            exchange_folders = [
-                folder.name
-                for folder in os.scandir(self._base_folder())
-                if os.path.isdir(folder)
-                and folder.name != enums.RunDatabases.LIVE.value
-            ]
-            return exchange_folders[0] if len(exchange_folders) == 1 else None
-        raise RuntimeError(f"Unhandled database_adaptor {self.database_adaptor}")
+        return await self.database_adaptor.get_single_sub_identifier(
+            self._base_folder(), [enums.RunDatabases.LIVE.value]
+        )
 
-    def symbol_base_identifier_exists(self, exchange, symbol) -> bool:
+    async def symbol_base_identifier_exists(self, exchange, symbol) -> bool:
         """
         :return: True if there are data under this exchange name
         """
@@ -171,9 +161,7 @@ class RunDatabasesIdentifier:
             exchange,
             f"{symbol_util.merge_symbol(symbol)}{self.suffix}",
         )
-        if self.database_adaptor.is_file_system_based():
-            return os.path.isfile(identifier)
-        return False
+        return await self.database_adaptor.identifier_exists(identifier, True)
 
     def get_backtesting_run_folder(self) -> str:
         """
@@ -230,7 +218,7 @@ class RunDatabasesIdentifier:
                 if is_optimizer
                 else self._base_folder(backtesting_id=index)
             )
-            if not self._exists(name_candidate):
+            if not await self.database_adaptor.identifier_exists(name_candidate, False):
                 return index
         raise RuntimeError(
             f"Reached maximum number of {'optimizer' if is_optimizer else 'backtesting'} runs "
@@ -241,34 +229,33 @@ class RunDatabasesIdentifier:
         """
         :return: a list of every existing campaign name
         """
-        if self.database_adaptor.is_file_system_based():
-            optimization_campaign_folder = self._merge_parts(self.base_path)
-            if os.path.exists(optimization_campaign_folder):
-                return [
-                    self._parse_optimizer_id(folder.name)
-                    for folder in os.scandir(optimization_campaign_folder)
-                    if os.path.isdir(folder)
-                    and folder.name != enums.RunDatabases.LIVE.value
-                ]
-        return []
+        optimization_campaign_folder = self._merge_parts(self.base_path)
+        if await self.database_adaptor.identifier_exists(
+            optimization_campaign_folder, False
+        ):
+            return [
+                self._parse_optimizer_id(element)
+                async for element in self.database_adaptor.get_sub_identifiers(
+                    optimization_campaign_folder, [enums.RunDatabases.LIVE.value]
+                )
+            ]
 
     async def get_optimizer_run_ids(self) -> list:
         """
         :return: a list of every optimizer id in the current campaign
         """
-        if self.database_adaptor.is_file_system_based():
-            optimizer_runs_path = self._merge_parts(
-                self.base_path,
-                self.optimization_campaign_name,
-                enums.RunDatabases.OPTIMIZER.value,
-            )
-            if os.path.exists(optimizer_runs_path):
-                return [
-                    self._parse_optimizer_id(folder.name)
-                    for folder in os.scandir(optimizer_runs_path)
-                    if os.path.isdir(folder)
-                ]
-        return []
+        optimizer_runs_path = self._merge_parts(
+            self.base_path,
+            self.optimization_campaign_name,
+            enums.RunDatabases.OPTIMIZER.value,
+        )
+        if await self.database_adaptor.identifier_exists(optimizer_runs_path, False):
+            return [
+                self._parse_optimizer_id(element)
+                async for element in self.database_adaptor.get_sub_identifiers(
+                    optimizer_runs_path, []
+                )
+            ]
 
     @staticmethod
     def _parse_optimizer_id(identifier) -> str:
@@ -329,8 +316,3 @@ class RunDatabasesIdentifier:
             if self.database_adaptor.is_file_system_based()
             else constants.DB_SEPARATOR.join(*parts)
         )
-
-    def _exists(self, identifier):
-        if self.database_adaptor.is_file_system_based():
-            return os.path.exists(identifier)
-        raise RuntimeError(f"Unhandled database_adaptor {self.database_adaptor}")
