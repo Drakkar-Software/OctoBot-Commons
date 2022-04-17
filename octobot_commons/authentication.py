@@ -83,9 +83,9 @@ class Authenticator(singleton.Singleton):
         """
         raise NotImplementedError
 
-    async def send_signal(self, signal_stream_id, signal_version, signal_content):
+    async def send(self, message, channel_type, identifier=None):
         """
-        Sends a signal
+        Sends a message
         """
         raise NotImplementedError
 
