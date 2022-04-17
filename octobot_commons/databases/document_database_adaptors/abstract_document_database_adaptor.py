@@ -1,4 +1,4 @@
-# pylint: disable=W0613
+# pylint: disable=W0613, R0904
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -51,6 +51,38 @@ class AbstractDocumentDatabaseAdaptor:
         Returns the database file extension. Implemented in file system based databases
         """
         raise NotImplementedError("get_db_file_ext")
+
+    @staticmethod
+    async def create_identifier(identifier):
+        """
+        Initialize the identifier by creating it in the database
+        """
+        raise NotImplementedError("identifier")
+
+    @staticmethod
+    async def identifier_exists(identifier, is_full_identifier) -> bool:
+        """
+        Returns True when the given identifier is part of an existing database identifier
+        :param identifier: the identifier to look into
+        :param is_full_identifier: when True, only check identifiers that don't have sub identifiers.
+        When False, only check identifiers that have sub identifiers
+        """
+        raise NotImplementedError("identifier_exists")
+
+    @staticmethod
+    async def get_sub_identifiers(identifier, ignored_identifiers):
+        """
+        Returns an iterable over the existing sub-identifiers under the given identifier
+        """
+        raise NotImplementedError("get_sub_identifiers")
+
+    @staticmethod
+    async def get_single_sub_identifier(identifier, ignored_identifiers) -> str:
+        """
+        Returns the name of the only sub-identifier at a given parent identifier, None otherwise
+        example use: get the name of the only exchange the backtesting happened on if it only ran on a single exchange,
+        """
+        raise NotImplementedError("get_single_sub_identifier")
 
     def get_uuid(self, document) -> int:
         """
