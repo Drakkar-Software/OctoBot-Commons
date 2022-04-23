@@ -1,4 +1,4 @@
-# pylint: disable=R0902,R0913
+# pylint: disable=R0902,R0913,C0415
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -148,8 +148,17 @@ class RunDatabasesIdentifier:
         :return: the name of the only exchange the backtesting happened on if it only ran on a single exchange,
         None otherwise
         """
+        ignored_folders = [enums.RunDatabases.LIVE.value]
+        try:
+            import octobot_tentacles_manager.constants as tentacles_manager_constants
+
+            ignored_folders.append(
+                tentacles_manager_constants.TENTACLES_SPECIFIC_CONFIG_FOLDER
+            )
+        except ImportError:
+            pass
         return await self.database_adaptor.get_single_sub_identifier(
-            self._base_folder(), [enums.RunDatabases.LIVE.value]
+            self._base_folder(), ignored_folders
         )
 
     async def symbol_base_identifier_exists(self, exchange, symbol) -> bool:
