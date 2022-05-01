@@ -288,7 +288,7 @@ class ActivationTopics(enum.Enum):
     FULL_CANDLES = "once per bar close"
     IN_CONSTRUCTION_CANDLES = "once per second (Live Price)"
     RECENT_TRADES = "recent trades"
-    EVALUATORS = "after evaluators"
+    EVALUATION_CYCLE = "after evaluators"
 
 
 class DataBaseOrderBy(enum.Enum):
