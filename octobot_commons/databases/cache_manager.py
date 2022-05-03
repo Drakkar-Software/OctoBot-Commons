@@ -16,7 +16,6 @@
 #  License along with this library.
 import os
 
-import octobot_commons.logging as logging
 import octobot_commons.databases.document_database_adaptors as adaptors
 import octobot_commons.databases.implementations.cache_timestamp_database as cache_timestamp_database
 import octobot_commons.databases.databases_util as databases_util
@@ -36,7 +35,6 @@ class CacheManager:
 
     def __init__(self, database_adaptor=adaptors.TinyDBAdaptor):
         self.database_adaptor = database_adaptor
-        self.logger = logging.get_logger(self.__class__.__name__)
 
     def get_cache(
         self,
