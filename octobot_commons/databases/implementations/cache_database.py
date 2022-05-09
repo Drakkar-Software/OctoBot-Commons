@@ -15,6 +15,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import copy
+import sortedcontainers
 
 import octobot_commons.enums as enums
 import octobot_commons.databases.implementations.db_writer as writer
@@ -62,7 +63,7 @@ class CacheDatabase(writer.DBWriter):
 
     async def _ensure_local_cache(self, identifier_key, update=False):
         if update or self._local_cache is None:
-            self._local_cache = {}
+            self._local_cache = sortedcontainers.SortedDict()
             for cache in await self.get_cache():
                 cache[self.UUID_KEY] = self._database.get_uuid(cache)
                 self._local_cache[cache[identifier_key]] = cache
@@ -77,7 +78,7 @@ class CacheDatabase(writer.DBWriter):
         await self._database.delete(self.CACHE_TABLE, None)
         await self._database.delete(self.CACHE_METADATA_TABLE, None)
         await super().clear()
-        self._local_cache = {}
+        self._local_cache = sortedcontainers.SortedDict()
         self._are_metadata_written = False
         # always rewrite metadata as they are necessary to handle cache later
         await self._ensure_metadata()
