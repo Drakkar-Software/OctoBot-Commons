@@ -44,8 +44,11 @@ def open_order_pretty_printer(exchange_name, dict_order, markdown=False) -> str:
         from octobot_trading.api.orders import parse_order_type
 
         _, _, code = get_markers(markdown)
-        currency, market = symbol_util.split_symbol(
+        _, market = symbol_util.split_symbol(
             str(dict_order.get(ExchangeConstantsOrderColumns.SYMBOL.value, ""))
+        )
+        quantity_currency = dict_order.get(
+            ExchangeConstantsOrderColumns.QUANTITY_CURRENCY.value, ""
         )
         order_type = parse_order_type(dict_order)
         if order_type == TraderOrderType.UNKNOWN:
@@ -57,7 +60,7 @@ def open_order_pretty_printer(exchange_name, dict_order, markdown=False) -> str:
 
         return (
             f"{code}{order_type.name.replace('_', ' ')}{code}: {code}"
-            f"{get_min_string_from_number(quantity)} {currency}{code} at {code}"
+            f"{get_min_string_from_number(quantity)} {quantity_currency}{code} at {code}"
             f"{get_min_string_from_number(price)} {market}{code} on {exchange_name.capitalize()}"
         )
     except ImportError:
@@ -92,7 +95,7 @@ def trade_pretty_printer(exchange_name, trade, markdown=False) -> str:
         )
         return (
             f"{code}{trade_type.name.replace('_', ' ')}{code}: {code}"
-            f"{get_min_string_from_number(trade.executed_quantity)} {trade.currency}{code} at {code}"
+            f"{get_min_string_from_number(trade.executed_quantity)} {trade.quantity_currency}{code} at {code}"
             f"{get_min_string_from_number(trade.executed_price)} {trade.market}{code} "
             f"{exchange_name.capitalize()} "
             f"{trade_executed_time_str} "
