@@ -35,7 +35,7 @@ class ChronologicalReadDatabaseCache:
         for identifier in identifiers:
             if identifier not in nested_cache:
                 nested_cache[identifier] = {}
-                nested_cache = nested_cache[identifier]
+            nested_cache = nested_cache[identifier]
         data = self._get_cache_data(identifiers)
         data[self.DATA_SORT_KEY] = sort_key
         data[self.DATA_KEY] = sorted(values, key=lambda x: x[sort_key])
