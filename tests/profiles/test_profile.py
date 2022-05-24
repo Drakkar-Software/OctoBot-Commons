@@ -226,13 +226,17 @@ def test_merge_partially_managed_element(profile):
                 constants.CONFIG_EXCHANGE_KEY: constants.DEFAULT_API_KEY,
                 constants.CONFIG_EXCHANGE_SECRET: constants.DEFAULT_API_SECRET,
                 constants.CONFIG_EXCHANGE_PASSWORD: constants.DEFAULT_API_PASSWORD,
+                constants.CONFIG_EXCHANGE_TYPE: constants.DEFAULT_EXCHANGE_TYPE,
                 constants.CONFIG_ENABLED_OPTION: False
             }
         }
     }
     config = {}
     # add whole exchange and exchanges key with 2 exchanges in profile
-    profile.config[constants.CONFIG_EXCHANGES]["kucoin"] = {constants.CONFIG_ENABLED_OPTION: True}
+    profile.config[constants.CONFIG_EXCHANGES]["kucoin"] = {
+        constants.CONFIG_ENABLED_OPTION: True,
+        constants.CONFIG_EXCHANGE_TYPE: constants.CONFIG_EXCHANGE_FUTURE
+    }
     profile._merge_partially_managed_element(config, profile.config, element, template)
     assert config == {
         constants.CONFIG_EXCHANGES: {
@@ -240,12 +244,14 @@ def test_merge_partially_managed_element(profile):
                 constants.CONFIG_EXCHANGE_KEY: constants.DEFAULT_API_KEY,
                 constants.CONFIG_EXCHANGE_SECRET: constants.DEFAULT_API_SECRET,
                 constants.CONFIG_EXCHANGE_PASSWORD: constants.DEFAULT_API_PASSWORD,
+                constants.CONFIG_EXCHANGE_TYPE: constants.DEFAULT_EXCHANGE_TYPE,
                 constants.CONFIG_ENABLED_OPTION: False
             },
             "kucoin": {
                 constants.CONFIG_EXCHANGE_KEY: constants.DEFAULT_API_KEY,
                 constants.CONFIG_EXCHANGE_SECRET: constants.DEFAULT_API_SECRET,
                 constants.CONFIG_EXCHANGE_PASSWORD: constants.DEFAULT_API_PASSWORD,
+                constants.CONFIG_EXCHANGE_TYPE: constants.CONFIG_EXCHANGE_FUTURE,
                 constants.CONFIG_ENABLED_OPTION: True
             }
         }
@@ -272,6 +278,7 @@ def test_merge_partially_managed_element(profile):
                 constants.CONFIG_EXCHANGE_KEY: constants.DEFAULT_API_KEY,
                 constants.CONFIG_EXCHANGE_SECRET: constants.DEFAULT_API_SECRET,
                 constants.CONFIG_EXCHANGE_PASSWORD: constants.DEFAULT_API_PASSWORD,
+                constants.CONFIG_EXCHANGE_TYPE: constants.CONFIG_EXCHANGE_FUTURE,
                 constants.CONFIG_ENABLED_OPTION: True
             }
         }
