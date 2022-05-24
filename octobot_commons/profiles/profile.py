@@ -42,10 +42,14 @@ class Profile:
             constants.CONFIG_EXCHANGE_SECRET: constants.DEFAULT_API_SECRET,
             constants.CONFIG_EXCHANGE_PASSWORD: constants.DEFAULT_API_PASSWORD,
             constants.CONFIG_ENABLED_OPTION: False,
+            constants.CONFIG_EXCHANGE_TYPE: constants.DEFAULT_EXCHANGE_TYPE,
         }
     }
     PARTIALLY_MANAGED_ELEMENTS_ALLOWED_KEYS = {
-        constants.CONFIG_EXCHANGES: [constants.CONFIG_ENABLED_OPTION]
+        constants.CONFIG_EXCHANGES: [
+            constants.CONFIG_ENABLED_OPTION,
+            constants.CONFIG_EXCHANGE_TYPE,
+        ]
     }
 
     def __init__(self, profile_path: str, schema_path: str = None):
