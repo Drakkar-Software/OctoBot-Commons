@@ -19,7 +19,7 @@ import octobot_commons
 import octobot_commons.enums as enums
 import octobot_commons.constants as constants
 import octobot_commons.logging as logging_util
-import octobot_commons.symbol_util as symbol_util
+import octobot_commons.symbols.symbol_util as symbol_util
 import octobot_commons.timestamp_util as timestamp_util
 import octobot_commons.number_util as number_util
 
@@ -44,9 +44,9 @@ def open_order_pretty_printer(exchange_name, dict_order, markdown=False) -> str:
         from octobot_trading.api.orders import parse_order_type
 
         _, _, code = get_markers(markdown)
-        _, market = symbol_util.split_symbol(
+        market = symbol_util.parse_symbol(
             str(dict_order.get(ExchangeConstantsOrderColumns.SYMBOL.value, ""))
-        )
+        ).quote
         quantity_currency = dict_order.get(
             ExchangeConstantsOrderColumns.QUANTITY_CURRENCY.value, ""
         )

@@ -20,7 +20,7 @@ import shutil
 import octobot_commons.databases.document_database_adaptors as adaptors
 import octobot_commons.constants as constants
 import octobot_commons.enums as enums
-import octobot_commons.symbol_util as symbol_util
+import octobot_commons.symbols.symbol_util as symbol_util
 
 
 class RunDatabasesIdentifier:

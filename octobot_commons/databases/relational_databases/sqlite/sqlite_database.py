@@ -1,4 +1,4 @@
-# pylint: disable=C0116,W0511,R0201,R0913
+# pylint: disable=C0116,W0511,R0913
 #  Drakkar-Software OctoBot-Backtesting
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
