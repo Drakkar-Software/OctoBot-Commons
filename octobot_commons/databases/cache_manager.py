@@ -20,7 +20,7 @@ import octobot_commons.databases.document_database_adaptors as adaptors
 import octobot_commons.databases.implementations.cache_timestamp_database as cache_timestamp_database
 import octobot_commons.databases.databases_util as databases_util
 import octobot_commons.constants as common_constants
-import octobot_commons.symbol_util as symbol_util
+import octobot_commons.symbols.symbol_util as symbol_util
 import octobot_commons.errors as common_errors
 import octobot_commons.event_tree as event_tree
 

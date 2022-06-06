@@ -15,19 +15,16 @@
 #  License along with this library.
 
 import octobot_commons
+import octobot_commons.symbols.symbol
 
 
-def split_symbol(symbol):
+def parse_symbol(symbol):
     """
-    Split the specified symbol
-    :param symbol: the symbol to split
-    :return: currency, market
+    Parse the specified symbol into a Symbol object
+    :param symbol: the symbol to parse
+    :return: Symbol object
     """
-    try:
-        separated_symbol = symbol.split(octobot_commons.MARKET_SEPARATOR)
-        return separated_symbol[0], separated_symbol[1]
-    except IndexError:
-        return symbol
+    return octobot_commons.symbols.symbol.Symbol(symbol)
 
 
 def merge_symbol(symbol):

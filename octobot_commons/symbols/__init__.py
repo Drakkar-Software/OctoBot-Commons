@@ -1,4 +1,3 @@
-# cython: language_level=3
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -15,12 +14,26 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-cpdef object split_symbol(str symbol)
-cpdef str merge_symbol(str symbol)
-cpdef str merge_currencies(str currency, str market, str separator=*)
-cpdef str convert_symbol(
-    str symbol,
-    str symbol_separator,
-    str new_symbol_separator=*,
-    bint should_uppercase=*,
-    bint should_lowercase=*)
+from octobot_commons.symbols import symbol_util
+
+from octobot_commons.symbols.symbol_util import (
+    parse_symbol,
+    merge_symbol,
+    merge_currencies,
+    convert_symbol,
+)
+
+from octobot_commons.symbols import symbol
+
+from octobot_commons.symbols.symbol import (
+    Symbol,
+)
+
+
+__all__ = [
+    "parse_symbol",
+    "merge_symbol",
+    "merge_currencies",
+    "convert_symbol",
+    "Symbol",
+]
