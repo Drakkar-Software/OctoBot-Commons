@@ -38,6 +38,7 @@ class TimeFrames(enum.Enum):
     THREE_DAYS = "3d"
     ONE_WEEK = "1w"
     ONE_MONTH = "1M"
+    ONE_YEAR = "1y"
 
 
 TimeFramesMinutes = {
@@ -57,6 +58,7 @@ TimeFramesMinutes = {
     TimeFrames.THREE_DAYS: 4320,
     TimeFrames.ONE_WEEK: 10080,
     TimeFrames.ONE_MONTH: 43200,
+    TimeFrames.ONE_YEAR: 524160,
 }
 
 
