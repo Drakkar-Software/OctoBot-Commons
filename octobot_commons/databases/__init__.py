@@ -15,6 +15,7 @@
 #  License along with this library.
 
 
+from octobot_commons.databases import global_storage
 from octobot_commons.databases import database_caches
 from octobot_commons.databases import document_database_adaptors
 from octobot_commons.databases import bases
@@ -25,6 +26,10 @@ from octobot_commons.databases import run_databases_identifier
 from octobot_commons.databases import cache_manager
 from octobot_commons.databases import databases_util
 from octobot_commons.databases import cache_client
+
+from octobot_commons.databases.global_storage import (
+    GlobalSharedMemoryStorage,
+)
 
 from octobot_commons.databases.database_caches import (
     GenericDatabaseCache,
@@ -73,6 +78,7 @@ from octobot_commons.databases.cache_client import (
 
 
 __all__ = [
+    "GlobalSharedMemoryStorage",
     "GenericDatabaseCache",
     "ChronologicalReadDatabaseCache",
     "AbstractDocumentDatabaseAdaptor",
