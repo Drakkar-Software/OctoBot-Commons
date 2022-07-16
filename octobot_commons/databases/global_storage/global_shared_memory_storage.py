@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import sys
+
 import octobot_commons.singleton as singleton
 
 
@@ -23,3 +25,17 @@ class GlobalSharedMemoryStorage(dict, singleton.Singleton):
         only stored in RAM, not persisted on disc
         not thread safe
     """
+
+    def remove_oldest_elements(self, elements_count_to_remove: int):
+        """
+        Remove (pop) the elements_count_to_remove oldest elements
+        :param elements_count_to_remove: number of elements to remove
+        """
+        for key in list(self.keys())[:elements_count_to_remove]:
+            self.pop(key)
+
+    def get_bytes_size(self):
+        """
+        Return the size in bytes of the memory storage
+        """
+        return sys.getsizeof(self)
