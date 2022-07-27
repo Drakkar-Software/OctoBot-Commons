@@ -37,7 +37,7 @@ class Authenticator(singleton.Singleton):
         singleton.Singleton._instances[Authenticator] = self
 
     @abc.abstractmethod
-    def login(self, username, password):
+    async def login(self, username, password):
         """
         Used to trigger a login
         :param username: authentication username
