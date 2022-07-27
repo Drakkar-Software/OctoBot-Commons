@@ -293,7 +293,7 @@ class Profile:
             logger.exception(
                 err,
                 True,
-                f"Error when reading profile at '{profile_path}': {err}",
+                f"Ignored profile due to an error upon reading '{profile_path}': {err}",
             )
         return None
 
