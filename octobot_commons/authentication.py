@@ -70,6 +70,13 @@ class Authenticator(singleton.Singleton):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def must_be_authenticated_through_authenticator(self):
+        """
+        :return: True when this authenticator has to be validated
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def ensure_token_validity(self):
         """
         Called before @authenticated methods to ensure authentication
