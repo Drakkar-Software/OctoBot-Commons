@@ -19,22 +19,22 @@ import traceback
 import octobot_commons.constants as constants
 import octobot_commons.logging as logging_util
 
-LOGGER = logging_util.get_logger("asyncio_tools")
 
-
-def run_coroutine_in_asyncio_loop(coroutine, async_loop):
+def run_coroutine_in_asyncio_loop(coroutine, async_loop, log_exceptions=True):
     """
     Run a coroutine in the specified asyncio loop
     :param coroutine: the coroutine to run
     :param async_loop: the asyncio loop
+    :param log_exceptions: logs exceptions when True
     :return: the execution result
     """
+    logger = logging_util.get_logger("asyncio_tools")
     current_task_before_start = asyncio.current_task(async_loop)
     future = asyncio.run_coroutine_threadsafe(coroutine, async_loop)
     try:
         return future.result(constants.DEFAULT_FUTURE_TIMEOUT)
     except asyncio.TimeoutError as timeout_error:
-        LOGGER.error(
+        logger.error(
             f"{coroutine} coroutine took too long to execute, cancelling the task. "
             f"(current task before starting this one: {current_task_before_start}, actual current "
             f"task before cancel: {asyncio.current_task(async_loop)})"
@@ -42,11 +42,12 @@ def run_coroutine_in_asyncio_loop(coroutine, async_loop):
         future.cancel()
         raise timeout_error
     except Exception as global_exception:
-        LOGGER.exception(
-            global_exception,
-            True,
-            f"{coroutine} coroutine raised an exception: {global_exception}",
-        )
+        if log_exceptions:
+            logger.exception(
+                global_exception,
+                True,
+                f"{coroutine} coroutine raised an exception: {global_exception}",
+            )
         raise global_exception
 
 
