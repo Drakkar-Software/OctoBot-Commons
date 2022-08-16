@@ -13,11 +13,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import json
 import os
 import zipfile
 import shutil
 import pathlib
 import uuid
+import time
 import octobot_commons.constants as constants
 import octobot_commons.logging as bot_logging
 
@@ -32,11 +34,21 @@ def export_profile(profile, export_path: str) -> str:
     :param export_path: export path ending with filename
     :return: the exported profile path including file extension
     """
-    export_path_with_ext = f"{export_path}.{constants.PROFILE_EXPORT_FORMAT}"
+    temp_path = f"{export_path}{int(time.time() * 1000)}"
     # remove any existing file to prevent any side effect
+    if os.path.exists(temp_path):
+        raise OSError(f"Can't export profile, the {temp_path} folder exists")
+    export_path_with_ext = f"{export_path}.{constants.PROFILE_EXPORT_FORMAT}"
     if os.path.isfile(export_path_with_ext):
         os.remove(export_path_with_ext)
-    shutil.make_archive(export_path, constants.PROFILE_EXPORT_FORMAT, profile.path)
+    # copy profile into a temp dir to edit it
+    shutil.copytree(profile.path, temp_path)
+    try:
+        _filter_profile_export(temp_path)
+        # export the edited profile
+        shutil.make_archive(export_path, constants.PROFILE_EXPORT_FORMAT, temp_path)
+    finally:
+        shutil.rmtree(temp_path)
     return export_path_with_ext
 
 
@@ -67,6 +79,27 @@ def import_profile(
     bot_logging.get_logger("ProfileSharing").info(f"{action} {profile_name} profile.")
     _import_profile_files(import_path, target_import_path)
     _ensure_unique_profile_id(target_import_path)
+
+
+def _filter_profile_export(profile_path: str):
+    profile_file = os.path.join(profile_path, constants.PROFILE_CONFIG_FILE)
+    if os.path.isfile(profile_file):
+        with open(profile_file) as open_file:
+            parsed_profile = json.load(open_file)
+        _filter_disabled(parsed_profile, constants.CONFIG_EXCHANGES)
+        with open(profile_file, "w") as open_file:
+            json.dump(parsed_profile, open_file, indent=4, sort_keys=True)
+
+
+def _filter_disabled(profile_config: dict, element):
+    filtered_exchanges = {
+        exchange: details
+        for exchange, details in profile_config[constants.PROFILE_CONFIG][
+            element
+        ].items()
+        if details.get(constants.CONFIG_ENABLED_OPTION, True)
+    }
+    profile_config[constants.PROFILE_CONFIG][element] = filtered_exchanges
 
 
 def _get_target_import_path(
