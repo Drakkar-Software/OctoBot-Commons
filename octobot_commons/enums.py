@@ -355,3 +355,14 @@ class CommunityFeedAttrs(enum.Enum):
 class CommunityChannelTypes(enum.Enum):
     SIGNAL = "t"  # to check
     ALERT = "alert"
+
+
+class SignalBundlesAttrs(enum.Enum):
+    IDENTIFIER = "identifier"
+    SIGNALS = "signals"
+    VERSION = "version"
+
+
+class SignalsAttrs(enum.Enum):
+    TOPIC = "topic"
+    CONTENT = "content"
