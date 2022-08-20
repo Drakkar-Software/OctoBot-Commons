@@ -1,3 +1,4 @@
+# pylint: disable=C0116
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -17,7 +18,6 @@ import octobot_commons.enums
 
 
 class SignalBundle:
-
     def __init__(self, identifier: str, signals=None, version=None):
         self.identifier: str = identifier
         self.signals: list = signals or []
@@ -26,16 +26,20 @@ class SignalBundle:
     def to_dict(self) -> dict:
         return {
             octobot_commons.enums.SignalBundlesAttrs.IDENTIFIER.value: self.identifier,
-            octobot_commons.enums.SignalBundlesAttrs.SIGNALS.value: [signal.to_dict() for signal in self.signals],
+            octobot_commons.enums.SignalBundlesAttrs.SIGNALS.value: [
+                signal.to_dict() for signal in self.signals
+            ],
             octobot_commons.enums.SignalBundlesAttrs.VERSION.value: self.version,
         }
 
     def __str__(self):
         return f"{self.to_dict()}"
 
+    # pylint: disable=C0415
     def _get_version(self) -> str:
         try:
             import octobot.constants
+
             return octobot.constants.COMMUNITY_FEED_CURRENT_MINIMUM_VERSION
         except ImportError:
             return "1.0.0"

@@ -15,12 +15,15 @@
 #  License along with this library.
 import octobot_commons.enums as commons_enums
 import octobot_commons.authentication as authentication
-import octobot_commons.signals as signals
+import octobot_commons.signals.signal_bundle as signal_bundle
 
 
-async def emit_signal_bundle(signal_bundle: signals.SignalBundle):
+async def emit_signal_bundle(to_send_signal_bundle: signal_bundle.SignalBundle):
+    """
+    Emits a signal bundle
+    """
     await authentication.Authenticator.instance().send(
-        signal_bundle.to_dict(),
+        to_send_signal_bundle.to_dict(),
         commons_enums.CommunityChannelTypes.SIGNAL,
-        identifier=signal_bundle.identifier
+        identifier=to_send_signal_bundle.identifier,
     )

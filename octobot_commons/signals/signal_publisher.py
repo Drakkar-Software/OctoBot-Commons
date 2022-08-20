@@ -30,16 +30,30 @@ class SignalPublisher(singleton.Singleton):
         self._signal_builder_wrappers = {}
         self._timeout_watcher_tasks = {}
 
-    def get_signal_bundle_builder(self, wrapper_key: str) -> signal_builder_wrapper.SignalBuilderWrapper:
+    def get_signal_bundle_builder(
+        self, wrapper_key: str
+    ) -> signal_builder_wrapper.SignalBuilderWrapper:
+        """
+        Return the SignalBuilderWrapper registered under the given key
+        """
         return self._signal_builder_wrappers[wrapper_key].signal_bundle_builder
 
     @contextlib.asynccontextmanager
-    async def remote_signal_bundle_builder(self, wrapper_key: str, identifier: str,
-                                           timeout: float = signal_builder_wrapper.SignalBuilderWrapper.NO_TIMEOUT_VALUE,
-                                           signal_builder_class=DEFAULT_SIGNAL_BUILDER_CLASS):
+    async def remote_signal_bundle_builder(
+        self,
+        wrapper_key: str,
+        identifier: str,
+        timeout: float = signal_builder_wrapper.SignalBuilderWrapper.NO_TIMEOUT_VALUE,
+        signal_builder_class=DEFAULT_SIGNAL_BUILDER_CLASS,
+    ):
+        """
+        Context manager ensuring that any signal under the given key is buildable and sent
+        when context manager is closing.
+        Use signal_builder_class to specify signal builders to create
+        """
         signal_builder_wrap = None
         try:
-            signal_builder_wrap = await self._create_or_get_signal_builder_wrapper(
+            signal_builder_wrap = self._create_or_get_signal_builder_wrapper(
                 wrapper_key, identifier, timeout, signal_builder_class
             )
             signal_builder_wrap.register_user()
@@ -52,22 +66,28 @@ class SignalPublisher(singleton.Singleton):
             if signal_builder_wrap is not None:
                 if signal_builder_wrap.has_single_user():
                     self._unregister_timeout(wrapper_key)
-                    self._signal_builder_wrappers.pop(wrapper_key)
+                    self._signal_builder_wrappers.pop(wrapper_key, None)
                 else:
                     signal_builder_wrap.unregister_user()
 
     def stop(self):
+        """
+        Stop all timeout tasks and clear any remaining registered wrapper
+        :return:
+        """
         for task in self._timeout_watcher_tasks.values():
             task.cancel()
         self._timeout_watcher_tasks = {}
+        self._signal_builder_wrappers = {}
 
-    async def _create_or_get_signal_builder_wrapper(
-            self, wrapper_key: str, identifier: str, timeout: float, signal_builder_class
-    ) \
-            -> signal_builder_wrapper.SignalBuilderWrapper:
+    def _create_or_get_signal_builder_wrapper(
+        self, wrapper_key: str, identifier: str, timeout: float, signal_builder_class
+    ) -> signal_builder_wrapper.SignalBuilderWrapper:
         if wrapper_key in self._signal_builder_wrappers:
             return self._signal_builder_wrappers[wrapper_key]
-        self._signal_builder_wrappers[wrapper_key] = signal_builder_wrapper.SignalBuilderWrapper(
+        self._signal_builder_wrappers[
+            wrapper_key
+        ] = signal_builder_wrapper.SignalBuilderWrapper(
             identifier, signal_builder_class, timeout
         )
         return self._signal_builder_wrappers[wrapper_key]
@@ -75,11 +95,13 @@ class SignalPublisher(singleton.Singleton):
     async def _emit_signal_if_necessary(self, signal_builder_wrap):
         # check has_single_user in case the same builder is used multiple times at once
         if not signal_builder_wrap.signal_bundle_builder.is_empty():
-            await signals_emitter.emit_signal_bundle(
-                signal_builder_wrap.signal_bundle_builder.build()
-            )
-            # always reset builder after emitting to avoid emitting the same signal twice
-            signal_builder_wrap.signal_bundle_builder.reset()
+            try:
+                await signals_emitter.emit_signal_bundle(
+                    signal_builder_wrap.signal_bundle_builder.build()
+                )
+            finally:
+                # always reset builder after emitting to avoid emitting the same signal twice
+                signal_builder_wrap.signal_bundle_builder.reset()
 
     async def _schedule_signal_auto_emit(self, wrapper_key, delay):
         while wrapper_key in self._signal_builder_wrappers:
@@ -93,12 +115,12 @@ class SignalPublisher(singleton.Singleton):
                 wrapper.signal_emit_time = time.time() + delay
 
     def _register_timeout_if_any(self, wrapper_key):
-        if self._signal_builder_wrappers[wrapper_key].timeout != \
-           signal_builder_wrapper.SignalBuilderWrapper.NO_TIMEOUT_VALUE:
+        wrapper = self._signal_builder_wrappers[wrapper_key]
+        if wrapper.timeout != wrapper.NO_TIMEOUT_VALUE:
             self._timeout_watcher_tasks[wrapper_key] = asyncio.create_task(
-                self._schedule_signal_auto_emit(wrapper_key, self._signal_builder_wrappers[wrapper_key].timeout)
+                self._schedule_signal_auto_emit(wrapper_key, wrapper.timeout)
             )
 
     def _unregister_timeout(self, wrapper_key):
-        if task := self._timeout_watcher_tasks.pop(wrapper_key):
+        if task := self._timeout_watcher_tasks.pop(wrapper_key, None):
             task.cancel()

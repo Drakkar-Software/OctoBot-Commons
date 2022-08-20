@@ -1,3 +1,4 @@
+# pylint: disable=C0116
 #  Drakkar-Software OctoBot-Trading
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -19,12 +20,16 @@ import octobot_commons.enums as commons_enums
 
 
 def create_signal_bundle(signal_bundle_dict: dict) -> signal_bundle.SignalBundle:
-    signal_bundle_value = signal_bundle_dict[commons_enums.CommunityFeedAttrs.VALUE.value]
+    signal_bundle_value = signal_bundle_dict[
+        commons_enums.CommunityFeedAttrs.VALUE.value
+    ]
     return signal_bundle.SignalBundle(
         signal_bundle_value.get(commons_enums.SignalBundlesAttrs.IDENTIFIER.value),
         signals=[
             create_signal(s)
-            for s in signal_bundle_value.get(commons_enums.SignalBundlesAttrs.SIGNALS.value, [])
+            for s in signal_bundle_value.get(
+                commons_enums.SignalBundlesAttrs.SIGNALS.value, []
+            )
         ],
         version=signal_bundle_value.get(commons_enums.SignalBundlesAttrs.VERSION.value),
     )

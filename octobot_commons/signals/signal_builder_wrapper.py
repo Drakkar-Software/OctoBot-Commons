@@ -1,3 +1,4 @@
+# pylint: disable=C0116
 #  Drakkar-Software OctoBot-Trading
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -22,8 +23,12 @@ import octobot_commons.signals.signal_bundle_builder as signal_bundle_builder
 class SignalBuilderWrapper:
     NO_TIMEOUT_VALUE = -1
 
-    def __init__(self, identifier: str, signal_builder_class=signal_bundle_builder.SignalBundleBuilder,
-                 timeout: float = NO_TIMEOUT_VALUE):
+    def __init__(
+        self,
+        identifier: str,
+        signal_builder_class=signal_bundle_builder.SignalBundleBuilder,
+        timeout: float = NO_TIMEOUT_VALUE,
+    ):
         self.signal_builder_class = signal_builder_class
         self.signal_bundle_builder = signal_builder_class(identifier)
         self.timeout = timeout
