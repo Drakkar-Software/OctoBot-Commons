@@ -28,15 +28,27 @@ class SignalBundleBuilder:
         self.reset()
 
     def register_signal(self, topic: str, content: dict, **kwargs):
+        """
+        Store a signal to be packed on build call
+        """
         self.signals.append(self.create_signal(topic, content, **kwargs))
 
     def create_signal(self, topic: str, content: dict, **kwargs):
+        """
+        Create a signal from self.signal_class
+        """
         return self.signal_class(topic, content, **kwargs)
 
     def is_empty(self) -> bool:
+        """
+        Return True when no signal are to be built
+        """
         return not self.signals
 
     def build(self) -> signal_bundle.SignalBundle:
+        """
+        Create a signal_bundle.SignalBundle from registered signals
+        """
         return signal_bundle.SignalBundle(
             self.identifier,
             signals=self.signals,
@@ -44,4 +56,7 @@ class SignalBundleBuilder:
         )
 
     def reset(self):
+        """
+        Remove all registered signals
+        """
         self.signals = []

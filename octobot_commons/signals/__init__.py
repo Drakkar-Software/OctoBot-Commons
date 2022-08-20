@@ -60,5 +60,12 @@ from octobot_commons.signals.signal_publisher import (
 )
 
 
-__all__ = ["Signal", "SignalBundle", "create_signal_bundle", "create_signal",
-           "emit_signal_bundle", "SignalBuilderWrapper", "SignalPublisher"]
+__all__ = [
+    "Signal",
+    "SignalBundle",
+    "create_signal_bundle",
+    "create_signal",
+    "emit_signal_bundle",
+    "SignalBuilderWrapper",
+    "SignalPublisher",
+]
