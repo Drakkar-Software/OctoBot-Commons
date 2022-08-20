@@ -21,6 +21,7 @@ import octobot_commons.enums as commons_enums
 def create_signal_bundle(signal_bundle_dict: dict) -> signal_bundle.SignalBundle:
     signal_bundle_value = signal_bundle_dict[commons_enums.CommunityFeedAttrs.VALUE.value]
     return signal_bundle.SignalBundle(
+        signal_bundle_value.get(commons_enums.SignalBundlesAttrs.IDENTIFIER.value),
         signals=[
             create_signal(s)
             for s in signal_bundle_value.get(commons_enums.SignalBundlesAttrs.SIGNALS.value, [])
@@ -31,7 +32,6 @@ def create_signal_bundle(signal_bundle_dict: dict) -> signal_bundle.SignalBundle
 
 def create_signal(signal_dict: dict) -> signal.Signal:
     return signal.Signal(
-        signal_dict.get(commons_enums.SignalsAttrs.IDENTIFIER.value),
         signal_dict.get(commons_enums.SignalsAttrs.TOPIC.value),
         signal_dict.get(commons_enums.SignalsAttrs.CONTENT.value),
     )
