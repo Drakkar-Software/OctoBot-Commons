@@ -28,9 +28,14 @@ class SignalBuilderWrapper:
         identifier: str,
         signal_builder_class=signal_bundle_builder.SignalBundleBuilder,
         timeout: float = NO_TIMEOUT_VALUE,
+        builder_args: tuple = None,
     ):
         self.signal_builder_class = signal_builder_class
-        self.signal_bundle_builder = signal_builder_class(identifier)
+        self.signal_bundle_builder = (
+            signal_builder_class(identifier, *builder_args)
+            if builder_args
+            else signal_builder_class(identifier)
+        )
         self.timeout = timeout
         self.timeout_event = asyncio.Event()
         self.signal_emit_time = time.time() + timeout

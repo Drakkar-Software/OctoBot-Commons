@@ -58,14 +58,26 @@ async def test_remote_signal_bundle_builder(publisher, signal_builder_wrapper):
     assert "wkey" not in signals.SignalPublisher.instance()._timeout_watcher_tasks
 
     class OtherSignalBuilder(signals.SignalPublisher.DEFAULT_SIGNAL_BUILDER_CLASS):
-        pass
+        def __init__(self, identifier: str, other_arg):
+            super().__init__(identifier)
+            self.other_arg = other_arg
     with mock.patch.object(signals.SignalPublisher.instance(), "_emit_signal_if_necessary", mock.AsyncMock()) as \
          _emit_signal_if_necessary_mock:
-        with pytest.raises(RuntimeError):
+        with pytest.raises(TypeError):
+            # missing builder custom arg
             async with signals.SignalPublisher.instance().remote_signal_bundle_builder(
                     "wkey", "widentifier", timeout=1, signal_builder_class=OtherSignalBuilder
+            ):
+                pass
+            _emit_signal_if_necessary_mock.assert_not_called()
+            assert "wkey" not in signals.SignalPublisher.instance()._signal_builder_wrappers
+            assert "wkey" not in signals.SignalPublisher.instance()._timeout_watcher_tasks
+        with pytest.raises(RuntimeError):
+            async with signals.SignalPublisher.instance().remote_signal_bundle_builder(
+                    "wkey", "widentifier", timeout=1, signal_builder_class=OtherSignalBuilder, builder_args=("other", )
             ) as builder:
                 assert isinstance(builder, OtherSignalBuilder)
+                assert builder.other_arg == "other"
                 assert "wkey" in signals.SignalPublisher.instance()._signal_builder_wrappers
                 assert "wkey" in signals.SignalPublisher.instance()._timeout_watcher_tasks
                 raise RuntimeError
@@ -74,7 +86,7 @@ async def test_remote_signal_bundle_builder(publisher, signal_builder_wrapper):
             assert "wkey" not in signals.SignalPublisher.instance()._timeout_watcher_tasks
 
         async with signals.SignalPublisher.instance().remote_signal_bundle_builder(
-                "wkey", "widentifier", timeout=1, signal_builder_class=OtherSignalBuilder
+                "wkey", "widentifier", timeout=1, signal_builder_class=OtherSignalBuilder, builder_args=("other", )
         ) as builder:
             assert isinstance(builder, OtherSignalBuilder)
             assert "wkey" in signals.SignalPublisher.instance()._signal_builder_wrappers
@@ -105,15 +117,19 @@ def test_stop(publisher):
 
 
 def test_create_or_get_signal_builder_wrapper(publisher):
+    with pytest.raises(TypeError):
+        signals.SignalPublisher.instance()._create_or_get_signal_builder_wrapper(
+            "key2", "id", 1, signals.SignalPublisher.DEFAULT_SIGNAL_BUILDER_CLASS, ("unexpected_args", )
+        )
     wrapper_1 = signals.SignalPublisher.instance()._create_or_get_signal_builder_wrapper(
-        "key", "id", 1, signals.SignalPublisher.DEFAULT_SIGNAL_BUILDER_CLASS
+        "key", "id", 1, signals.SignalPublisher.DEFAULT_SIGNAL_BUILDER_CLASS, None
     )
     assert signals.SignalPublisher.instance()._create_or_get_signal_builder_wrapper(
-        "key", "id", 1, signals.SignalPublisher.DEFAULT_SIGNAL_BUILDER_CLASS
+        "key", "id", 1, signals.SignalPublisher.DEFAULT_SIGNAL_BUILDER_CLASS, None
     ) is wrapper_1
 
     wrapper_2 = signals.SignalPublisher.instance()._create_or_get_signal_builder_wrapper(
-        "key2", "id", 1, signals.SignalPublisher.DEFAULT_SIGNAL_BUILDER_CLASS
+        "key2", "id", 1, signals.SignalPublisher.DEFAULT_SIGNAL_BUILDER_CLASS, None
     )
     assert wrapper_1 != wrapper_2
     assert "key" in signals.SignalPublisher.instance()._signal_builder_wrappers
