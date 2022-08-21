@@ -1,4 +1,5 @@
-#  Drakkar-Software OctoBot-Trading
+# pylint: disable=R0913
+# Drakkar-Software OctoBot-Trading
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -45,6 +46,7 @@ class SignalPublisher(singleton.Singleton):
         identifier: str,
         timeout: float = signal_builder_wrapper.SignalBuilderWrapper.NO_TIMEOUT_VALUE,
         signal_builder_class=DEFAULT_SIGNAL_BUILDER_CLASS,
+        builder_args=None,
     ):
         """
         Context manager ensuring that any signal under the given key is buildable and sent
@@ -54,7 +56,7 @@ class SignalPublisher(singleton.Singleton):
         signal_builder_wrap = None
         try:
             signal_builder_wrap = self._create_or_get_signal_builder_wrapper(
-                wrapper_key, identifier, timeout, signal_builder_class
+                wrapper_key, identifier, timeout, signal_builder_class, builder_args
             )
             signal_builder_wrap.register_user()
             self._register_timeout_if_any(wrapper_key)
@@ -81,14 +83,19 @@ class SignalPublisher(singleton.Singleton):
         self._signal_builder_wrappers = {}
 
     def _create_or_get_signal_builder_wrapper(
-        self, wrapper_key: str, identifier: str, timeout: float, signal_builder_class
+        self,
+        wrapper_key: str,
+        identifier: str,
+        timeout: float,
+        signal_builder_class,
+        builder_args: tuple,
     ) -> signal_builder_wrapper.SignalBuilderWrapper:
         if wrapper_key in self._signal_builder_wrappers:
             return self._signal_builder_wrappers[wrapper_key]
         self._signal_builder_wrappers[
             wrapper_key
         ] = signal_builder_wrapper.SignalBuilderWrapper(
-            identifier, signal_builder_class, timeout
+            identifier, signal_builder_class, timeout, builder_args
         )
         return self._signal_builder_wrappers[wrapper_key]
 
