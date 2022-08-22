@@ -3,7 +3,7 @@ cython==0.29.26
 numpy==1.22.0
 
 # Commons requirements
-jsonschema==3.2.0
+jsonschema==4.14.0
 cryptography
 sortedcontainers
 
