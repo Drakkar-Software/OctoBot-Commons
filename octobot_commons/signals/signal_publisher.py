@@ -101,14 +101,19 @@ class SignalPublisher(singleton.Singleton):
 
     async def _emit_signal_if_necessary(self, signal_builder_wrap):
         # check has_single_user in case the same builder is used multiple times at once
-        if not signal_builder_wrap.signal_bundle_builder.is_empty():
+        if (
+            not signal_builder_wrap.signal_bundle_builder.is_empty()
+            and not signal_builder_wrap.is_being_emitted
+        ):
             try:
+                signal_builder_wrap.is_being_emitted = True
                 await signals_emitter.emit_signal_bundle(
                     signal_builder_wrap.signal_bundle_builder.build()
                 )
             finally:
                 # always reset builder after emitting to avoid emitting the same signal twice
                 signal_builder_wrap.signal_bundle_builder.reset()
+                signal_builder_wrap.is_being_emitted = False
 
     async def _schedule_signal_auto_emit(self, wrapper_key, delay):
         while wrapper_key in self._signal_builder_wrappers:
