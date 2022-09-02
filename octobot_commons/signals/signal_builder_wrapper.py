@@ -36,6 +36,7 @@ class SignalBuilderWrapper:
             if builder_args
             else signal_builder_class(identifier)
         )
+        self.is_being_emitted = False
         self.timeout = timeout
         self.timeout_event = asyncio.Event()
         self.signal_emit_time = time.time() + timeout
