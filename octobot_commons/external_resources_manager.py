@@ -1,4 +1,4 @@
-# pylint: disable=W0703
+# pylint: disable=W0703,W3101
 #  Drakkar-Software OctoBot
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
