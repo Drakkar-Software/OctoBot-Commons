@@ -30,12 +30,14 @@ class RunDatabasesIdentifier:
         optimization_campaign_name=None,
         database_adaptor=adaptors.TinyDBAdaptor,
         backtesting_id=None,
+        bot_recording_id=None,
         optimizer_id=None,
         context=None,
     ):
         self.database_adaptor = database_adaptor
         self.optimization_campaign_name = optimization_campaign_name
         self.backtesting_id = backtesting_id
+        self.bot_recording_id = bot_recording_id
         self.optimizer_id = optimizer_id
         self.tentacle_class = tentacle_class
         self.context = context
@@ -50,6 +52,7 @@ class RunDatabasesIdentifier:
     async def initialize(self, exchange=None, from_global_history=False):
         """
         Initializes the necessary elements for these run databases. Creates necessary folder on file system databases
+        :param bot_recording_id: switch between bot history databases, can be any positive int
         :param exchange: name of the associated exchange
         :param from_global_history: When True, initializes the run databases as not related to a specific trading mode.
         Used for live trading cross trading mode stats (such as profitability)
@@ -124,6 +127,14 @@ class RunDatabasesIdentifier:
             f"{enums.RunDatabases.METADATA.value}", None, ignore_backtesting_id=True
         )
 
+    def get_bot_recording_metadata_identifier(self) -> str:
+        """
+        :return: the database identifier associated to bot_recording metadata
+        """
+        return self._get_db_identifier(
+            f"{enums.RunDatabases.METADATA.value}", None, ignore_bot_recording_id=True
+        )
+
     def _get_db_identifier(self, run_database_name, exchange, **base_folder_kwargs):
         if exchange is None:
             return self._merge_parts(
@@ -195,6 +206,12 @@ class RunDatabasesIdentifier:
         """
         return await self._generate_new_id(is_optimizer=False)
 
+    async def generate_new_bot_recording_id(self) -> int:
+        """
+        :return: a new unique bot recording id
+        """
+        return await self._generate_new_id(is_optimizer=False, is_bot_recording=True)
+
     async def generate_new_optimizer_id(self, back_list) -> int:
         """
         :return: a new unique optimizer id
@@ -212,7 +229,7 @@ class RunDatabasesIdentifier:
             return
         raise RuntimeError(f"Unhandled database_adaptor {self.database_adaptor}")
 
-    async def _generate_new_id(self, back_list=None, is_optimizer=False):
+    async def _generate_new_id(self, back_list=None, is_optimizer=False, is_bot_recording=False):
         back_list = back_list or []
         max_runs = (
             constants.MAX_OPTIMIZER_RUNS
@@ -224,8 +241,8 @@ class RunDatabasesIdentifier:
                 continue
             name_candidate = (
                 self._base_folder(optimizer_id=index)
-                if is_optimizer
-                else self._base_folder(backtesting_id=index)
+                if is_optimizer else (self._base_folder(bot_recording_id=index) if is_bot_recording
+                                      else self._base_folder(backtesting_id=index))
             )
             if not await self.database_adaptor.identifier_exists(name_candidate, False):
                 return index
@@ -280,6 +297,8 @@ class RunDatabasesIdentifier:
         self,
         ignore_backtesting_id=False,
         backtesting_id=None,
+        bot_recording_id=None,
+        ignore_bot_recording_id=None,
         ignore_optimizer_id=False,
         optimizer_id=None,
         from_global_history=False,
@@ -287,6 +306,7 @@ class RunDatabasesIdentifier:
         path = self._get_base_path(from_global_history, backtesting_id, optimizer_id)
         backtesting_id = backtesting_id or self.backtesting_id
         optimizer_id = optimizer_id or self.optimizer_id
+        bot_recording_id = bot_recording_id or self.bot_recording_id
         # when in optimizer or backtesting: wrap it into the current campaign
         if backtesting_id is not None or optimizer_id is not None:
             if self.optimization_campaign_name is None:
@@ -316,7 +336,10 @@ class RunDatabasesIdentifier:
             )
         if optimizer_id is None:
             # live mode
-            return self._merge_parts(path, enums.RunDatabases.LIVE.value)
+            if ignore_bot_recording_id:
+                return self._merge_parts(path, enums.RunDatabases.LIVE.value)
+            return self._merge_parts(path, f"{enums.RunDatabases.LIVE.value}\\{enums.RunDatabases.LIVE.value}"
+                                           f"{constants.DB_SEPARATOR}{self.bot_recording_id}")
         return path
 
     def _merge_parts(self, *parts):
