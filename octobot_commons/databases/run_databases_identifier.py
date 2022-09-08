@@ -228,7 +228,9 @@ class RunDatabasesIdentifier:
             return
         raise RuntimeError(f"Unhandled database_adaptor {self.database_adaptor}")
 
-    async def _generate_new_id(self, back_list=None, is_optimizer=False, is_bot_recording=False):
+    async def _generate_new_id(
+        self, back_list=None, is_optimizer=False, is_bot_recording=False
+    ):
         back_list = back_list or []
         max_runs = (
             constants.MAX_OPTIMIZER_RUNS
@@ -240,8 +242,12 @@ class RunDatabasesIdentifier:
                 continue
             name_candidate = (
                 self._base_folder(optimizer_id=index)
-                if is_optimizer else (self._base_folder(live_id=index) if is_bot_recording
-                                      else self._base_folder(backtesting_id=index))
+                if is_optimizer
+                else (
+                    self._base_folder(live_id=index)
+                    if is_bot_recording
+                    else self._base_folder(backtesting_id=index)
+                )
             )
             if not await self.database_adaptor.identifier_exists(name_candidate, False):
                 return index
@@ -340,7 +346,7 @@ class RunDatabasesIdentifier:
             return self._merge_parts(
                 path,
                 f"{os.path.join(enums.RunDatabases.LIVE.value, enums.RunDatabases.LIVE.value)}"
-                f"{constants.DB_SEPARATOR}{live_id}"
+                f"{constants.DB_SEPARATOR}{live_id}",
             )
         return path
 
