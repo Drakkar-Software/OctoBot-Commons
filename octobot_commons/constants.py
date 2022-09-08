@@ -45,9 +45,11 @@ SCHEMA = "schema"
 CONFIG_FILE_EXT = ".json"
 CONFIG_FILE_SCHEMA = f"{CONFIG_FOLDER}/config_{SCHEMA}.json"
 CONFIG_REFRESH_RATE = "refresh_rate_seconds"
+CONFIG_SAVED_HISTORICAL_TIMEFRAMES = "saved_historical_timeframes"
 CONFIG_OPTIMIZER_ID = "optimizer_id"
 CONFIG_BACKTESTING_ID = "backtesting_id"
-CONFIG_SAVED_HISTORICAL_TIMEFRAMES = "saved_historical_timeframes"
+CONFIG_CURRENT_LIVE_ID = "current-live-id"
+DEFAULT_CURRENT_LIVE_ID = 1
 
 # profiles
 PROFILES_FOLDER = "profiles"
