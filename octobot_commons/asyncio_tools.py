@@ -21,7 +21,9 @@ import octobot_commons.constants as constants
 import octobot_commons.logging as logging_util
 
 
-def run_coroutine_in_asyncio_loop(coroutine, async_loop, log_exceptions=True, timeout=constants.DEFAULT_FUTURE_TIMEOUT):
+def run_coroutine_in_asyncio_loop(
+    coroutine, async_loop, log_exceptions=True, timeout=constants.DEFAULT_FUTURE_TIMEOUT
+):
     """
     Run a coroutine in the specified asyncio loop
     :param coroutine: the coroutine to run
