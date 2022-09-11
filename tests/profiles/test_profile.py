@@ -28,7 +28,8 @@ from tests.profiles import profile, get_profile_path, get_profiles_path
 
 
 def test_read_config(profile):
-    profile.read_config()
+    save_ref = profile
+    assert profile.read_config() is save_ref
     assert profile.profile_id == "default"
     assert profile.name == "default"
     assert profile.description == "OctoBot default profile."
@@ -157,12 +158,14 @@ def test_as_dict(profile):
             constants.CONFIG_DESCRIPTION: None,
             constants.CONFIG_AVATAR: None,
             constants.CONFIG_READ_ONLY: False,
+            constants.CONFIG_IMPORTED: False,
         },
         constants.PROFILE_CONFIG: {},
     }
     profile.read_config()
     # do not test read config
     profile.config = {"a": 1}
+    profile.imported = True
     assert profile.as_dict() == {
         constants.CONFIG_PROFILE: {
             constants.CONFIG_ID: "default",
@@ -170,6 +173,7 @@ def test_as_dict(profile):
             constants.CONFIG_DESCRIPTION: "OctoBot default profile.",
             constants.CONFIG_AVATAR: "default_profile.png",
             constants.CONFIG_READ_ONLY: False,
+            constants.CONFIG_IMPORTED: True,
         },
         constants.PROFILE_CONFIG: {
             "a": 1
