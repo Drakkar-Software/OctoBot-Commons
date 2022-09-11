@@ -57,7 +57,7 @@ def import_profile(
     name: str = None,
     bot_install_path: str = ".",
     replace_if_exists: bool = False,
-) -> None:
+) -> Profile:
     """
     Imports the given profile export archive into the user's profile directory with the "imported_" prefix
     :param import_path: path to the profile zipped archive
@@ -66,6 +66,7 @@ def import_profile(
     :param replace_if_exists: when True erase the profile with the same name if it exists
     :return: None
     """
+    logger = bot_logging.get_logger("ProfileSharing")
     profile_name = name or (
         f"{constants.IMPORTED_PROFILE_PREFIX}_{os.path.split(import_path)[-1]}"
     )
@@ -73,12 +74,16 @@ def import_profile(
     target_import_path, replaced = _get_target_import_path(
         bot_install_path, profile_name, replace_if_exists
     )
-    action = "Creating"
+    action = "Creat"
     if replaced:
-        action = "Updating"
-    bot_logging.get_logger("ProfileSharing").info(f"{action} {profile_name} profile.")
+        action = "Updat"
+    logger.info(f"{action}ing {profile_name} profile.")
     _import_profile_files(import_path, target_import_path)
-    _ensure_unique_profile_id(target_import_path)
+    profile = Profile(target_import_path)
+    profile.read_config()
+    _ensure_unique_profile_id(profile)
+    logger.info(f"{action}ed {profile.name} ({profile_name}) profile.")
+    return profile
 
 
 def _filter_profile_export(profile_path: str):
@@ -153,17 +158,15 @@ def _get_unique_profile_folder(target_import_path: str) -> str:
     return candidate
 
 
-def _ensure_unique_profile_id(profile_path: str) -> None:
+def _ensure_unique_profile_id(profile) -> None:
     """
     Ensure that no other installed profile has the same id
-    :param profile_path: the installed profile folder
+    :param profile: the installed profile
     :return: None
     """
     ids = Profile.get_all_profiles_ids(
-        pathlib.Path(profile_path).parent, ignore=profile_path
+        pathlib.Path(profile.path).parent, ignore=profile.path
     )
-    profile = Profile(profile_path)
-    profile.read_config()
     iteration = 1
     while profile.profile_id in ids and iteration < 100:
         profile.profile_id = str(uuid.uuid4())

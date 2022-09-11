@@ -113,7 +113,11 @@ def test_import_profile(profile):
         imported_profile_path = os.path.join(constants.USER_PROFILES_FOLDER, "imported_super_profile")
         with mock.patch.object(profile_sharing, "_ensure_unique_profile_id", mock.Mock()) \
                 as _ensure_unique_profile_id_mock:
-            profiles.import_profile(exported_file)
+            imported_profile = profiles.import_profile(exported_file)
+            assert isinstance(imported_profile, profiles.Profile)
+            profile.read_config()
+            assert profile.name == imported_profile.name
+            assert profile.path != imported_profile.path
             _ensure_unique_profile_id_mock.assert_called_once()
         assert os.path.isdir(imported_profile_path)
         # ensure all files got imported
@@ -123,10 +127,10 @@ def test_import_profile(profile):
                 os.path.isfile(os.path.join(dir_path, f))
                 for f in files
             )
-        profiles.import_profile(exported_file)
+        assert isinstance(profiles.import_profile(exported_file), profiles.Profile)
         assert os.path.isdir(f"{imported_profile_path}_2")
         with mock.patch.object(shutil, "rmtree", mock.Mock()) as shutil_rmtree_mock:
-            profiles.import_profile(exported_file, replace_if_exists=True)
+            assert isinstance(profiles.import_profile(exported_file, replace_if_exists=True), profiles.Profile)
             shutil_rmtree_mock.assert_called_once()
         assert os.path.isdir(imported_profile_path)
         assert not os.path.isdir(f"{imported_profile_path}_3")
@@ -152,7 +156,9 @@ def test_ensure_unique_profile_id(profile):
     other_profile_path = profiles_path.joinpath(other_profile)
     with _cleaned_tentacles(dir1=other_profile_path):
         shutil.copytree(profile.path, other_profile_path)
-        _ensure_unique_profile_id(other_profile_path)
+        other_profile = profiles.Profile(other_profile_path)
+        other_profile.read_config()
+        _ensure_unique_profile_id(other_profile)
         ids = profiles.Profile.get_all_profiles_ids(profiles_path)
         assert len(ids) == 2
         # changed new profile id
