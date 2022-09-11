@@ -61,13 +61,14 @@ class Profile:
         self.avatar: str = None
         self.avatar_path: str = None
         self.read_only: bool = False
+        self.imported: bool = False
 
         self.config: dict = {}
 
-    def read_config(self) -> None:
+    def read_config(self):
         """
         Reads a profile from self.path
-        :return: None
+        :return: self
         """
         with open(self.config_file()) as profile_file:
             parsed_profile = json.load(profile_file)
@@ -77,12 +78,14 @@ class Profile:
             self.description = profile_config.get(constants.CONFIG_DESCRIPTION, "")
             self.avatar = profile_config.get(constants.CONFIG_AVATAR, "")
             self.read_only = profile_config.get(constants.CONFIG_READ_ONLY, False)
+            self.imported = profile_config.get(constants.CONFIG_IMPORTED, False)
             self.config = parsed_profile[constants.PROFILE_CONFIG]
 
         if self.avatar:
             avatar_path = os.path.join(self.path, self.avatar)
             if os.path.isfile(avatar_path):
                 self.avatar_path = avatar_path
+        return self
 
     def save_config(self, global_config: dict):
         """
@@ -151,6 +154,7 @@ class Profile:
         clone.description = description or clone.description
         clone.profile_id = str(uuid.uuid4())
         clone.read_only = False
+        clone.imported = False
         try:
             clone.path = os.path.join(
                 os.path.split(self.path)[0], f"{clone.name}_{clone.profile_id}"
@@ -180,6 +184,7 @@ class Profile:
                 constants.CONFIG_DESCRIPTION: self.description,
                 constants.CONFIG_AVATAR: self.avatar,
                 constants.CONFIG_READ_ONLY: self.read_only,
+                constants.CONFIG_IMPORTED: self.imported,
             },
             constants.PROFILE_CONFIG: self.config,
         }

@@ -79,8 +79,8 @@ def import_profile(
         action = "Updat"
     logger.info(f"{action}ing {profile_name} profile.")
     _import_profile_files(import_path, target_import_path)
-    profile = Profile(target_import_path)
-    profile.read_config()
+    profile = Profile(target_import_path).read_config()
+    profile.imported = True
     _ensure_unique_profile_id(profile)
     logger.info(f"{action}ed {profile.name} ({profile_name}) profile.")
     return profile

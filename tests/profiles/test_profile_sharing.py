@@ -118,6 +118,8 @@ def test_import_profile(profile):
             profile.read_config()
             assert profile.name == imported_profile.name
             assert profile.path != imported_profile.path
+            assert profile.imported is False
+            assert imported_profile.imported is True
             _ensure_unique_profile_id_mock.assert_called_once()
         assert os.path.isdir(imported_profile_path)
         # ensure all files got imported
@@ -156,8 +158,7 @@ def test_ensure_unique_profile_id(profile):
     other_profile_path = profiles_path.joinpath(other_profile)
     with _cleaned_tentacles(dir1=other_profile_path):
         shutil.copytree(profile.path, other_profile_path)
-        other_profile = profiles.Profile(other_profile_path)
-        other_profile.read_config()
+        other_profile = profiles.Profile(other_profile_path).read_config()
         _ensure_unique_profile_id(other_profile)
         ids = profiles.Profile.get_all_profiles_ids(profiles_path)
         assert len(ids) == 2

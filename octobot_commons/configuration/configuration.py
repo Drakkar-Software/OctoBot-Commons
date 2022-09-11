@@ -176,6 +176,14 @@ class Configuration:
             os.path.isdir(self.profiles_path) and os.listdir(self.profiles_path)
         )
 
+    def get_non_imported_profiles(self) -> list:
+        """
+        :return: The list of loaded profiles in self that have not been imported into this OctoBot
+        """
+        return [
+            profile for profile in self.profile_by_id.values() if not profile.imported
+        ]
+
     def get_tentacles_config_path(self) -> str:
         """
         :return: The tentacles configurations associated to the activated profile
