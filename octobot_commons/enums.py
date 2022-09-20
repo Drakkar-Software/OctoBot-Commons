@@ -368,3 +368,19 @@ class SignalBundlesAttrs(enum.Enum):
 class SignalsAttrs(enum.Enum):
     TOPIC = "topic"
     CONTENT = "content"
+
+
+class InitializationEventTopics(enum.Enum):
+    EXCHANGE = "exchanges"
+
+
+class InitializationEventExchangeTopics(enum.Enum):
+    CANDLES = "candles"
+    POSITIONS = "positions"
+    BALANCE = "balance"
+    ORDERS = "orders"
+    TRADES = "trades"
+    CONTRACTS = "contracts"
+    PRICE = "price"
+    ORDER_BOOK = "order_book"
+    FUNDING = "funding"

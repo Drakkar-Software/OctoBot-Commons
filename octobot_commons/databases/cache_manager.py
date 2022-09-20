@@ -22,7 +22,7 @@ import octobot_commons.databases.databases_util as databases_util
 import octobot_commons.constants as common_constants
 import octobot_commons.symbols.symbol_util as symbol_util
 import octobot_commons.errors as common_errors
-import octobot_commons.event_tree as event_tree
+import octobot_commons.tree as tree
 
 
 class CacheManager:
@@ -30,7 +30,7 @@ class CacheManager:
     Manages cache as a global dict since caches can be accessed from live, backtesting and optimizers concurrently
     """
 
-    CACHES = event_tree.EventTree()
+    CACHES = tree.BaseTree()
     DEFAULT_CONFIG_IDENTIFIER = "default"
 
     def __init__(self, database_adaptor=adaptors.TinyDBAdaptor):
@@ -70,7 +70,7 @@ class CacheManager:
         cache_path = [tentacle_name, exchange_name, symbol, time_frame, identifier]
         try:
             return self.__class__.CACHES.get_node(cache_path).node_value.get_database()
-        except event_tree.NodeExistsError:
+        except tree.NodeExistsError:
             if open_if_missing:
                 if tentacle is None:
                     config_names = self.__class__.CACHES.get_children_keys(
@@ -122,7 +122,7 @@ class CacheManager:
                     [tentacle_name, exchange_name, symbol, time_frame, identifier]
                 )
             )
-        except event_tree.NodeExistsError:
+        except tree.NodeExistsError:
             return False
 
     def get_cache_registered_requirements(
@@ -180,7 +180,7 @@ class CacheManager:
             ):
                 await cache.node_value.clear()
             return True
-        except event_tree.NodeExistsError:
+        except tree.NodeExistsError:
             return False
 
     async def reset_cache(
@@ -232,7 +232,7 @@ class CacheManager:
                 for identifier in to_remove_caches:
                     self.__class__.CACHES.delete_node(identifier)
             return True
-        except event_tree.NodeExistsError:
+        except tree.NodeExistsError:
             return False
 
     async def reset(self):
@@ -242,7 +242,7 @@ class CacheManager:
         for cache, _ in self._caches():
             if cache.node_value.is_open():
                 await cache.node_value.close()
-        self.__class__.CACHES = event_tree.EventTree()
+        self.__class__.CACHES = tree.BaseTree()
 
     def _caches(
         self,
@@ -336,7 +336,7 @@ class CacheManager:
             return self.__class__.CACHES.get_node(
                 [tentacle_name, exchange_name, symbol, time_frame, identifier]
             ).node_value.get_path()
-        except event_tree.NodeExistsError:
+        except tree.NodeExistsError:
             sanitized_pair = symbol_util.merge_symbol(symbol) if symbol else symbol
             required_tentacles = tentacles_requirements.get_all_required_tentacles(
                 False
