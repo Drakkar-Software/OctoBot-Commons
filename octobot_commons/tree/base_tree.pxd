@@ -16,7 +16,7 @@
 #  License along with this library.
 
 
-cdef class EventTreeNode:
+cdef class BaseTreeNode:
     cdef public object node_value
     cdef public object node_value_time
     cdef public object node_type
@@ -25,17 +25,17 @@ cdef class EventTreeNode:
 cdef class NodeExistsError(Exception):
     pass
 
-cdef class EventTree:
-    cdef public EventTreeNode root
+cdef class BaseTree:
+    cdef public BaseTreeNode root
 
-    cpdef void set_node(self, object value, object node_type, EventTreeNode node, double timestamp=*)
+    cpdef void set_node(self, object value, object node_type, BaseTreeNode node, double timestamp=*)
     cpdef void set_node_at_path(self, object value, object node_type, list path, double timestamp=*)
-    cpdef EventTreeNode get_node(self, list path, EventTreeNode starting_node=*)
-    cpdef EventTreeNode delete_node(self, list path, EventTreeNode starting_node=*)
-    cpdef EventTreeNode get_or_create_node(self, list path, EventTreeNode starting_node=*)
+    cpdef BaseTreeNode get_node(self, list path, BaseTreeNode starting_node=*)
+    cpdef BaseTreeNode delete_node(self, list path, BaseTreeNode starting_node=*)
+    cpdef BaseTreeNode get_or_create_node(self, list path, BaseTreeNode starting_node=*)
     cpdef list get_children_keys(self, list path)
 
-    cdef EventTreeNode _get_node(self, list path, EventTreeNode starting_node=*)
-    cdef EventTreeNode _delete_node(self, list path, EventTreeNode starting_node=*)
-    cdef EventTreeNode _create_node_path(self, list path, EventTreeNode starting_node=*)
-    cdef void _set_node(self, EventTreeNode node, object value=*, object node_type=*, double timestamp=*)
+    cdef BaseTreeNode _get_node(self, list path, BaseTreeNode starting_node=*)
+    cdef BaseTreeNode _delete_node(self, list path, BaseTreeNode starting_node=*)
+    cdef BaseTreeNode _create_node_path(self, list path, BaseTreeNode starting_node=*)
+    cdef void _set_node(self, BaseTreeNode node, object value=*, object node_type=*, double timestamp=*)

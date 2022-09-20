@@ -15,9 +15,9 @@
 #  License along with this library.
 
 
-class EventTreeNode:
+class BaseTreeNode:
     """
-    Node element of a EventTree
+    Node element of a BaseTree
     """
 
     __slots__ = [
@@ -40,9 +40,9 @@ class NodeExistsError(Exception):
     """
 
 
-class EventTree:
+class BaseTree:
     """
-    Event Tree based on EventTreeNodes
+    Tree based on BaseTreeNode
     """
 
     __slots__ = ["root"]
@@ -51,7 +51,7 @@ class EventTree:
         """
         Init the root node
         """
-        self.root = EventTreeNode(None, None)
+        self.root = BaseTreeNode(None, None)
 
     def set_node(self, value, node_type, node, timestamp=0):
         """
@@ -166,7 +166,7 @@ class EventTree:
         Can raise a KeyError if the path does not exists
         :param path: the path (as a list of string) to the node
         :param starting_node: the node to start the path, root if None
-        :return: EventTreeNode at path
+        :return: BaseTreeNode at path
         """
         current_node = self.root if starting_node is None else starting_node
         for key in path:
@@ -179,7 +179,7 @@ class EventTree:
         Can raise a KeyError if the path does not exists
         :param path: the path (as a list of string) to the node
         :param starting_node: the node to start the path, root if None
-        :return: EventTreeNode at path
+        :return: BaseTreeNode at path
         """
         current_node = self.root if starting_node is None else starting_node
         for key in path[:-1]:
@@ -199,7 +199,7 @@ class EventTree:
                 current_node = current_node.children[key]
             except KeyError:
                 # create a new node as the current node child
-                current_node.children[key] = EventTreeNode(None, None)
+                current_node.children[key] = BaseTreeNode(None, None)
 
                 # change to the new node
                 current_node = current_node.children[key]

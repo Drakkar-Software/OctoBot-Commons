@@ -194,7 +194,6 @@ class AsyncJob:
             self.successive_failures = 0
         except Exception as exception:
             self._handle_run_exception(exception, error_on_single_failure)
-
         finally:
             self.last_execution_time = time.time()
             self.simultaneous_calls -= 1
