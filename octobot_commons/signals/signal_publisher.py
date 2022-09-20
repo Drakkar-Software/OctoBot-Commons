@@ -19,6 +19,7 @@ import contextlib
 import time
 
 import octobot_commons.singleton as singleton
+import octobot_commons.logging as logging
 import octobot_commons.signals.signals_emitter as signals_emitter
 import octobot_commons.signals.signal_bundle_builder as signal_bundle_builder
 import octobot_commons.signals.signal_builder_wrapper as signal_builder_wrapper
@@ -77,10 +78,12 @@ class SignalPublisher(singleton.Singleton):
         Stop all timeout tasks and clear any remaining registered wrapper
         :return:
         """
+        logging.get_logger(self.__class__.__name__).debug("Stopping ...")
         for task in self._timeout_watcher_tasks.values():
             task.cancel()
         self._timeout_watcher_tasks = {}
         self._signal_builder_wrappers = {}
+        logging.get_logger(self.__class__.__name__).debug("Stopped ...")
 
     def _create_or_get_signal_builder_wrapper(
         self,
