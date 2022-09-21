@@ -151,21 +151,21 @@ class MetaDatabase:
         """
         Closes all the open databases
         """
-        await asyncio.gather(
-            *(
-                db.close()
-                for db in (
-                    self.run_db,
-                    self.orders_db,
-                    self.trades_db,
-                    self.transactions_db,
-                    self.historical_portfolio_value_db,
-                    self.backtesting_metadata_db,
-                    *self.symbol_dbs.values(),
-                )
-                if db is not None
+        # avoid asyncio.gather here as it is producing unexplained side effects (frozen thread preventing stop)
+        for coro in (
+            db.close()
+            for db in (
+                self.run_db,
+                self.orders_db,
+                self.trades_db,
+                self.transactions_db,
+                self.historical_portfolio_value_db,
+                self.backtesting_metadata_db,
+                *self.symbol_dbs.values(),
             )
-        )
+            if db is not None
+        ):
+            await coro
 
     @classmethod
     @contextlib.asynccontextmanager

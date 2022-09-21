@@ -1,5 +1,5 @@
 # cython: language_level=3
-#  Drakkar-Software OctoBot-Backtesting
+#  Drakkar-Software OctoBot-Trading
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
 #  This library is free software; you can redistribute it and/or
@@ -10,22 +10,19 @@
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+#  Lesser General License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+cimport octobot_commons.singleton as singleton
 
-from octobot_commons.databases cimport relational_databases
-from octobot_commons.databases.relational_databases cimport (
-    SQLiteDatabase,
-)
+cdef class RunDatabasesProvider(singleton.Singleton):
+    cdef public dict run_databases
 
-from octobot_commons.databases cimport run_databases
-from octobot_commons.databases.run_databases cimport (
-    RunDatabasesProvider,
-)
-
-__all__ = [
-    "SQLiteDatabase",
-    "RunDatabasesProvider",
-]
+    cpdef bint has_bot_id(self, str bot_id)
+    cpdef object get_run_db(self, str bot_id)
+    cpdef object get_orders_db(self, str bot_id, str exchange=*)
+    cpdef object get_trades_db(self, str bot_id, str exchange=*)
+    cpdef object get_transactions_db(self, str bot_id, str exchange=*)
+    cpdef object get_backtesting_metadata_db(self, str bot_id)
+    cpdef object get_symbol_db(self, str bot_id, str exchange, str symbol)

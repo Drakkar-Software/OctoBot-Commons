@@ -103,3 +103,9 @@ class UnsupportedError(Exception):
     """
     Raised when an unsupported message is received
     """
+
+
+class InvalidUserInputError(Exception):
+    """
+    Raised when a user input in invalid
+    """

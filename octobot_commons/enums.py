@@ -385,3 +385,19 @@ class InitializationEventExchangeTopics(enum.Enum):
     PRICE = "price"
     ORDER_BOOK = "order_book"
     FUNDING = "funding"
+
+
+class UserInputTentacleTypes(enum.Enum):
+    TRADING_MODE = "trading_mode"
+    EVALUATOR = "evaluator"
+
+
+class UserInputTypes(enum.Enum):
+    INT = "int"
+    FLOAT = "float"
+    BOOLEAN = "boolean"
+    OPTIONS = "options"
+    MULTIPLE_OPTIONS = "multiple-options"
+    TEXT = "text"
+    OBJECT = "object"
+    OBJECT_ARRAY = "object_array"
