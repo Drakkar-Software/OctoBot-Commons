@@ -22,10 +22,10 @@ from octobot_commons.databases import bases
 from octobot_commons.databases import implementations
 from octobot_commons.databases import relational_databases
 
-from octobot_commons.databases import run_databases_identifier
 from octobot_commons.databases import cache_manager
 from octobot_commons.databases import databases_util
 from octobot_commons.databases import cache_client
+from octobot_commons.databases import run_databases
 
 from octobot_commons.databases.global_storage import (
     GlobalSharedMemoryStorage,
@@ -60,8 +60,13 @@ from octobot_commons.databases.relational_databases import (
     new_sqlite_database,
 )
 
-from octobot_commons.databases.run_databases_identifier import (
+from octobot_commons.databases.run_databases import (
     RunDatabasesIdentifier,
+    RunDatabasesProvider,
+    init_bot_storage,
+    get_run_db,
+    get_symbol_db,
+    close_bot_storage,
 )
 
 from octobot_commons.databases.cache_manager import (
@@ -94,6 +99,11 @@ __all__ = [
     "SQLiteDatabase",
     "new_sqlite_database",
     "RunDatabasesIdentifier",
+    "RunDatabasesProvider",
+    "init_bot_storage",
+    "get_run_db",
+    "get_symbol_db",
+    "close_bot_storage",
     "CacheManager",
     "CacheWrapper",
     "CacheClient",
