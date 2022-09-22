@@ -137,6 +137,7 @@ class UserCommands(enum.Enum):
     Allowed user commands
     """
 
+    RELOAD_CONFIG = "reload_config"
     RELOAD_SCRIPT = "reload_script"
     CLEAR_PLOTTING_CACHE = "clear_plotting_cache"
     CLEAR_SIMULATED_ORDERS_CACHE = "clear_simulated_orders_cache"
