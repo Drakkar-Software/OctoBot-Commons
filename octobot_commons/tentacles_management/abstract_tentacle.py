@@ -67,7 +67,7 @@ class AbstractTentacle:
         raise NotImplementedError
 
     @classmethod
-    def create_local_instance(cls, tentacles_setup_config, tentacle_config):
+    def create_local_instance(cls, config, tentacles_setup_config, tentacle_config):
         raise NotImplementedError
 
     def init_user_inputs(self, inputs: dict) -> None:
@@ -88,7 +88,7 @@ class AbstractTentacle:
             self.logger.exception(e, True, f"Error when initializing user inputs: {e}")
 
     @classmethod
-    async def get_raw_config_and_user_inputs(cls, tentacles_setup_config, bot_id):
+    async def get_raw_config_and_user_inputs(cls, config, tentacles_setup_config, bot_id):
         try:
             import octobot_tentacles_manager.api as api
             specific_config = api.get_tentacle_config(tentacles_setup_config, cls)
@@ -100,9 +100,9 @@ class AbstractTentacle:
                 # (nested) user inputs
                 return specific_config, saved_user_inputs
             # use user inputs from init_user_inputs
-            evaluator_instance = cls.create_local_instance(tentacles_setup_config, specific_config)
+            tentacle_instance = cls.create_local_instance(config, tentacles_setup_config, specific_config)
             user_inputs = {}
-            evaluator_instance.init_user_inputs(user_inputs)
+            tentacle_instance.init_user_inputs(user_inputs)
             return specific_config, list(user_inputs.values())
         except ImportError as err:
             raise ImportError("octobot_tentacles_manager is required") from err
