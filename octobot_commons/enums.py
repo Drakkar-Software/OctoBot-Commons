@@ -371,10 +371,6 @@ class SignalsAttrs(enum.Enum):
     CONTENT = "content"
 
 
-class InitializationEventTopics(enum.Enum):
-    EXCHANGE = "exchanges"
-
-
 class InitializationEventExchangeTopics(enum.Enum):
     POSITIONS = "positions"
     BALANCE = "balance"

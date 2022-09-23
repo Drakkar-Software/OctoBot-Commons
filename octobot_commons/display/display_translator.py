@@ -177,8 +177,8 @@ class DisplayTranslator:
                 if schema_type == "boolean":
                     properties["format"] = "checkbox"
                 elif schema_type == "number":
-                    if input_type == "float":
-                        properties["multipleOf"] = self.DEFAULT_NUMBER_MULTIPLIER
+                    if input_type == enums.UserInputTypes.INT.value:
+                        properties["multipleOf"] = 1
                 elif input_type == enums.UserInputTypes.OBJECT_ARRAY.value:
                     # nested object in array, insert array first
                     properties["items"] = {
@@ -205,7 +205,7 @@ class DisplayTranslator:
                         schema_type = self._get_element_schema_type(options)
                     elif schema_type == "array":
                         properties["format"] = "select2"
-                        properties["minItems"] = 1
+                        properties["minItems"] = properties.get("minItems", 1)
                         properties["uniqueItems"] = True
                         properties["items"] = {
                             "title": title,
@@ -238,7 +238,7 @@ class DisplayTranslator:
                             )
                 elif schema_type == "text":
                     schema_type = "string"
-                    properties["minLength"] = 1
+                    properties["minLength"] = properties.get("minLength", 1)
                 properties["type"] = schema_type
             except KeyError as e:
                 self.logger.error(f"Unknown input type: {e}")
