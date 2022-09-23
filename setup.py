@@ -44,6 +44,7 @@ PACKAGES = find_packages(exclude=["tests"])
 packages_list = [
     "octobot_commons.async_job",
     "octobot_commons.tree.base_tree",
+    "octobot_commons.tree.event_tree",
     "octobot_commons.evaluators_util",
     "octobot_commons.data_util",
     "octobot_commons.list_util",
