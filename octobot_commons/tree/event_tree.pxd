@@ -14,13 +14,28 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+cimport octobot_commons.tree.base_tree as base_tree
 
-from octobot_commons.singleton cimport singleton_class
 
-from octobot_commons.singleton.singleton_class cimport (
-    Singleton,
-)
+cdef class EventTreeNode(base_tree.BaseTreeNode):
+    cdef base_tree.BaseTreeNode _parent
+    cdef object _logger
 
-__all__ = [
-    "Singleton",
-]
+    cpdef void bind_parent(self, object parent)
+    cpdef bint is_triggered(self)
+    cpdef void trigger(self)
+    cpdef void clear(self)
+    cpdef void on_child_change(self)
+    cpdef object get_parent(self)
+    cpdef list get_path_to_root(self)
+    cpdef object get_child_key(self, object child_to_find)
+
+    cdef void _propagate(self)
+    cdef void _trigger(self)
+    cdef void _trigger_and_log(self)
+    cdef void _clear(self)
+    cdef list _untriggered_children(self)
+
+
+cdef class EventTree(base_tree.BaseTree):
+    cpdef create_node_at_path(self, list path, bint triggered)

@@ -22,9 +22,27 @@ from octobot_commons.tree.base_tree import (
     NodeExistsError,
 )
 
+from octobot_commons.tree import event_tree
+
+from octobot_commons.tree.event_tree import (
+    EventTreeNode,
+    EventTree,
+)
+
+from octobot_commons.tree import event_provider
+
+from octobot_commons.tree.event_provider import (
+    EventProvider,
+    get_exchange_path,
+)
+
 
 __all__ = [
     "BaseTree",
     "BaseTreeNode",
     "NodeExistsError",
+    "EventTreeNode",
+    "EventTree",
+    "EventProvider",
+    "get_exchange_path",
 ]

@@ -27,11 +27,23 @@ class BaseTreeNode:
         "children",
     ]
 
-    def __init__(self, node_value, node_type):
+    def __init__(self, node_value, node_type, **_):
         self.node_value = node_value
         self.node_value_time = None
         self.node_type = node_type
         self.children = {}
+
+    def set_child(self, key, child):
+        """
+        Set a child at the given key
+        """
+        self.children[key] = child
+
+    def pop_child(self, key, default):
+        """
+        Pop the child the given key
+        """
+        return self.children.pop(key, default)
 
 
 class NodeExistsError(Exception):
@@ -45,13 +57,14 @@ class BaseTree:
     Tree based on BaseTreeNode
     """
 
+    TREE_NODE_CLASS = BaseTreeNode
     __slots__ = ["root"]
 
     def __init__(self):
         """
         Init the root node
         """
-        self.root = BaseTreeNode(None, None)
+        self.root = self.TREE_NODE_CLASS(None, None)
 
     def set_node(self, value, node_type, node, timestamp=0):
         """
@@ -114,7 +127,7 @@ class BaseTree:
         except KeyError:
             raise NodeExistsError
 
-    def get_or_create_node(self, path, starting_node=None):
+    def get_or_create_node(self, path, starting_node=None, **kwargs):
         """
         Get the node at the specified path
         Creates the node if it doesn't exists
@@ -128,7 +141,7 @@ class BaseTree:
         try:
             return self._get_node(path, starting_node=starting_node)
         except KeyError:
-            return self._create_node_path(path, starting_node=starting_node)
+            return self._create_node_path(path, starting_node=starting_node, **kwargs)
 
     def get_nested_children_with_path(self, path=None, select_leaves_only=True):
         """
@@ -184,9 +197,9 @@ class BaseTree:
         current_node = self.root if starting_node is None else starting_node
         for key in path[:-1]:
             current_node = current_node.children[key]
-        return current_node.children.pop(path[-1], None)
+        return current_node.pop_child(path[-1], None)
 
-    def _create_node_path(self, path, starting_node=None):
+    def _create_node_path(self, path, starting_node=None, **kwargs):
         """
         Expensive method that creates the path to the selected node
         :param path: path (as a list of string) to the selected node
@@ -199,12 +212,17 @@ class BaseTree:
                 current_node = current_node.children[key]
             except KeyError:
                 # create a new node as the current node child
-                current_node.children[key] = BaseTreeNode(None, None)
-
-                # change to the new node
-                current_node = current_node.children[key]
+                # us it as the new node
+                current_node = self.child_factory(current_node, key, **kwargs)
 
         return current_node
+
+    def child_factory(self, node, key, **kwargs):
+        """
+        Create a new child an associate it to the given key
+        """
+        node.set_child(key, self.TREE_NODE_CLASS(None, None, **kwargs))
+        return node.children[key]
 
     def _set_node(self, node, value=None, node_type=None, timestamp=0):
         """

@@ -1,3 +1,4 @@
+# cython: language_level=3
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -21,9 +22,18 @@ from octobot_commons.tree.base_tree cimport (
     NodeExistsError,
 )
 
+from octobot_commons.tree cimport event_tree
+
+from octobot_commons.tree.event_tree cimport (
+    EventTreeNode,
+    EventTree,
+)
+
 
 __all__ = [
     "BaseTree",
     "BaseTreeNode",
     "NodeExistsError",
+    "EventTreeNode",
+    "EventTree",
 ]

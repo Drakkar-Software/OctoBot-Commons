@@ -22,6 +22,9 @@ cdef class BaseTreeNode:
     cdef public object node_type
     cdef public dict children
 
+    cpdef void set_child(self, object key, object child)
+    cpdef object pop_child(self, object key, object default)
+
 cdef class NodeExistsError(Exception):
     pass
 
@@ -32,10 +35,8 @@ cdef class BaseTree:
     cpdef void set_node_at_path(self, object value, object node_type, list path, double timestamp=*)
     cpdef BaseTreeNode get_node(self, list path, BaseTreeNode starting_node=*)
     cpdef BaseTreeNode delete_node(self, list path, BaseTreeNode starting_node=*)
-    cpdef BaseTreeNode get_or_create_node(self, list path, BaseTreeNode starting_node=*)
     cpdef list get_children_keys(self, list path)
 
     cdef BaseTreeNode _get_node(self, list path, BaseTreeNode starting_node=*)
     cdef BaseTreeNode _delete_node(self, list path, BaseTreeNode starting_node=*)
-    cdef BaseTreeNode _create_node_path(self, list path, BaseTreeNode starting_node=*)
     cdef void _set_node(self, BaseTreeNode node, object value=*, object node_type=*, double timestamp=*)

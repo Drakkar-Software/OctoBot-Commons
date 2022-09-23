@@ -375,12 +375,12 @@ class InitializationEventTopics(enum.Enum):
 
 
 class InitializationEventExchangeTopics(enum.Enum):
-    CANDLES = "candles"
     POSITIONS = "positions"
     BALANCE = "balance"
     ORDERS = "orders"
     TRADES = "trades"
     CONTRACTS = "contracts"
+    CANDLES = "candles"
     PRICE = "price"
     ORDER_BOOK = "order_book"
     FUNDING = "funding"
