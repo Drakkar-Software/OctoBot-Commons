@@ -128,6 +128,7 @@ class AbstractTentacle:
             show_in_optimizer=True,
             path=None,
             order=None,
+            array_indexes=None,
     ):
         """
         Set and return a user input value.
@@ -141,12 +142,16 @@ class AbstractTentacle:
         parent = self.get_local_config()
         if parent_input_name is not None:
             found, nested_parent = dict_util.find_nested_value(
-                self.get_local_config(), configuration.sanitize_user_input_name(parent_input_name)
+                self.get_local_config(), configuration.sanitize_user_input_name(parent_input_name),
+                list_indexes=array_indexes
             )
             if found and isinstance(nested_parent, dict):
-                # non dict nested parents are not supported
                 parent = nested_parent
+            elif found and isinstance(nested_parent, list) and array_indexes:
+                # non dict nested parents are not supported
+                parent = nested_parent[array_indexes[-1]]
             else:
+                # non dict or list with array_indexes nested parents are not supported
                 parent = None
         if parent is not None:
             try:

@@ -65,7 +65,7 @@ def get_global_logger_level() -> object:
     return logging.getLogger().getEffectiveLevel()
 
 
-def get_logger(logger_name="Anonymous") -> object:
+def get_logger(logger_name="Anonymous"):
     """
     Return the logger from the logger_name
     :param logger_name: the logger name
