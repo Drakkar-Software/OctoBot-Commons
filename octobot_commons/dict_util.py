@@ -15,26 +15,38 @@
 #  License along with this library.
 
 
-def find_nested_value(dict_, field):
+def find_nested_value(dict_, field, list_indexes=None):
     """
     Find a nested value in a dict
     :param dict_: the dict
     :param field: the field to search
+    :param list_indexes: indexes to go to on list elements. If not provided, each element of each list is explored
     :return: a tuple : True if found else False, the dict at field value else the field
     """
     if field in dict_:
         return True, dict_[field]
     for value in dict_.values():
         if isinstance(value, dict):
-            found_value, possible_value = find_nested_value(value, field)
+            found_value, possible_value = find_nested_value(value, field, list_indexes=list_indexes)
             if found_value:
                 return found_value, possible_value
         elif isinstance(value, list):
-            for item in value:
-                if isinstance(item, dict):
-                    found_value, possible_value = find_nested_value(item, field)
-                    if found_value:
-                        return found_value, possible_value
+            if list_indexes:
+                # list_indexes is provided: only look at the given index
+                try:
+                    item = value[list_indexes[0]]
+                    if isinstance(item, dict):
+                        found_value, possible_value = find_nested_value(item, field, list_indexes=list_indexes[1:])
+                        if found_value:
+                            return found_value, possible_value
+                except IndexError:
+                    pass
+            else:
+                for item in value:
+                    if isinstance(item, dict):
+                        found_value, possible_value = find_nested_value(item, field, list_indexes=list_indexes)
+                        if found_value:
+                            return found_value, possible_value
     return False, field
 
 
