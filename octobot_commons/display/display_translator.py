@@ -155,6 +155,7 @@ class DisplayTranslator:
         properties["propertyOrder"] = len(main_schema["properties"]) + self.JSON_PROPERTY_AUTO_ORDER_START \
             if property_order is None else property_order
         name = user_input_element["name"]
+        properties["options"]["name"] = name.replace(" ", "_")
         properties["title"] = name
         if title := user_input_element.get("title"):
             # use title if available
@@ -242,7 +243,7 @@ class DisplayTranslator:
                 properties["type"] = schema_type
             except KeyError as e:
                 self.logger.error(f"Unknown input type: {e}")
-        main_schema["properties"][name.replace(" ", "_")] = properties
+        main_schema["properties"][properties["options"]["name"]] = properties
 
     def _get_associated_user_input(self, user_input, nested_user_inputs_by_tentacle):
         # include all user input associated to this one (same parent_input_name and tentacle)
