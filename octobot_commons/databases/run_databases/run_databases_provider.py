@@ -58,5 +58,5 @@ class RunDatabasesProvider(singleton.Singleton):
     async def close(self, bot_id):
         self.logger.debug(f"Closing bot storage for bot_id: {bot_id} ...")
         await self.run_databases[bot_id].close()
-        self.run_databases.pop(bot_id)
+        # do not pop bot_id to keep run data access
         self.logger.debug(f"Closed bot storage for bot_id: {bot_id}")
