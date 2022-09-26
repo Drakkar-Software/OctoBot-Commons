@@ -14,12 +14,17 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import octobot_commons.databases.run_databases.run_databases_provider as run_databases_provider
+import octobot_commons.configuration as configuration
 
 
-async def init_bot_storage(bot_id, run_database_identifier):
+async def init_bot_storage(bot_id, run_database_identifier, clear_user_inputs):
     if not run_databases_provider.RunDatabasesProvider.instance().has_bot_id(bot_id):
         # only one run database per bot id
         await run_databases_provider.RunDatabasesProvider.instance().add_bot_id(bot_id, run_database_identifier)
+        if clear_user_inputs:
+            await configuration.clear_user_inputs(
+                run_databases_provider.RunDatabasesProvider.instance().get_run_db(bot_id)
+            )
 
 
 def get_run_db(bot_id):
