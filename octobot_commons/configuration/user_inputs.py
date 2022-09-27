@@ -179,5 +179,9 @@ async def get_user_inputs(reader, tentacle_name=None):
     ]
 
 
-async def clear_user_inputs(writer):
-    await writer.delete(enums.DBTables.INPUTS.value, None)
+async def clear_user_inputs(writer, tentacle_name=None):
+    if tentacle_name is None:
+        await writer.delete_all(enums.DBTables.INPUTS.value)
+    else:
+        query = {"tentacle": tentacle_name}
+        await writer.delete(enums.DBTables.INPUTS.value, query)
