@@ -82,8 +82,10 @@ class AbstractTentacle:
             inputs = {}
             self.init_user_inputs(inputs)
             run_db = databases.RunDatabasesProvider.instance().get_run_db(bot_id)
+            await configuration.clear_user_inputs(run_db, self.get_name())
             for user_input in inputs.values():
                 await configuration.save_user_input(user_input, run_db)
+            await run_db.flush()
         except Exception as e:
             self.logger.exception(e, True, f"Error when initializing user inputs: {e}")
 

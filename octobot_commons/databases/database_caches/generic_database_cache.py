@@ -110,10 +110,31 @@ class GenericDatabaseCache:
             pass
         return False
 
-    def clear(self):
+    def delete_from_rows_cache(self, table, val_by_keys):
+        """
+        :param table: table name
+        :param val_by_keys: dict to look for
+        :return: True if a row of the local cache contains every value of the given dict
+        """
+        # Should check the real database in case this returns false
+        try:
+            self.rows_cache[table] = [
+                element
+                for element in self.rows_cache[table]
+                if not dict_util.contains_each_element(element, val_by_keys)
+            ]
+        except KeyError:
+            pass
+
+    def clear(self, table=None):
         """
         Resets the current cache
         """
-        self.rows_cache = {}
-        self.query_cache = {}
-        self.uuid_cache = {}
+        if table:
+            self.rows_cache.pop(table, None)
+            self.query_cache.pop(table, None)
+            self.uuid_cache.pop(table, None)
+        else:
+            self.rows_cache = {}
+            self.query_cache = {}
+            self.uuid_cache = {}

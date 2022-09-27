@@ -102,16 +102,25 @@ class DBWriter(base_database.BaseDatabase):
         """
         return await self._database.update_many(table_name, update_values)
 
-    async def delete(self, table_name: str, query):
+    async def delete(self, table_name: str, dict_query: dict):
         """
         Deletes selected values at once, doesn't use cache
         """
+        query = None
+        if dict_query:
+            self.cache.delete_from_rows_cache(table_name, dict_query)
+            query = await self.search()
+            for key, value in dict_query.items():
+                query = query[key] == value
+        else:
+            self.cache.clear(table_name)
         return await self._database.delete(table_name, query)
 
     async def delete_all(self, table_name: str):
         """
         Deletes all rows from a table
         """
+        self.cache.clear(table_name)
         return await self._database.delete(table_name, None)
 
     async def log_many(self, table_name: str, rows: list, cache=True):
