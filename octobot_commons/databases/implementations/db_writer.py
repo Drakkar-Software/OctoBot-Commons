@@ -108,10 +108,13 @@ class DBWriter(base_database.BaseDatabase):
         """
         query = None
         if dict_query:
-            self.cache.delete_from_rows_cache(table_name, dict_query)
-            query = await self.search()
-            for key, value in dict_query.items():
-                query = query[key] == value
+            if isinstance(dict_query, dict):
+                self.cache.delete_from_rows_cache(table_name, dict_query)
+                query = await self.search()
+                for key, value in dict_query.items():
+                    query = query[key] == value
+            else:
+                query = dict_query
         else:
             self.cache.clear(table_name)
         return await self._database.delete(table_name, query)
