@@ -32,6 +32,7 @@ class DisplayTranslator:
         enums.UserInputTypes.OPTIONS.value: "options",
         enums.UserInputTypes.MULTIPLE_OPTIONS.value: "array",
         enums.UserInputTypes.OBJECT_ARRAY.value: "array",
+        enums.UserInputTypes.STRING_ARRAY.value: "array",
         enums.UserInputTypes.OBJECT.value: "object",
         constants.NESTED_TENTACLE_CONFIG: "object",
     }
@@ -87,6 +88,7 @@ class DisplayTranslator:
         tentacle_type_by_tentacles = {}
         shown_tentacles = {}
         nested_user_inputs_by_tentacle = self._extract_nested_user_inputs(inputs)
+        tentacle = None
         for user_input_element in inputs:
             try:
                 tentacle = user_input_element["tentacle"]
@@ -180,21 +182,22 @@ class DisplayTranslator:
                 elif schema_type == "number":
                     if input_type == enums.UserInputTypes.INT.value:
                         properties["multipleOf"] = 1
-                elif input_type == enums.UserInputTypes.OBJECT_ARRAY.value:
+                elif input_type in (enums.UserInputTypes.STRING_ARRAY.value, enums.UserInputTypes.OBJECT_ARRAY.value):
                     # nested object in array, insert array first
                     properties["items"] = {
-                        "type": "object",
+                        "type": "object" if input_type == enums.UserInputTypes.OBJECT_ARRAY.value else "string",
                         "properties": {}
                     }
                     if item_title := user_input_element.get("item_title"):
                         properties["items"]["title"] = item_title
-                    for associated_user_input in self._get_associated_user_input(user_input_element,
-                                                                                 nested_user_inputs_by_tentacle):
-                        self._generate_schema(
-                            properties["items"],
-                            associated_user_input,
-                            nested_user_inputs_by_tentacle
-                        )
+                    if input_type == enums.UserInputTypes.OBJECT_ARRAY.value:
+                        for associated_user_input in self._get_associated_user_input(user_input_element,
+                                                                                     nested_user_inputs_by_tentacle):
+                            self._generate_schema(
+                                properties["items"],
+                                associated_user_input,
+                                nested_user_inputs_by_tentacle
+                            )
                 elif schema_type in ("options", "array"):
                     options = user_input_element.get("options", [])
                     default_value = def_val if def_val is not None else options[0] if options else None

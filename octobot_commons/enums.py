@@ -398,3 +398,4 @@ class UserInputTypes(enum.Enum):
     TEXT = "text"
     OBJECT = "object"
     OBJECT_ARRAY = "object_array"
+    STRING_ARRAY = "string_array"
