@@ -50,17 +50,26 @@ def find_nested_value(dict_, field, list_indexes=None):
     return False, field
 
 
-def nested_update_dict(base_dict, updated_dict):
+def nested_update_dict(base_dict, updated_dict, list_indexes=None):
     """
      Updates a dict with values from another but keeps the 1st dict values when not specified
      in the update dict. Handle nested values unlike the default dict.update().
+     If a list is found in the dict, elements of the list are all updated
     :param base_dict: the dict to be updated
     :param updated_dict: the dict to take updated values from
+    :param list_indexes: indexes to go to on list elements. If not provided, each element of each list is explored
     """
+    if isinstance(base_dict, list):
+        if list_indexes:
+            nested_update_dict(base_dict[list_indexes[0]], updated_dict, list_indexes=list_indexes[1:])
+        else:
+            for element in base_dict:
+                nested_update_dict(element, updated_dict)
+        return
     for key, val in updated_dict.items():
         if isinstance(val, dict):
             if key in base_dict:
-                nested_update_dict(base_dict[key], val)
+                nested_update_dict(base_dict[key], val, list_indexes=list_indexes)
             else:
                 base_dict[key] = val
         else:

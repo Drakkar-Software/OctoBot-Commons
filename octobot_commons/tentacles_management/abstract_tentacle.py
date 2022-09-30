@@ -150,7 +150,6 @@ class AbstractTentacle:
             if found and isinstance(nested_parent, dict):
                 parent = nested_parent
             elif found and isinstance(nested_parent, list) and array_indexes:
-                # non dict nested parents are not supported
                 parent = nested_parent[array_indexes[-1]]
             else:
                 # non dict or list with array_indexes nested parents are not supported
