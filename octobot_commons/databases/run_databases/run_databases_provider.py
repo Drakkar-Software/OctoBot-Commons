@@ -24,10 +24,13 @@ class RunDatabasesProvider(singleton.Singleton):
         self.logger = logging.get_logger(self.__class__.__name__)
         self.run_databases = {}
 
-    async def add_bot_id(self, bot_id, run_database_identifier, with_lock=False, cache_size=None):
+    async def add_bot_id(
+        self, bot_id, run_database_identifier, with_lock=False, cache_size=None
+    ):
         await run_database_identifier.initialize()
-        self.run_databases[bot_id] = databases.MetaDatabase(run_database_identifier, with_lock=with_lock,
-                                                            cache_size=cache_size)
+        self.run_databases[bot_id] = databases.MetaDatabase(
+            run_database_identifier, with_lock=with_lock, cache_size=cache_size
+        )
 
     def has_bot_id(self, bot_id):
         return bot_id in self.run_databases

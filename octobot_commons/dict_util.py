@@ -27,7 +27,9 @@ def find_nested_value(dict_, field, list_indexes=None):
         return True, dict_[field]
     for value in dict_.values():
         if isinstance(value, dict):
-            found_value, possible_value = find_nested_value(value, field, list_indexes=list_indexes)
+            found_value, possible_value = find_nested_value(
+                value, field, list_indexes=list_indexes
+            )
             if found_value:
                 return found_value, possible_value
         elif isinstance(value, list):
@@ -36,7 +38,9 @@ def find_nested_value(dict_, field, list_indexes=None):
                 try:
                     item = value[list_indexes[0]]
                     if isinstance(item, dict):
-                        found_value, possible_value = find_nested_value(item, field, list_indexes=list_indexes[1:])
+                        found_value, possible_value = find_nested_value(
+                            item, field, list_indexes=list_indexes[1:]
+                        )
                         if found_value:
                             return found_value, possible_value
                 except IndexError:
@@ -44,7 +48,9 @@ def find_nested_value(dict_, field, list_indexes=None):
             else:
                 for item in value:
                     if isinstance(item, dict):
-                        found_value, possible_value = find_nested_value(item, field, list_indexes=list_indexes)
+                        found_value, possible_value = find_nested_value(
+                            item, field, list_indexes=list_indexes
+                        )
                         if found_value:
                             return found_value, possible_value
     return False, field
@@ -61,7 +67,9 @@ def nested_update_dict(base_dict, updated_dict, list_indexes=None):
     """
     if isinstance(base_dict, list):
         if list_indexes:
-            nested_update_dict(base_dict[list_indexes[0]], updated_dict, list_indexes=list_indexes[1:])
+            nested_update_dict(
+                base_dict[list_indexes[0]], updated_dict, list_indexes=list_indexes[1:]
+            )
         else:
             for element in base_dict:
                 nested_update_dict(element, updated_dict)

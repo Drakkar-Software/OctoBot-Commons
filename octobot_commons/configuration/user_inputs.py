@@ -134,7 +134,7 @@ def format_user_input(
         "in_summary": show_in_summary,
         "in_optimizer": show_in_optimizer,
         "path": path,
-        "order": order
+        "order": order,
     }
 
 
@@ -145,27 +145,33 @@ async def save_user_input(
     skip_flush=False,
 ):
     if not await run_data_writer.contains_row(
-            enums.DBTables.INPUTS.value,
-            {
-                "name": formatted_input["name"],
-                "tentacle": formatted_input["tentacle"],
-                "nested_tentacle": formatted_input["nested_tentacle"],
-                "parent_input_name": formatted_input["parent_input_name"],
-                "is_nested_config": formatted_input["is_nested_config"]
-            }):
+        enums.DBTables.INPUTS.value,
+        {
+            "name": formatted_input["name"],
+            "tentacle": formatted_input["tentacle"],
+            "nested_tentacle": formatted_input["nested_tentacle"],
+            "parent_input_name": formatted_input["parent_input_name"],
+            "is_nested_config": formatted_input["is_nested_config"],
+        },
+    ):
         await run_data_writer.log(
             enums.DBTables.INPUTS.value,
             formatted_input,
         )
-        if not skip_flush and (flush_if_necessary or run_data_writer.are_data_initialized):
+        if not skip_flush and (
+            flush_if_necessary or run_data_writer.are_data_initialized
+        ):
             # in some cases, user inputs might be setup after the 1st trading mode cycle: flush
             # writer in live mode to ensure writing
             await run_data_writer.flush()
 
 
 def get_user_input_tentacle_type(tentacle) -> str:
-    return enums.UserInputTentacleTypes.TRADING_MODE.value \
-        if hasattr(tentacle, "trading_config") else enums.UserInputTentacleTypes.EVALUATOR.value
+    return (
+        enums.UserInputTentacleTypes.TRADING_MODE.value
+        if hasattr(tentacle, "trading_config")
+        else enums.UserInputTentacleTypes.EVALUATOR.value
+    )
 
 
 async def get_user_inputs(reader, tentacle_name=None):

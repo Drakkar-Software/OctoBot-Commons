@@ -90,19 +90,24 @@ class AbstractTentacle:
             self.logger.exception(e, True, f"Error when initializing user inputs: {e}")
 
     @classmethod
-    async def get_raw_config_and_user_inputs(cls, config, tentacles_setup_config, bot_id):
+    async def get_raw_config_and_user_inputs(
+        cls, config, tentacles_setup_config, bot_id
+    ):
         try:
             import octobot_tentacles_manager.api as api
+
             specific_config = api.get_tentacle_config(tentacles_setup_config, cls)
             if saved_user_inputs := await configuration.get_user_inputs(
                 databases.RunDatabasesProvider.instance().get_run_db(bot_id),
-                cls.get_name()
+                cls.get_name(),
             ):
                 # user inputs have been saved in run database, use those as they might contain additional
                 # (nested) user inputs
                 return specific_config, saved_user_inputs
             # use user inputs from init_user_inputs
-            tentacle_instance = cls.create_local_instance(config, tentacles_setup_config, specific_config)
+            tentacle_instance = cls.create_local_instance(
+                config, tentacles_setup_config, specific_config
+            )
             user_inputs = {}
             tentacle_instance.init_user_inputs(user_inputs)
             return specific_config, list(user_inputs.values())
@@ -110,27 +115,27 @@ class AbstractTentacle:
             raise ImportError("octobot_tentacles_manager is required") from err
 
     def user_input(
-            self,
-            name: str,
-            input_type,
-            def_val,
-            registered_inputs: dict,
-            min_val=None,
-            max_val=None,
-            options=None,
-            title=None,
-            item_title=None,
-            other_schema_values=None,
-            editor_options=None,
-            read_only=False,
-            is_nested_config=None,
-            nested_tentacle=None,
-            parent_input_name=None,
-            show_in_summary=True,
-            show_in_optimizer=True,
-            path=None,
-            order=None,
-            array_indexes=None,
+        self,
+        name: str,
+        input_type,
+        def_val,
+        registered_inputs: dict,
+        min_val=None,
+        max_val=None,
+        options=None,
+        title=None,
+        item_title=None,
+        other_schema_values=None,
+        editor_options=None,
+        read_only=False,
+        is_nested_config=None,
+        nested_tentacle=None,
+        parent_input_name=None,
+        show_in_summary=True,
+        show_in_optimizer=True,
+        path=None,
+        order=None,
+        array_indexes=None,
     ):
         """
         Set and return a user input value.
@@ -144,8 +149,9 @@ class AbstractTentacle:
         parent = self.get_local_config()
         if parent_input_name is not None:
             found, nested_parent = dict_util.find_nested_value(
-                self.get_local_config(), configuration.sanitize_user_input_name(parent_input_name),
-                list_indexes=array_indexes
+                self.get_local_config(),
+                configuration.sanitize_user_input_name(parent_input_name),
+                list_indexes=array_indexes,
             )
             if found and isinstance(nested_parent, dict):
                 parent = nested_parent
