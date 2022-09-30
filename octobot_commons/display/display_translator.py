@@ -24,6 +24,7 @@ class DisplayTranslator:
     """
     Interface for simplifying displayed elements translation
     """
+
     INPUT_TYPE_TO_SCHEMA_TYPE = {
         enums.UserInputTypes.INT.value: "number",
         enums.UserInputTypes.FLOAT.value: "number",
@@ -64,8 +65,8 @@ class DisplayTranslator:
                     element.to_json()
                     for element in self.elements
                     if not element.is_empty()
-                ]
-            }
+                ],
+            },
         }
 
     def is_empty(self):
@@ -101,19 +102,27 @@ class DisplayTranslator:
                         shown_tentacles[tentacle] = False
                 else:
                     shown_tentacles[tentacle] = True
-                tentacle_type_by_tentacles[tentacle] = user_input_element["tentacle_type"]
+                tentacle_type_by_tentacles[tentacle] = user_input_element[
+                    "tentacle_type"
+                ]
                 if tentacle not in config_schema_by_tentacles:
                     config_schema_by_tentacles[tentacle] = self._base_schema(tentacle)
                     config_by_tentacles[tentacle] = {}
-                config_by_tentacles[tentacle][user_input_element["name"].replace(" ", "_")] = \
-                    user_input_element["value"]
+                config_by_tentacles[tentacle][
+                    user_input_element["name"].replace(" ", "_")
+                ] = user_input_element["value"]
                 if user_input_element["parent_input_name"] is None:
                     # user input with parent_input_name are added alongside their parents, only add top
                     # level user inputs in schema
-                    self._generate_schema(config_schema_by_tentacles[tentacle], user_input_element,
-                                          nested_user_inputs_by_tentacle)
+                    self._generate_schema(
+                        config_schema_by_tentacles[tentacle],
+                        user_input_element,
+                        nested_user_inputs_by_tentacle,
+                    )
             except KeyError as e:
-                self.logger.error(f"Error when loading user inputs for {tentacle}: missing {e}")
+                self.logger.error(
+                    f"Error when loading user inputs for {tentacle}: missing {e}"
+                )
         for tentacle, schema in config_schema_by_tentacles.items():
             (part or self).user_inputs(
                 "Inputs",
@@ -121,7 +130,7 @@ class DisplayTranslator:
                 schema,
                 tentacle,
                 tentacle_type_by_tentacles[tentacle],
-                not shown_tentacles[tentacle]
+                not shown_tentacles[tentacle],
             )
 
     def _base_schema(self, tentacle):
@@ -139,12 +148,18 @@ class DisplayTranslator:
                 if tentacle not in user_inputs_by_tentacles:
                     user_inputs_by_tentacles[tentacle] = {}
                 if user_input["is_nested_config"]:
-                    user_inputs_by_tentacles[tentacle][user_input["name"].replace(" ", "_")] = user_input
+                    user_inputs_by_tentacles[tentacle][
+                        user_input["name"].replace(" ", "_")
+                    ] = user_input
                 else:
-                    user_inputs_by_tentacles[tentacle][len(user_inputs_by_tentacles[tentacle])] = user_input
+                    user_inputs_by_tentacles[tentacle][
+                        len(user_inputs_by_tentacles[tentacle])
+                    ] = user_input
         return user_inputs_by_tentacles
 
-    def _generate_schema(self, main_schema, user_input_element, nested_user_inputs_by_tentacle):
+    def _generate_schema(
+        self, main_schema, user_input_element, nested_user_inputs_by_tentacle
+    ):
         properties = {
             "options": {
                 "in_summary": user_input_element.get("in_summary", True),
@@ -154,8 +169,11 @@ class DisplayTranslator:
         }
         # prioritize user defined order, otherwise keep the order inputs are saved
         property_order = user_input_element.get("order", None)
-        properties["propertyOrder"] = len(main_schema["properties"]) + self.JSON_PROPERTY_AUTO_ORDER_START \
-            if property_order is None else property_order
+        properties["propertyOrder"] = (
+            len(main_schema["properties"]) + self.JSON_PROPERTY_AUTO_ORDER_START
+            if property_order is None
+            else property_order
+        )
         name = user_input_element["name"]
         properties["options"]["name"] = name.replace(" ", "_")
         properties["title"] = name
@@ -182,27 +200,39 @@ class DisplayTranslator:
                 elif schema_type == "number":
                     if input_type == enums.UserInputTypes.INT.value:
                         properties["multipleOf"] = 1
-                elif input_type in (enums.UserInputTypes.STRING_ARRAY.value, enums.UserInputTypes.OBJECT_ARRAY.value):
+                elif input_type in (
+                    enums.UserInputTypes.STRING_ARRAY.value,
+                    enums.UserInputTypes.OBJECT_ARRAY.value,
+                ):
                     # nested object in array, insert array first
                     properties["items"] = {
-                        "type": "object" if input_type == enums.UserInputTypes.OBJECT_ARRAY.value else "string",
-                        "properties": {}
+                        "type": "object"
+                        if input_type == enums.UserInputTypes.OBJECT_ARRAY.value
+                        else "string",
+                        "properties": {},
                     }
                     if item_title := user_input_element.get("item_title"):
                         properties["items"]["title"] = item_title
                     if input_type == enums.UserInputTypes.OBJECT_ARRAY.value:
-                        for associated_user_input in self._get_associated_user_input(user_input_element,
-                                                                                     nested_user_inputs_by_tentacle):
+                        for associated_user_input in self._get_associated_user_input(
+                            user_input_element, nested_user_inputs_by_tentacle
+                        ):
                             self._generate_schema(
                                 properties["items"],
                                 associated_user_input,
-                                nested_user_inputs_by_tentacle
+                                nested_user_inputs_by_tentacle,
                             )
                 elif schema_type in ("options", "array"):
                     options = user_input_element.get("options", [])
-                    default_value = def_val if def_val is not None else options[0] if options else None
+                    default_value = (
+                        def_val
+                        if def_val is not None
+                        else options[0]
+                        if options
+                        else None
+                    )
                     if schema_type == "options":
-                        properties["default"] = default_value,
+                        properties["default"] = (default_value,)
                         properties["format"] = "select"
                         properties["enum"] = options
                         # override schema_type as we couldn't know it before
@@ -215,7 +245,7 @@ class DisplayTranslator:
                             "title": title,
                             "type": self._get_element_schema_type(options),
                             "default": default_value,
-                            "enum": options
+                            "enum": options,
                         }
 
                 elif schema_type == "object":
@@ -226,19 +256,24 @@ class DisplayTranslator:
                             try:
                                 self._generate_schema(
                                     properties,
-                                    nested_user_inputs_by_tentacle[nested_tentacle][user_input_name],
-                                    nested_user_inputs_by_tentacle
+                                    nested_user_inputs_by_tentacle[nested_tentacle][
+                                        user_input_name
+                                    ],
+                                    nested_user_inputs_by_tentacle,
                                 )
                             except KeyError as e:
-                                self.logger.warning(f"Missing user input model for {e}. This element might not be "
-                                                    f"associated to a tentacle")
+                                self.logger.warning(
+                                    f"Missing user input model for {e}. This element might not be "
+                                    f"associated to a tentacle"
+                                )
                     else:
-                        for associated_user_input in self._get_associated_user_input(user_input_element,
-                                                                                     nested_user_inputs_by_tentacle):
+                        for associated_user_input in self._get_associated_user_input(
+                            user_input_element, nested_user_inputs_by_tentacle
+                        ):
                             self._generate_schema(
                                 properties,
                                 associated_user_input,
-                                nested_user_inputs_by_tentacle
+                                nested_user_inputs_by_tentacle,
                             )
                 elif schema_type == "text":
                     schema_type = "string"
@@ -252,10 +287,11 @@ class DisplayTranslator:
         # include all user input associated to this one (same parent_input_name and tentacle)
         return (
             associated_user_input
-            for associated_user_input in nested_user_inputs_by_tentacle[user_input["tentacle"]].values()
+            for associated_user_input in nested_user_inputs_by_tentacle[
+                user_input["tentacle"]
+            ].values()
             if associated_user_input["tentacle"] == user_input["tentacle"]
-               and associated_user_input["parent_input_name"] == user_input["name"]
-
+            and associated_user_input["parent_input_name"] == user_input["name"]
         )
 
     def _get_element_schema_type(self, options):
@@ -266,20 +302,22 @@ class DisplayTranslator:
             if isinstance(options[0], float):
                 return self.INPUT_TYPE_TO_SCHEMA_TYPE[enums.UserInputTypes.FLOAT.value]
             if isinstance(options[0], bool):
-                return self.INPUT_TYPE_TO_SCHEMA_TYPE[enums.UserInputTypes.BOOLEAN.value]
+                return self.INPUT_TYPE_TO_SCHEMA_TYPE[
+                    enums.UserInputTypes.BOOLEAN.value
+                ]
             if isinstance(options[0], str):
                 return default_type
         except IndexError:
             return default_type
 
     def user_inputs(
-            self,
-            name,
-            config_values,
-            schema,
-            tentacle,
-            tentacle_type,
-            is_hidden,
+        self,
+        name,
+        config_values,
+        schema,
+        tentacle,
+        tentacle_type,
+        is_hidden,
     ):
         element = Element(
             None,
@@ -298,37 +336,37 @@ class DisplayTranslator:
 
 class Element:
     def __init__(
-            self,
-            kind,
-            x,
-            y,
-            open=None,
-            high=None,
-            low=None,
-            close=None,
-            volume=None,
-            x_type=None,
-            y_type=None,
-            title=None,
-            text=None,
-            mode=None,
-            line_shape=None,
-            own_xaxis=False,
-            own_yaxis=False,
-            value=None,
-            config_values=None,
-            schema=None,
-            tentacle=None,
-            tentacle_type=None,
-            columns=None,
-            rows=None,
-            searches=None,
-            is_hidden=None,
-            type=enums.DisplayedElementTypes.CHART.value,
-            color=None,
-            html=None,
-            size=None,
-            symbol=None,
+        self,
+        kind,
+        x,
+        y,
+        open=None,
+        high=None,
+        low=None,
+        close=None,
+        volume=None,
+        x_type=None,
+        y_type=None,
+        title=None,
+        text=None,
+        mode=None,
+        line_shape=None,
+        own_xaxis=False,
+        own_yaxis=False,
+        value=None,
+        config_values=None,
+        schema=None,
+        tentacle=None,
+        tentacle_type=None,
+        columns=None,
+        rows=None,
+        searches=None,
+        is_hidden=None,
+        type=enums.DisplayedElementTypes.CHART.value,
+        color=None,
+        html=None,
+        size=None,
+        symbol=None,
     ):
         self.kind = kind
         self.x = x
