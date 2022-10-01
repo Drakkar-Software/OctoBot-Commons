@@ -157,9 +157,7 @@ class DisplayTranslator:
                     ] = user_input
         return user_inputs_by_tentacles
 
-    def _generate_schema(
-        self, main_schema, user_input_element, nested_user_inputs_by_tentacle
-    ):
+    def _init_schema_properties(self, main_schema, user_input_element, title, def_val):
         properties = {
             "options": {
                 "in_summary": user_input_element.get("in_summary", True),
@@ -177,10 +175,9 @@ class DisplayTranslator:
         name = user_input_element["name"]
         properties["options"]["name"] = name.replace(" ", "_")
         properties["title"] = name
-        if title := user_input_element.get("title"):
+        if title:
             # use title if available
             properties["title"] = title
-        def_val = user_input_element.get("def_val")
         properties["default"] = def_val
         min_val = user_input_element.get("min_val")
         if min_val is not None:
@@ -192,95 +189,108 @@ class DisplayTranslator:
             properties["options"].update(editor_options)
         if other_schema_values := user_input_element.get("other_schema_values"):
             properties.update(other_schema_values)
-        if input_type := user_input_element.get("input_type"):
-            try:
-                schema_type = self.INPUT_TYPE_TO_SCHEMA_TYPE[input_type]
-                if schema_type == "boolean":
-                    properties["format"] = "checkbox"
-                elif schema_type == "number":
-                    if input_type == enums.UserInputTypes.INT.value:
-                        properties["multipleOf"] = 1
-                elif input_type in (
+        return properties
+
+    def _adapt_to_input_type(self, user_input_element, nested_user_inputs_by_tentacle, properties,
+                             input_type, title, def_val):
+        try:
+            schema_type = self.INPUT_TYPE_TO_SCHEMA_TYPE[input_type]
+            if schema_type == "boolean":
+                properties["format"] = "checkbox"
+            elif schema_type == "number":
+                if input_type == enums.UserInputTypes.INT.value:
+                    properties["multipleOf"] = 1
+            elif input_type in (
                     enums.UserInputTypes.STRING_ARRAY.value,
                     enums.UserInputTypes.OBJECT_ARRAY.value,
-                ):
-                    # nested object in array, insert array first
+            ):
+                # nested object in array, insert array first
+                properties["items"] = {
+                    "type": "object"
+                    if input_type == enums.UserInputTypes.OBJECT_ARRAY.value
+                    else "string",
+                    "properties": {},
+                }
+                if item_title := user_input_element.get("item_title"):
+                    properties["items"]["title"] = item_title
+                if input_type == enums.UserInputTypes.OBJECT_ARRAY.value:
+                    for associated_user_input in self._get_associated_user_input(
+                            user_input_element, nested_user_inputs_by_tentacle
+                    ):
+                        self._generate_schema(
+                            properties["items"],
+                            associated_user_input,
+                            nested_user_inputs_by_tentacle,
+                        )
+            elif schema_type in ("options", "array"):
+                options = user_input_element.get("options", [])
+                default_value = (
+                    def_val
+                    if def_val is not None
+                    else options[0]
+                    if options
+                    else None
+                )
+                if schema_type == "options":
+                    properties["default"] = (default_value,)
+                    properties["format"] = "select"
+                    properties["enum"] = options
+                    # override schema_type as we couldn't know it before
+                    schema_type = self._get_element_schema_type(options)
+                elif schema_type == "array":
+                    properties["format"] = "select2"
+                    properties["minItems"] = properties.get("minItems", 1)
+                    properties["uniqueItems"] = True
                     properties["items"] = {
-                        "type": "object"
-                        if input_type == enums.UserInputTypes.OBJECT_ARRAY.value
-                        else "string",
-                        "properties": {},
+                        "title": title,
+                        "type": self._get_element_schema_type(options),
+                        "default": default_value,
+                        "enum": options,
                     }
-                    if item_title := user_input_element.get("item_title"):
-                        properties["items"]["title"] = item_title
-                    if input_type == enums.UserInputTypes.OBJECT_ARRAY.value:
-                        for associated_user_input in self._get_associated_user_input(
-                            user_input_element, nested_user_inputs_by_tentacle
-                        ):
-                            self._generate_schema(
-                                properties["items"],
-                                associated_user_input,
-                                nested_user_inputs_by_tentacle,
-                            )
-                elif schema_type in ("options", "array"):
-                    options = user_input_element.get("options", [])
-                    default_value = (
-                        def_val
-                        if def_val is not None
-                        else options[0]
-                        if options
-                        else None
-                    )
-                    if schema_type == "options":
-                        properties["default"] = (default_value,)
-                        properties["format"] = "select"
-                        properties["enum"] = options
-                        # override schema_type as we couldn't know it before
-                        schema_type = self._get_element_schema_type(options)
-                    elif schema_type == "array":
-                        properties["format"] = "select2"
-                        properties["minItems"] = properties.get("minItems", 1)
-                        properties["uniqueItems"] = True
-                        properties["items"] = {
-                            "title": title,
-                            "type": self._get_element_schema_type(options),
-                            "default": default_value,
-                            "enum": options,
-                        }
 
-                elif schema_type == "object":
-                    properties["properties"] = {}
-                    nested_tentacle = user_input_element["nested_tentacle"]
-                    if nested_tentacle:
-                        for user_input_name in user_input_element["value"]:
-                            try:
-                                self._generate_schema(
-                                    properties,
-                                    nested_user_inputs_by_tentacle[nested_tentacle][
-                                        user_input_name
-                                    ],
-                                    nested_user_inputs_by_tentacle,
-                                )
-                            except KeyError as e:
-                                self.logger.warning(
-                                    f"Missing user input model for {e}. This element might not be "
-                                    f"associated to a tentacle"
-                                )
-                    else:
-                        for associated_user_input in self._get_associated_user_input(
-                            user_input_element, nested_user_inputs_by_tentacle
-                        ):
+            elif schema_type == "object":
+                properties["properties"] = {}
+                nested_tentacle = user_input_element["nested_tentacle"]
+                if nested_tentacle:
+                    for user_input_name in user_input_element["value"]:
+                        try:
                             self._generate_schema(
                                 properties,
-                                associated_user_input,
+                                nested_user_inputs_by_tentacle[nested_tentacle][
+                                    user_input_name
+                                ],
                                 nested_user_inputs_by_tentacle,
                             )
-                elif schema_type == "text":
-                    schema_type = "string"
-                    properties["minLength"] = properties.get("minLength", 1)
-                properties["type"] = schema_type
-            except KeyError as e:
-                self.logger.error(f"Unknown input type: {e}")
+                        except KeyError as e:
+                            self.logger.warning(
+                                f"Missing user input model for {e}. This element might not be "
+                                f"associated to a tentacle"
+                            )
+                else:
+                    for associated_user_input in self._get_associated_user_input(
+                            user_input_element, nested_user_inputs_by_tentacle
+                    ):
+                        self._generate_schema(
+                            properties,
+                            associated_user_input,
+                            nested_user_inputs_by_tentacle,
+                        )
+            elif schema_type == "text":
+                schema_type = "string"
+                properties["minLength"] = properties.get("minLength", 1)
+            properties["type"] = schema_type
+        except KeyError as e:
+            self.logger.error(f"Unknown input type: {e}")
+
+    def _generate_schema(
+        self, main_schema, user_input_element, nested_user_inputs_by_tentacle
+    ):
+        title = user_input_element.get("title")
+        def_val = user_input_element.get("def_val")
+        properties = self._init_schema_properties(main_schema, user_input_element, title, def_val)
+        if input_type := user_input_element.get("input_type"):
+            self._adapt_to_input_type(user_input_element, nested_user_inputs_by_tentacle, properties,
+                                      input_type, title, def_val)
         main_schema["properties"][properties["options"]["name"]] = properties
 
     def _get_associated_user_input(self, user_input, nested_user_inputs_by_tentacle):
