@@ -146,20 +146,7 @@ class AbstractTentacle:
         """
         value = def_val
         sanitized_name = configuration.sanitize_user_input_name(name)
-        parent = self.get_local_config()
-        if parent_input_name is not None:
-            found, nested_parent = dict_util.find_nested_value(
-                self.get_local_config(),
-                configuration.sanitize_user_input_name(parent_input_name),
-                list_indexes=array_indexes,
-            )
-            if found and isinstance(nested_parent, dict):
-                parent = nested_parent
-            elif found and isinstance(nested_parent, list) and array_indexes:
-                parent = nested_parent[array_indexes[-1]]
-            else:
-                # non dict or list with array_indexes nested parents are not supported
-                parent = None
+        parent = self._find_parent_config_node(parent_input_name, array_indexes)
         if parent is not None:
             try:
                 value = parent[sanitized_name]
@@ -195,3 +182,20 @@ class AbstractTentacle:
         if parent is not None:
             parent[sanitized_name] = value
         return value
+
+    def _find_parent_config_node(self, parent_input_name, array_indexes):
+        if parent_input_name is not None:
+            found, nested_parent = dict_util.find_nested_value(
+                self.get_local_config(),
+                configuration.sanitize_user_input_name(parent_input_name),
+                list_indexes=array_indexes,
+            )
+            if found and isinstance(nested_parent, dict):
+                return nested_parent
+            elif found and isinstance(nested_parent, list) and array_indexes:
+                return nested_parent[array_indexes[-1]]
+            else:
+                # non dict or list with array_indexes nested parents are not supported
+                return None
+        return self.get_local_config()
+
