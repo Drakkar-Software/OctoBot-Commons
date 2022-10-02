@@ -110,7 +110,9 @@ class AbstractTentacle:
             )
             user_inputs = {}
             tentacle_instance.init_user_inputs(user_inputs)
-            return specific_config, list(user_input.to_dict() for user_input in user_inputs.values())
+            return specific_config, list(
+                user_input.to_dict() for user_input in user_inputs.values()
+            )
         except ImportError as err:
             raise ImportError("octobot_tentacles_manager is required") from err
 
@@ -198,4 +200,3 @@ class AbstractTentacle:
                 # non dict or list with array_indexes nested parents are not supported
                 return None
         return self.get_local_config()
-

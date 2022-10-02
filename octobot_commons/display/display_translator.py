@@ -191,8 +191,15 @@ class DisplayTranslator:
             properties.update(other_schema_values)
         return properties
 
-    def _adapt_to_input_type(self, user_input_element, nested_user_inputs_by_tentacle, properties,
-                             input_type, title, def_val):
+    def _adapt_to_input_type(
+        self,
+        user_input_element,
+        nested_user_inputs_by_tentacle,
+        properties,
+        input_type,
+        title,
+        def_val,
+    ):
         try:
             schema_type = self.INPUT_TYPE_TO_SCHEMA_TYPE[input_type]
             if schema_type == "boolean":
@@ -201,8 +208,8 @@ class DisplayTranslator:
                 if input_type == enums.UserInputTypes.INT.value:
                     properties["multipleOf"] = 1
             elif input_type in (
-                    enums.UserInputTypes.STRING_ARRAY.value,
-                    enums.UserInputTypes.OBJECT_ARRAY.value,
+                enums.UserInputTypes.STRING_ARRAY.value,
+                enums.UserInputTypes.OBJECT_ARRAY.value,
             ):
                 # nested object in array, insert array first
                 properties["items"] = {
@@ -215,7 +222,7 @@ class DisplayTranslator:
                     properties["items"]["title"] = item_title
                 if input_type == enums.UserInputTypes.OBJECT_ARRAY.value:
                     for associated_user_input in self._get_associated_user_input(
-                            user_input_element, nested_user_inputs_by_tentacle
+                        user_input_element, nested_user_inputs_by_tentacle
                     ):
                         self._generate_schema(
                             properties["items"],
@@ -225,11 +232,7 @@ class DisplayTranslator:
             elif schema_type in ("options", "array"):
                 options = user_input_element.get("options", [])
                 default_value = (
-                    def_val
-                    if def_val is not None
-                    else options[0]
-                    if options
-                    else None
+                    def_val if def_val is not None else options[0] if options else None
                 )
                 if schema_type == "options":
                     properties["default"] = (default_value,)
@@ -268,7 +271,7 @@ class DisplayTranslator:
                             )
                 else:
                     for associated_user_input in self._get_associated_user_input(
-                            user_input_element, nested_user_inputs_by_tentacle
+                        user_input_element, nested_user_inputs_by_tentacle
                     ):
                         self._generate_schema(
                             properties,
@@ -287,10 +290,18 @@ class DisplayTranslator:
     ):
         title = user_input_element.get("title")
         def_val = user_input_element.get("def_val")
-        properties = self._init_schema_properties(main_schema, user_input_element, title, def_val)
+        properties = self._init_schema_properties(
+            main_schema, user_input_element, title, def_val
+        )
         if input_type := user_input_element.get("input_type"):
-            self._adapt_to_input_type(user_input_element, nested_user_inputs_by_tentacle, properties,
-                                      input_type, title, def_val)
+            self._adapt_to_input_type(
+                user_input_element,
+                nested_user_inputs_by_tentacle,
+                properties,
+                input_type,
+                title,
+                def_val,
+            )
         main_schema["properties"][properties["options"]["name"]] = properties
 
     def _get_associated_user_input(self, user_input, nested_user_inputs_by_tentacle):
