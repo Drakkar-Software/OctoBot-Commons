@@ -17,6 +17,79 @@
 import octobot_commons.enums as enums
 
 
+class UserInput:
+    def __init__(
+        self,
+        name,
+        input_type,
+        value,
+        def_val,
+        tentacle_type,
+        tentacle_name,
+        min_val=None,
+        max_val=None,
+        options=None,
+        title=None,
+        item_title=None,
+        other_schema_values=None,
+        editor_options=None,
+        read_only=False,
+        is_nested_config=None,
+        nested_tentacle=None,
+        parent_input_name=None,
+        show_in_summary=True,
+        show_in_optimizer=True,
+        path=None,
+        order=None
+    ):
+        self.name = name
+        self.input_type = input_type
+        self.value = value
+        self.def_val = def_val
+        self.tentacle_type = tentacle_type
+        self.tentacle_name = tentacle_name
+        self.min_val = min_val
+        self.max_val = max_val
+        self.options = options
+        self.title = title
+        self.item_title = item_title
+        self.other_schema_values = other_schema_values
+        self.editor_options = editor_options
+        self.read_only = read_only
+        self.is_nested_config = is_nested_config
+        self.nested_tentacle = nested_tentacle
+        self.parent_input_name = parent_input_name
+        self.show_in_summary = show_in_summary
+        self.show_in_optimizer = show_in_optimizer
+        self.path = path
+        self.order = order
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "input_type": self.input_type if isinstance(self.input_type, str) else self.input_type.value,
+            "value": self.value,
+            "def_val": self.def_val,
+            "min_val": self.min_val,
+            "max_val": self.max_val,
+            "options": self.options,
+            "title": self.title,
+            "item_title": self.item_title,
+            "other_schema_values": self.other_schema_values,
+            "editor_options": self.editor_options,
+            "read_only": self.read_only,
+            "tentacle_type": self.tentacle_type,
+            "tentacle": self.tentacle_name,
+            "nested_tentacle": self.nested_tentacle,
+            "parent_input_name": self.parent_input_name,
+            "is_nested_config": self.is_nested_config,
+            "in_summary": self.show_in_summary,
+            "in_optimizer": self.show_in_optimizer,
+            "path": self.path,
+            "order": self.order,
+        }
+
+
 async def user_input(
     name,
     input_type,
@@ -54,7 +127,7 @@ async def user_input(
     except KeyError:
         saved_config[name.replace(" ", "_")] = def_val
         value = def_val
-    formatted_input = format_user_input(
+    u_input = UserInput(
         name,
         input_type,
         value,
@@ -78,7 +151,7 @@ async def user_input(
         order=order,
     )
     await save_user_input(
-        formatted_input,
+        u_input,
         run_data_writer,
         flush_if_necessary=flush_if_necessary,
         skip_flush=skip_flush,
@@ -90,56 +163,8 @@ def sanitize_user_input_name(name):
     return name.replace(" ", "_")
 
 
-def format_user_input(
-    name,
-    input_type,
-    value,
-    def_val,
-    tentacle_type,
-    tentacle_name,
-    min_val=None,
-    max_val=None,
-    options=None,
-    title=None,
-    item_title=None,
-    other_schema_values=None,
-    editor_options=None,
-    read_only=False,
-    is_nested_config=False,
-    parent_input_name=None,
-    nested_tentacle=None,
-    show_in_summary=True,
-    show_in_optimizer=True,
-    path=None,
-    order=None,
-):
-    return {
-        "name": name,
-        "input_type": input_type if isinstance(input_type, str) else input_type.value,
-        "value": value,
-        "def_val": def_val,
-        "min_val": min_val,
-        "max_val": max_val,
-        "options": options,
-        "title": title,
-        "item_title": item_title,
-        "other_schema_values": other_schema_values,
-        "editor_options": editor_options,
-        "read_only": read_only,
-        "tentacle_type": tentacle_type,
-        "tentacle": tentacle_name,
-        "nested_tentacle": nested_tentacle,
-        "parent_input_name": parent_input_name,
-        "is_nested_config": is_nested_config,
-        "in_summary": show_in_summary,
-        "in_optimizer": show_in_optimizer,
-        "path": path,
-        "order": order,
-    }
-
-
 async def save_user_input(
-    formatted_input,
+    u_input: UserInput,
     run_data_writer,
     flush_if_necessary=False,
     skip_flush=False,
@@ -147,16 +172,16 @@ async def save_user_input(
     if not await run_data_writer.contains_row(
         enums.DBTables.INPUTS.value,
         {
-            "name": formatted_input["name"],
-            "tentacle": formatted_input["tentacle"],
-            "nested_tentacle": formatted_input["nested_tentacle"],
-            "parent_input_name": formatted_input["parent_input_name"],
-            "is_nested_config": formatted_input["is_nested_config"],
+            "name": u_input.name,
+            "tentacle": u_input.tentacle_name,
+            "nested_tentacle": u_input.nested_tentacle,
+            "parent_input_name": u_input.parent_input_name,
+            "is_nested_config": u_input.is_nested_config,
         },
     ):
         await run_data_writer.log(
             enums.DBTables.INPUTS.value,
-            formatted_input,
+            u_input.to_dict(),
         )
         if not skip_flush and (
             flush_if_necessary or run_data_writer.are_data_initialized

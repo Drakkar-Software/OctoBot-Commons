@@ -50,7 +50,7 @@ from octobot_commons.configuration.fields_utils import (
 )
 from octobot_commons.configuration.user_inputs import (
     user_input,
-    format_user_input,
+    UserInput,
     sanitize_user_input_name,
     save_user_input,
     get_user_input_tentacle_type,
@@ -81,7 +81,7 @@ __all__ = [
     "decrypt_element_if_possible",
     "get_password_hash",
     "user_input",
-    "format_user_input",
+    "UserInput",
     "sanitize_user_input_name",
     "save_user_input",
     "get_user_input_tentacle_type",
