@@ -13,6 +13,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import asyncio
+import concurrent.futures
+
 import octobot_commons.singleton as singleton
 import octobot_commons.logging as logging
 import octobot_commons.tree.event_tree as event_tree
@@ -76,6 +79,18 @@ class EventProvider(singleton.Singleton):
         Create a new event tree for the given bot_id
         """
         self._event_tree_by_bot_id[bot_id] = event_tree.EventTree()
+
+    async def wait_for_event(self, bot_id, path, timeout) -> bool:
+        try:
+            event = self.get_or_create_event(bot_id, path, allow_creation=False)
+            if not event.is_triggered():
+                await asyncio.wait_for(event.wait(), timeout)
+        except base_tree.NodeExistsError:
+            # nothing to wait for
+            pass
+        except (asyncio.TimeoutError, concurrent.futures.TimeoutError):
+            return False
+        return True
 
 
 def get_exchange_path(exchange, topic, symbol=None, time_frame=None):

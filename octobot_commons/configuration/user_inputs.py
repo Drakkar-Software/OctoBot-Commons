@@ -40,7 +40,7 @@ class UserInput:
         show_in_summary=True,
         show_in_optimizer=True,
         path=None,
-        order=None
+        order=None,
     ):
         self.name = name
         self.input_type = input_type
@@ -67,7 +67,9 @@ class UserInput:
     def to_dict(self):
         return {
             "name": self.name,
-            "input_type": self.input_type if isinstance(self.input_type, str) else self.input_type.value,
+            "input_type": self.input_type
+            if isinstance(self.input_type, str)
+            else self.input_type.value,
             "value": self.value,
             "def_val": self.def_val,
             "min_val": self.min_val,
