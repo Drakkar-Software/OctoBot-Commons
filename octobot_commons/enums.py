@@ -386,6 +386,7 @@ class InitializationEventExchangeTopics(enum.Enum):
 class UserInputTentacleTypes(enum.Enum):
     TRADING_MODE = "trading_mode"
     EVALUATOR = "evaluator"
+    EXCHANGE = "exchange"
     UNDEFINED = "undefined"
 
 

@@ -110,7 +110,7 @@ class AbstractTentacle:
             )
             user_inputs = {}
             tentacle_instance.init_user_inputs(user_inputs)
-            return specific_config, list(user_inputs.values())
+            return specific_config, list(user_input.to_dict() for user_input in user_inputs.values())
         except ImportError as err:
             raise ImportError("octobot_tentacles_manager is required") from err
 
@@ -156,7 +156,7 @@ class AbstractTentacle:
         input_key = f"{parent_input_name}{name}"
         if input_key not in registered_inputs:
             # do not register user input multiple times
-            registered_inputs[input_key] = configuration.format_user_input(
+            registered_inputs[input_key] = configuration.UserInput(
                 name,
                 input_type,
                 value,
