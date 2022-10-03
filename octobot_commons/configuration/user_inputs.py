@@ -17,11 +17,12 @@
 import contextlib
 
 import octobot_commons.enums as enums
-import octobot_commons.errors as errors
 import octobot_commons.dict_util as dict_util
 
 
 class UserInput:
+    MAX_ORDER = 9999
+
     def __init__(
         self,
         name,
