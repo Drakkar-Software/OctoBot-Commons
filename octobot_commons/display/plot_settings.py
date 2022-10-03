@@ -13,22 +13,20 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-
-from octobot_commons.display import display_translator
-from octobot_commons.display.display_translator import (
-    DisplayTranslator,
-    Element,
-)
-
-from octobot_commons.display import display_factory
-from octobot_commons.display.display_factory import (
-    display_translator_factory,
-)
-
-from octobot_commons.display import plot_settings
-from octobot_commons.display.plot_settings import (
-    PlotSettings,
-)
+import octobot_commons.enums as enums
 
 
-__all__ = ["DisplayTranslator", "Element", "display_translator_factory", "PlotSettings"]
+class PlotSettings:
+    def __init__(
+        self,
+        chart=enums.PlotCharts.MAIN_CHART.value,
+        x_multiplier=1000,
+        kind="scattergl",
+        mode="markers",
+        y_data=None,
+    ):
+        self.chart = chart
+        self.x_multiplier = x_multiplier
+        self.kind = kind
+        self.mode = mode
+        self.y_data = y_data
