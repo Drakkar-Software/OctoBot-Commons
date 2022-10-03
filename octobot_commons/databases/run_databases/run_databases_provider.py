@@ -89,6 +89,12 @@ class RunDatabasesProvider(singleton.Singleton):
             raise errors.DatabaseNotFoundError("symbol parameter has to be provided")
         return self.run_databases[bot_id].get_symbol_db(exchange, symbol)
 
+    def get_historical_portfolio_value_db(self, bot_id, exchange, portfolio_suffix):
+        """
+        :return: the bot_id, exchange and portfolio_suffix associated transactions database.
+        """
+        return self.run_databases[bot_id].get_historical_portfolio_value_db(exchange, portfolio_suffix)
+
     async def close(self, bot_id):
         """
         Close the bot_id associated databases. Does not pop bot_id from self.run_databases to allow post-close calls.
