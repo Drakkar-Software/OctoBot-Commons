@@ -64,8 +64,6 @@ from octobot_commons.databases.run_databases import (
     RunDatabasesIdentifier,
     RunDatabasesProvider,
     init_bot_storage,
-    get_run_db,
-    get_symbol_db,
     close_bot_storage,
 )
 
@@ -101,8 +99,6 @@ __all__ = [
     "RunDatabasesIdentifier",
     "RunDatabasesProvider",
     "init_bot_storage",
-    "get_run_db",
-    "get_symbol_db",
     "close_bot_storage",
     "CacheManager",
     "CacheWrapper",

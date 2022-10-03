@@ -22,8 +22,6 @@ from octobot_commons.databases.run_databases.run_databases_provider import (
 )
 from octobot_commons.databases.run_databases.storage import (
     init_bot_storage,
-    get_run_db,
-    get_symbol_db,
     close_bot_storage,
 )
 
@@ -32,7 +30,5 @@ __all__ = [
     "RunDatabasesIdentifier",
     "RunDatabasesProvider",
     "init_bot_storage",
-    "get_run_db",
-    "get_symbol_db",
     "close_bot_storage",
 ]

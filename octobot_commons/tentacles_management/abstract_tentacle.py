@@ -17,7 +17,6 @@ import abc
 import copy
 
 
-import octobot_commons.dict_util as dict_util
 import octobot_commons.enums as commons_enums
 import octobot_commons.configuration as configuration
 import octobot_commons.databases as databases
@@ -29,11 +28,13 @@ class AbstractTentacle:
     """
 
     __metaclass__ = abc.ABCMeta
-    USER_INPUT_TENTACLE_TYPE = commons_enums.UserInputTentacleTypes.UNDEFINED
     ALLOW_SUPER_CLASS_CONFIG = False
+    USER_INPUT_TENTACLE_TYPE = commons_enums.UserInputTentacleTypes.UNDEFINED
 
     def __init__(self):
         self.logger = None
+        self.UI: configuration.UserInputFactory = configuration.UserInputFactory(self.USER_INPUT_TENTACLE_TYPE)
+        self.UI.set_tentacle_class(self.__class__).set_tentacle_config_proxy(self.get_local_config)
 
     @classmethod
     def get_name(cls) -> str:
@@ -115,88 +116,3 @@ class AbstractTentacle:
             )
         except ImportError as err:
             raise ImportError("octobot_tentacles_manager is required") from err
-
-    def user_input(
-        self,
-        name: str,
-        input_type,
-        def_val,
-        registered_inputs: dict,
-        min_val=None,
-        max_val=None,
-        options=None,
-        title=None,
-        item_title=None,
-        other_schema_values=None,
-        editor_options=None,
-        read_only=False,
-        is_nested_config=None,
-        nested_tentacle=None,
-        parent_input_name=None,
-        show_in_summary=True,
-        show_in_optimizer=True,
-        path=None,
-        order=None,
-        array_indexes=None,
-    ):
-        """
-        Set and return a user input value.
-        The returned value is set as an attribute named as the "name" param with " " replaced by "_"
-        in self.specific_config.
-        Types are: int, float, boolean, options, multiple-options, text, object
-        :return: the saved_config value if any, def_val otherwise
-        """
-        value = def_val
-        sanitized_name = configuration.sanitize_user_input_name(name)
-        parent = self._find_parent_config_node(parent_input_name, array_indexes)
-        if parent is not None:
-            try:
-                value = parent[sanitized_name]
-            except KeyError:
-                # use default value
-                pass
-        input_key = f"{parent_input_name}{name}"
-        if input_key not in registered_inputs:
-            # do not register user input multiple times
-            registered_inputs[input_key] = configuration.UserInput(
-                name,
-                input_type,
-                value,
-                def_val,
-                self.USER_INPUT_TENTACLE_TYPE.value,
-                self.get_name(),
-                min_val=min_val,
-                max_val=max_val,
-                options=options,
-                title=title,
-                item_title=item_title,
-                other_schema_values=other_schema_values,
-                editor_options=editor_options,
-                read_only=read_only,
-                is_nested_config=is_nested_config,
-                nested_tentacle=nested_tentacle,
-                parent_input_name=parent_input_name,
-                show_in_summary=show_in_summary,
-                show_in_optimizer=show_in_optimizer,
-                path=path,
-                order=order,
-            )
-        if parent is not None:
-            parent[sanitized_name] = value
-        return value
-
-    def _find_parent_config_node(self, parent_input_name, array_indexes):
-        if parent_input_name is not None:
-            found, nested_parent = dict_util.find_nested_value(
-                self.get_local_config(),
-                configuration.sanitize_user_input_name(parent_input_name),
-                list_indexes=array_indexes,
-            )
-            if found and isinstance(nested_parent, dict):
-                return nested_parent
-            elif found and isinstance(nested_parent, list) and array_indexes:
-                return nested_parent[array_indexes[-1]]
-            else:
-                # non dict or list with array_indexes nested parents are not supported
-                return None
-        return self.get_local_config()
