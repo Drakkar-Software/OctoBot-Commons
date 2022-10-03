@@ -26,33 +26,40 @@ def find_nested_value(dict_, field, list_indexes=None):
     if field in dict_:
         return True, dict_[field]
     for value in dict_.values():
+        found_value = False
+        possible_value = None
         if isinstance(value, dict):
             found_value, possible_value = find_nested_value(
                 value, field, list_indexes=list_indexes
             )
-            if found_value:
-                return found_value, possible_value
         elif isinstance(value, list):
-            if list_indexes:
-                # list_indexes is provided: only look at the given index
-                try:
-                    item = value[list_indexes[0]]
-                    if isinstance(item, dict):
-                        found_value, possible_value = find_nested_value(
-                            item, field, list_indexes=list_indexes[1:]
-                        )
-                        if found_value:
-                            return found_value, possible_value
-                except IndexError:
-                    pass
-            else:
-                for item in value:
-                    if isinstance(item, dict):
-                        found_value, possible_value = find_nested_value(
-                            item, field, list_indexes=list_indexes
-                        )
-                        if found_value:
-                            return found_value, possible_value
+            found_value, possible_value = _find_nested_value_in_list(value, field, list_indexes)
+        if found_value:
+            return found_value, possible_value
+    return False, field
+
+
+def _find_nested_value_in_list(list_value, field, list_indexes):
+    if list_indexes:
+        # list_indexes is provided: only look at the given index
+        try:
+            item = list_value[list_indexes[0]]
+            if isinstance(item, dict):
+                found_value, possible_value = find_nested_value(
+                    item, field, list_indexes=list_indexes[1:]
+                )
+                if found_value:
+                    return found_value, possible_value
+        except IndexError:
+            pass
+    else:
+        for item in list_value:
+            if isinstance(item, dict):
+                found_value, possible_value = find_nested_value(
+                    item, field, list_indexes=list_indexes
+                )
+                if found_value:
+                    return found_value, possible_value
     return False, field
 
 

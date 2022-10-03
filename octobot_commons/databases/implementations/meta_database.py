@@ -15,7 +15,6 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import contextlib
-import asyncio
 
 import octobot_commons.databases.implementations.db_writer_reader as db_writer_reader
 import octobot_commons.enums as enums

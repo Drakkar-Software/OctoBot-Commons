@@ -18,6 +18,9 @@ import octobot_commons.configuration as configuration
 
 
 async def init_bot_storage(bot_id, run_database_identifier, clear_user_inputs):
+    """
+    Initializes the associated bot_id databases. Deletes any existing user input if clear_user_inputs is True
+    """
     if not run_databases_provider.RunDatabasesProvider.instance().has_bot_id(bot_id):
         # only one run database per bot id
         await run_databases_provider.RunDatabasesProvider.instance().add_bot_id(
@@ -31,16 +34,9 @@ async def init_bot_storage(bot_id, run_database_identifier, clear_user_inputs):
             )
 
 
-def get_run_db(bot_id):
-    return run_databases_provider.RunDatabasesProvider.instance().get_run_db(bot_id)
-
-
-def get_symbol_db(bot_id, exchange, symbol):
-    return run_databases_provider.RunDatabasesProvider.instance().get_symbol_db(
-        bot_id, exchange, symbol
-    )
-
-
 async def close_bot_storage(bot_id):
+    """
+    :return: Close the bot_id associated run databases
+    """
     if run_databases_provider.RunDatabasesProvider.instance().has_bot_id(bot_id):
         await run_databases_provider.RunDatabasesProvider.instance().close(bot_id)
