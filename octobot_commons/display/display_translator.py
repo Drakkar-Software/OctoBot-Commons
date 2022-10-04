@@ -292,6 +292,7 @@ class DisplayTranslator:
         nested_tentacle = user_input_element["nested_tentacle"]
         if nested_tentacle:
             for user_input_name in user_input_element["value"]:
+                properties["options"]["is_nested_tentacle"] = True
                 try:
                     self._generate_schema(
                         properties,
