@@ -96,23 +96,22 @@ class AbstractTentacle:
     ):
         try:
             import octobot_tentacles_manager.api as api
-
             specific_config = api.get_tentacle_config(tentacles_setup_config, cls)
-            if saved_user_inputs := await configuration.get_user_inputs(
-                databases.RunDatabasesProvider.instance().get_run_db(bot_id),
-                cls.get_name(),
-            ):
-                # user inputs have been saved in run database, use those as they might contain additional
-                # (nested) user inputs
-                return specific_config, saved_user_inputs
-            # use user inputs from init_user_inputs
-            tentacle_instance = cls.create_local_instance(
-                config, tentacles_setup_config, specific_config
-            )
-            user_inputs = {}
-            tentacle_instance.init_user_inputs(user_inputs)
-            return specific_config, list(
-                user_input.to_dict() for user_input in user_inputs.values()
-            )
         except ImportError as err:
             raise ImportError("octobot_tentacles_manager is required") from err
+        if saved_user_inputs := await configuration.get_user_inputs(
+            databases.RunDatabasesProvider.instance().get_run_db(bot_id),
+            cls.get_name(),
+        ):
+            # user inputs have been saved in run database, use those as they might contain additional
+            # (nested) user inputs
+            return specific_config, saved_user_inputs
+        # use user inputs from init_user_inputs
+        tentacle_instance = cls.create_local_instance(
+            config, tentacles_setup_config, specific_config
+        )
+        user_inputs = {}
+        tentacle_instance.init_user_inputs(user_inputs)
+        return specific_config, list(
+            user_input.to_dict() for user_input in user_inputs.values()
+        )

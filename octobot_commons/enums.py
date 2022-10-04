@@ -326,6 +326,7 @@ class RunDatabases(enum.Enum):
     OPTIMIZER_RUNS_SCHEDULE_DB = "runs_schedule"
     RUN_DATA_DB = "run_data"
     PORTFOLIO_VALUE_DB = "portfolio_value"
+    HISTORICAL_PORTFOLIO_VALUE = "historical_portfolio_value"
     ORDERS_DB = "orders"
     TRADES_DB = "trades"
     TRANSACTIONS_DB = "transactions"
