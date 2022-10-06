@@ -83,6 +83,8 @@ class EventProvider(singleton.Singleton):
     async def wait_for_event(self, bot_id, path, timeout) -> bool:
         try:
             event = self.get_or_create_event(bot_id, path, allow_creation=False)
+            if timeout == 0:
+                return event.is_triggered()
             if not event.is_triggered():
                 await asyncio.wait_for(event.wait(), timeout)
         except base_tree.NodeExistsError:
