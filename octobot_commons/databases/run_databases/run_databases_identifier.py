@@ -49,15 +49,14 @@ class RunDatabasesIdentifier:
             else ""
         )
 
-    async def initialize(self, exchange=None, from_global_history=False):
+    async def initialize(self, exchange=None):
         """
         Initializes the necessary elements for these run databases. Creates necessary folder on file system databases
         :param exchange: name of the associated exchange
-        :param from_global_history: When True, initializes the run databases as not related to a specific trading mode.
         Used for live trading cross trading mode stats (such as profitability)
         """
         # global history is a live only feature
-        from_global_history = from_global_history and self.backtesting_id is None
+        from_global_history = self.backtesting_id is None
         deepest_identifier = (
             self._base_folder(from_global_history=from_global_history)
             if exchange is None
@@ -115,7 +114,6 @@ class RunDatabasesIdentifier:
         return self._get_db_identifier(
             f"{enums.RunDatabases.PORTFOLIO_VALUE_DB.value}{portfolio_type_suffix}",
             exchange,
-            from_global_history=self.backtesting_id is None,
         )
 
     def get_backtesting_metadata_identifier(self) -> str:
@@ -325,11 +323,11 @@ class RunDatabasesIdentifier:
         ignore_live_id=None,
         ignore_optimizer_id=False,
         optimizer_id=None,
-        from_global_history=False,
+        from_global_history=True,
     ) -> str:
-        path = self._get_base_path(from_global_history, backtesting_id, optimizer_id)
         backtesting_id = backtesting_id or self.backtesting_id
         optimizer_id = optimizer_id or self.optimizer_id
+        path = self._get_base_path(from_global_history, backtesting_id, optimizer_id)
         live_id = live_id or self.live_id
         # when in optimizer or backtesting: wrap it into the current campaign
         if backtesting_id is not None or optimizer_id is not None:
