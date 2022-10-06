@@ -42,6 +42,9 @@ class RunDatabasesProvider(singleton.Singleton):
         return bot_id in self.run_databases
 
     def is_storage_enabled(self, bot_id):
+        """
+        :return: True if storage is enabled for the given bot_id
+        """
         return self.run_databases[bot_id].run_dbs_identifier.enable_storage
 
     def get_any_run_databases_identifier(self):

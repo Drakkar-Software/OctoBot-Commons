@@ -1,3 +1,4 @@
+# pylint: disable=W0703
 #  Drakkar-Software OctoBot-Trading
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -22,13 +23,14 @@ import octobot_commons.enums as enums
 import octobot_commons.constants as constants
 import octobot_commons.logging as logging
 import octobot_commons.errors as errors
-import octobot_commons.databases as databases
+import octobot_commons.databases.implementations as databases_implementations
+import octobot_commons.databases.run_databases.run_databases_identifier as run_databases_identifier
 
 
 class RunDatabasesPruner:
-    def __init__(self, databases_root_path, max_databases_size, database_adaptor):
+    def __init__(self, databases_root_identifier, max_databases_size, database_adaptor):
         self.logger = logging.get_logger(self.__class__.__name__)
-        self.databases_root_path = databases_root_path
+        self.databases_root_identifier = databases_root_identifier
         self.max_databases_size = max_databases_size
         self.database_adaptor = database_adaptor
         self.all_db_data = []
@@ -45,20 +47,28 @@ class RunDatabasesPruner:
         self._run_db = f"{enums.RunDatabases.RUN_DATA_DB.value}{self.database_adaptor.get_db_file_ext()}"
 
     async def explore(self):
-        t0 = time.time()
+        """
+        Explore self.databases_root_identifier to gather storage
+        statistics to be used in prune_oldest_run_databases
+        """
+        t_start = time.time()
         if self.database_adaptor.is_file_system_based():
             self._explore_file_system_databases()
         else:
             raise errors.UnsupportedError(
                 "Only file system based databases are supported for now"
             )
-        total_time = round(time.time() - t0, 2)
+        total_time = round(time.time() - t_start, 2)
         if total_time > 1:
             self.logger.debug(
                 f"Explored run databases for pruning in {total_time} seconds."
             )
 
     async def prune_oldest_run_databases(self):
+        """
+        Delete the necessary backtesting run data for the total backtesting storage
+        size to be <= self.max_databases_size. Deletes oldest run data first
+        """
         self.all_db_data = sorted(
             self.all_db_data, key=lambda data: data.last_modified_time
         )
@@ -86,7 +96,7 @@ class RunDatabasesPruner:
                 int(identifier)
                 for identifier in await run_db_identifier.get_backtesting_run_ids()
             }
-            async with databases.DBWriterReader.database(
+            async with databases_implementations.DBWriterReader.database(
                 run_db_identifier.get_backtesting_metadata_identifier()
             ) as reader_writer:
                 found_runs = await reader_writer.all(enums.DBTables.METADATA.value)
@@ -103,12 +113,14 @@ class RunDatabasesPruner:
             if split_path[-2] == enums.RunDatabases.OPTIMIZER.value:
                 # in optimizer
                 # ex: [..., 'DipAnalyserTradingMode', 'Dip Analyser strat designer test', 'optimizer', 'optimizer_1']
-                optimizer_id = databases.RunDatabasesIdentifier.parse_optimizer_id(
-                    split_path[-1]
+                optimizer_id = (
+                    run_databases_identifier.RunDatabasesIdentifier.parse_optimizer_id(
+                        split_path[-1]
+                    )
                 )
                 campaign_name = split_path[-3]
                 trading_mode = split_path[-4]
-                return databases.RunDatabasesIdentifier(
+                return run_databases_identifier.RunDatabasesIdentifier(
                     trading_mode,
                     optimization_campaign_name=campaign_name,
                     backtesting_id=0,
@@ -118,14 +130,14 @@ class RunDatabasesPruner:
             # ex: [..., 'DipAnalyserTradingMode', 'Dip Analyser strat designer test', 'backtesting']
             campaign_name = split_path[-2]
             trading_mode = split_path[-3]
-            return databases.RunDatabasesIdentifier(
+            return run_databases_identifier.RunDatabasesIdentifier(
                 trading_mode,
                 optimization_campaign_name=campaign_name,
                 backtesting_id=0,
             )
-        except IndexError as e:
+        except IndexError as err:
             self.logger.exception(
-                e, True, f"Unhandled backtesting data path format: {runs_identifier}"
+                err, True, f"Unhandled backtesting data path format: {runs_identifier}"
             )
             return None
 
@@ -141,7 +153,7 @@ class RunDatabasesPruner:
             DBData(
                 directory, [DBPartData(f, True) for f in self._get_all_files(directory)]
             )
-            for directory in self._get_file_system_runs(self.databases_root_path)
+            for directory in self._get_file_system_runs(self.databases_root_identifier)
         ]
 
     def _get_file_system_runs(self, root):
@@ -162,17 +174,16 @@ class RunDatabasesPruner:
     def _prune_database(self, db_data):
         if self.database_adaptor.is_file_system_based():
             return self._prune_file_system_database(db_data)
-        else:
-            raise errors.UnsupportedError(
-                "Only file system based databases are supported for now"
-            )
+        raise errors.UnsupportedError(
+            "Only file system based databases are supported for now"
+        )
 
     def _prune_file_system_database(self, db_data):
         try:
             shutil.rmtree(db_data.identifier)
             return True
-        except Exception as e:
-            self.logger.exception(e, True, f"Error when deleting run database: {e}")
+        except Exception as err:
+            self.logger.exception(err, True, f"Error when deleting run database: {err}")
             return False
 
     def _get_total_db_size(self):
@@ -199,6 +210,9 @@ class DBData:
         self.last_modified_time = max(part.last_modified_time for part in self.parts)
 
     def get_human_readable_last_modified_time(self):
+        """
+        :return: self.last_modified_time in a human-readable format
+        """
         return time.strftime(
             "%Y-%m-%d %H:%M:%S", time.strptime(time.ctime(self.last_modified_time))
         )

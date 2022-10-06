@@ -1,4 +1,4 @@
-# pylint: disable=R0902,R0913,C0415
+# pylint: disable=R0902,R0913,C0415,R0904
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -309,10 +309,16 @@ class RunDatabasesIdentifier:
 
     @staticmethod
     def parse_optimizer_id(identifier) -> str:
+        """
+        :return: the associated optimizer id
+        """
         return identifier.split(constants.DB_SEPARATOR)[-1]
 
     @staticmethod
     def parse_backtesting_id(identifier) -> str:
+        """
+        :return: the associated backtesting id
+        """
         return identifier.split(constants.DB_SEPARATOR)[-1]
 
     def _get_base_path(self, from_global_history, backtesting_id, optimizer_id):

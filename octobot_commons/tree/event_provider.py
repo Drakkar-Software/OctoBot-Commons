@@ -81,6 +81,11 @@ class EventProvider(singleton.Singleton):
         self._event_tree_by_bot_id[bot_id] = event_tree.EventTree()
 
     async def wait_for_event(self, bot_id, path, timeout) -> bool:
+        """
+        Wait for the vent at the given path for the given bot_id.
+        Returns instantly if the path doesn't lead to an event or if timeout is 0
+        :return: False if the event is not triggered after timeout
+        """
         try:
             event = self.get_or_create_event(bot_id, path, allow_creation=False)
             if timeout == 0:

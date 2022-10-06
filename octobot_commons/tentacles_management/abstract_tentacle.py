@@ -1,3 +1,4 @@
+# pylint: disable=C0103,W0703,C0415
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -69,10 +70,19 @@ class AbstractTentacle:
         return {}
 
     def get_local_config(self):
+        """
+        :return: the config of the tentacle
+        """
         raise NotImplementedError
 
     @classmethod
     def create_local_instance(cls, config, tentacles_setup_config, tentacle_config):
+        """
+        :param config: the global configuration to give to the tentacle
+        :param tentacles_setup_config: the global tentacles setup configuration to give to the tentacle
+        :param tentacle_config: the tentacle configuration to give to the tentacle
+        :return: a local, aimed to be short-lived, tentacle instance
+        """
         raise NotImplementedError
 
     def init_user_inputs(self, inputs: dict) -> None:
@@ -80,9 +90,11 @@ class AbstractTentacle:
         Called right before starting the tentacle, should define all the tentacle's user inputs unless
         those are defined somewhere else.
         """
-        pass
 
     async def load_and_save_user_inputs(self, bot_id: str):
+        """
+        Initialize and save the user inputs of the tentacle
+        """
         try:
             inputs = {}
             self.init_user_inputs(inputs)
@@ -92,13 +104,18 @@ class AbstractTentacle:
                 for user_input in inputs.values():
                     await configuration.save_user_input(user_input, run_db)
                 await run_db.flush()
-        except Exception as e:
-            self.logger.exception(e, True, f"Error when initializing user inputs: {e}")
+        except Exception as err:
+            self.logger.exception(
+                err, True, f"Error when initializing user inputs: {err}"
+            )
 
     @classmethod
     async def get_raw_config_and_user_inputs(
         cls, config, tentacles_setup_config, bot_id
     ):
+        """
+        :return: the tentacle configuration and its list of user inputs
+        """
         try:
             import octobot_tentacles_manager.api as api
 

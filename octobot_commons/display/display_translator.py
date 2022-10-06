@@ -1,3 +1,4 @@
+# pylint: disable=R0913,R0914,R0902,W0622,C0103
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -70,6 +71,9 @@ class DisplayTranslator:
         }
 
     def is_empty(self):
+        """
+        :return: True if there is no element in self.elements or self.nested_elements
+        """
         return not (self.nested_elements or self.elements)
 
     @contextlib.contextmanager
@@ -84,6 +88,9 @@ class DisplayTranslator:
         yield element
 
     def add_user_inputs(self, inputs, part=None):
+        """
+        add user inputs to the given part or self
+        """
         config_by_tentacles = {}
         config_schema_by_tentacles = {}
         tentacle_type_by_tentacles = {}
@@ -119,12 +126,12 @@ class DisplayTranslator:
                         user_input_element,
                         nested_user_inputs_by_tentacle,
                     )
-            except KeyError as e:
+            except KeyError as err:
                 self.logger.error(
-                    f"Error when loading user inputs for {tentacle}: missing {e}"
+                    f"Error when loading user inputs for {tentacle}: missing {err}"
                 )
         for tentacle, schema in config_schema_by_tentacles.items():
-            (part or self).user_inputs(
+            (part or self).add_user_inputs_element(
                 "Inputs",
                 config_by_tentacles[tentacle],
                 schema,
@@ -211,24 +218,12 @@ class DisplayTranslator:
                 enums.UserInputTypes.STRING_ARRAY.value,
                 enums.UserInputTypes.OBJECT_ARRAY.value,
             ):
-                # nested object in array, insert array first
-                properties["items"] = {
-                    "type": "object"
-                    if input_type == enums.UserInputTypes.OBJECT_ARRAY.value
-                    else "string",
-                    "properties": {},
-                }
-                if item_title := user_input_element.get("item_title"):
-                    properties["items"]["title"] = item_title
-                if input_type == enums.UserInputTypes.OBJECT_ARRAY.value:
-                    for associated_user_input in self._get_associated_user_input(
-                        user_input_element, nested_user_inputs_by_tentacle
-                    ):
-                        self._generate_schema(
-                            properties["items"],
-                            associated_user_input,
-                            nested_user_inputs_by_tentacle,
-                        )
+                self._adapt_to_specific_array_user_input(
+                    user_input_element,
+                    nested_user_inputs_by_tentacle,
+                    properties,
+                    input_type,
+                )
             elif schema_type in ("options", "array"):
                 options = user_input_element.get("options", [])
                 default_value = (
@@ -250,40 +245,75 @@ class DisplayTranslator:
                         "default": default_value,
                         "enum": options,
                     }
-
             elif schema_type == "object":
-                properties["properties"] = {}
-                nested_tentacle = user_input_element["nested_tentacle"]
-                if nested_tentacle:
-                    for user_input_name in user_input_element["value"]:
-                        try:
-                            self._generate_schema(
-                                properties,
-                                nested_user_inputs_by_tentacle[nested_tentacle][
-                                    user_input_name
-                                ],
-                                nested_user_inputs_by_tentacle,
-                            )
-                        except KeyError as e:
-                            self.logger.warning(
-                                f"Missing user input model for {e}. This element might not be "
-                                f"associated to a tentacle"
-                            )
-                else:
-                    for associated_user_input in self._get_associated_user_input(
-                        user_input_element, nested_user_inputs_by_tentacle
-                    ):
-                        self._generate_schema(
-                            properties,
-                            associated_user_input,
-                            nested_user_inputs_by_tentacle,
-                        )
+                self._adapt_to_object_user_input(
+                    user_input_element, nested_user_inputs_by_tentacle, properties
+                )
             elif schema_type == "text":
                 schema_type = "string"
                 properties["minLength"] = properties.get("minLength", 1)
             properties["type"] = schema_type
-        except KeyError as e:
-            self.logger.error(f"Unknown input type: {e}")
+        except KeyError as err:
+            self.logger.error(f"Unknown input type: {err}")
+
+    def _adapt_to_specific_array_user_input(
+        self,
+        user_input_element,
+        nested_user_inputs_by_tentacle,
+        properties,
+        input_type,
+    ):
+        # nested object in array, insert array first
+        properties["items"] = {
+            "type": "object"
+            if input_type == enums.UserInputTypes.OBJECT_ARRAY.value
+            else "string",
+            "properties": {},
+        }
+        if item_title := user_input_element.get("item_title"):
+            properties["items"]["title"] = item_title
+        if input_type == enums.UserInputTypes.OBJECT_ARRAY.value:
+            for associated_user_input in self._get_associated_user_input(
+                user_input_element, nested_user_inputs_by_tentacle
+            ):
+                self._generate_schema(
+                    properties["items"],
+                    associated_user_input,
+                    nested_user_inputs_by_tentacle,
+                )
+
+    def _adapt_to_object_user_input(
+        self,
+        user_input_element,
+        nested_user_inputs_by_tentacle,
+        properties,
+    ):
+        properties["properties"] = {}
+        nested_tentacle = user_input_element["nested_tentacle"]
+        if nested_tentacle:
+            for user_input_name in user_input_element["value"]:
+                try:
+                    self._generate_schema(
+                        properties,
+                        nested_user_inputs_by_tentacle[nested_tentacle][
+                            user_input_name
+                        ],
+                        nested_user_inputs_by_tentacle,
+                    )
+                except KeyError as err:
+                    self.logger.warning(
+                        f"Missing user input model for {err}. This element might not be "
+                        f"associated to a tentacle"
+                    )
+        else:
+            for associated_user_input in self._get_associated_user_input(
+                user_input_element, nested_user_inputs_by_tentacle
+            ):
+                self._generate_schema(
+                    properties,
+                    associated_user_input,
+                    nested_user_inputs_by_tentacle,
+                )
 
     def _generate_schema(
         self, main_schema, user_input_element, nested_user_inputs_by_tentacle
@@ -329,9 +359,10 @@ class DisplayTranslator:
             if isinstance(options[0], str):
                 return default_type
         except IndexError:
-            return default_type
+            pass
+        return default_type
 
-    def user_inputs(
+    def add_user_inputs_element(
         self,
         name,
         config_values,
@@ -340,6 +371,9 @@ class DisplayTranslator:
         tentacle_type,
         is_hidden,
     ):
+        """
+        Add a user input type element to self.elements
+        """
         element = Element(
             None,
             None,
@@ -421,6 +455,9 @@ class Element:
         self.symbol = symbol
 
     def to_json(self):
+        """
+        :return: the json representation of self
+        """
         return {
             enums.PlotAttributes.KIND.value: self.kind,
             enums.PlotAttributes.X.value: self.x,
@@ -455,10 +492,16 @@ class Element:
         }
 
     def is_empty(self):
+        """
+        :return: False
+        """
         return False
 
     @staticmethod
     def to_list(array, multiplier=1):
+        """
+        :return: a new array in which each value is multiplied by multiplier
+        """
         if array is None:
             return None
         return [e * multiplier for e in array]
