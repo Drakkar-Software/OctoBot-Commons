@@ -33,8 +33,12 @@ class AbstractTentacle:
 
     def __init__(self):
         self.logger = None
-        self.UI: configuration.UserInputFactory = configuration.UserInputFactory(self.USER_INPUT_TENTACLE_TYPE)
-        self.UI.set_tentacle_class(self.__class__).set_tentacle_config_proxy(self.get_local_config)
+        self.UI: configuration.UserInputFactory = configuration.UserInputFactory(
+            self.USER_INPUT_TENTACLE_TYPE
+        )
+        self.UI.set_tentacle_class(self.__class__).set_tentacle_config_proxy(
+            self.get_local_config
+        )
 
     @classmethod
     def get_name(cls) -> str:
@@ -97,6 +101,7 @@ class AbstractTentacle:
     ):
         try:
             import octobot_tentacles_manager.api as api
+
             specific_config = api.get_tentacle_config(tentacles_setup_config, cls)
         except ImportError as err:
             raise ImportError("octobot_tentacles_manager is required") from err

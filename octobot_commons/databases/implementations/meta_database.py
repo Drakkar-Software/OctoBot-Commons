@@ -144,7 +144,7 @@ class MetaDatabase:
             with_lock=self.with_lock,
             cache_size=self.cache_size,
             database_adaptor=self.database_adaptor,
-            enable_storage=self.run_dbs_identifier.enable_storage
+            enable_storage=self.run_dbs_identifier.enable_storage,
         )
 
     async def close(self):

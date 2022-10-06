@@ -102,7 +102,9 @@ class RunDatabasesProvider(singleton.Singleton):
         """
         :return: the bot_id, exchange and portfolio_suffix associated transactions database.
         """
-        return self.run_databases[bot_id].get_historical_portfolio_value_db(exchange, portfolio_suffix)
+        return self.run_databases[bot_id].get_historical_portfolio_value_db(
+            exchange, portfolio_suffix
+        )
 
     async def close(self, bot_id):
         """
