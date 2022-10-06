@@ -218,6 +218,8 @@ async def save_user_input(
     Save the user input in the given run_data_writer. First checks if the user input is not already present.
     Does not update a user input if it is already saved in run_data_writer.
     """
+    if not run_data_writer.enable_storage:
+        return
     if not await run_data_writer.contains_row(
         enums.DBTables.INPUTS.value,
         {
