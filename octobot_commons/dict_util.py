@@ -33,7 +33,9 @@ def find_nested_value(dict_, field, list_indexes=None):
                 value, field, list_indexes=list_indexes
             )
         elif isinstance(value, list):
-            found_value, possible_value = _find_nested_value_in_list(value, field, list_indexes)
+            found_value, possible_value = _find_nested_value_in_list(
+                value, field, list_indexes
+            )
         if found_value:
             return found_value, possible_value
     return False, field

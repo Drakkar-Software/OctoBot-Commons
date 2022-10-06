@@ -102,7 +102,9 @@ class UserInput:
 
 class UserInputFactory:
     def __init__(self, user_input_tentacle_type: enums.UserInputTentacleTypes):
-        self.user_input_tentacle_type: enums.UserInputTentacleTypes = user_input_tentacle_type
+        self.user_input_tentacle_type: enums.UserInputTentacleTypes = (
+            user_input_tentacle_type
+        )
         self.tentacle_class = None
         self.tentacle_config_proxy = None
 
@@ -137,7 +139,7 @@ class UserInputFactory:
         path=None,
         order=None,
         array_indexes=None,
-        return_value_only=True
+        return_value_only=True,
     ):
         """
         Set and return a user input value.
@@ -147,7 +149,9 @@ class UserInputFactory:
         :return: the saved_config value if any, def_val otherwise
         """
         sanitized_name = sanitize_user_input_name(name)
-        parent = _find_parent_config_node(self.tentacle_config_proxy(), parent_input_name, array_indexes)
+        parent = _find_parent_config_node(
+            self.tentacle_config_proxy(), parent_input_name, array_indexes
+        )
         used_value = value
         if value is None:
             # value is not provided, use def_val
@@ -195,10 +199,14 @@ class UserInputFactory:
         previous_tentacle_class = self.tentacle_class
         previous_tentacle_config_proxy = self.tentacle_config_proxy
         try:
-            self.set_tentacle_class(tentacle_class).set_tentacle_config_proxy(tentacle_config_proxy)
+            self.set_tentacle_class(tentacle_class).set_tentacle_config_proxy(
+                tentacle_config_proxy
+            )
             yield
         finally:
-            self.set_tentacle_class(previous_tentacle_class).set_tentacle_config_proxy(previous_tentacle_config_proxy)
+            self.set_tentacle_class(previous_tentacle_class).set_tentacle_config_proxy(
+                previous_tentacle_config_proxy
+            )
 
 
 def sanitize_user_input_name(name):

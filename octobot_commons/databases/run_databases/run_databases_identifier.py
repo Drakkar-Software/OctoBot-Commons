@@ -40,7 +40,11 @@ class RunDatabasesIdentifier:
         self.backtesting_id = backtesting_id
         self.live_id = live_id
         self.optimizer_id = optimizer_id
-        self.tentacle_class = tentacle_class if isinstance(tentacle_class, str) else tentacle_class.__name__
+        self.tentacle_class = (
+            tentacle_class
+            if isinstance(tentacle_class, str)
+            else tentacle_class.__name__
+        )
         self.enable_storage = enable_storage
         self.context = context
         self.data_path = self._merge_parts(constants.USER_FOLDER, constants.DATA_FOLDER)
@@ -294,9 +298,7 @@ class RunDatabasesIdentifier:
         """
         :return: a list of every backtesting id in the current campaign
         """
-        runs_path = self._base_folder(
-            ignore_backtesting_id=True
-        )
+        runs_path = self._base_folder(ignore_backtesting_id=True)
         if await self.database_adaptor.identifier_exists(runs_path, False):
             return [
                 self.parse_backtesting_id(element)

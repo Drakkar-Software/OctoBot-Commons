@@ -33,10 +33,14 @@ class RunDatabasesPruner:
         self.database_adaptor = database_adaptor
         self.all_db_data = []
 
-        separator = os.path.sep if self.database_adaptor.is_file_system_based else constants.DB_SEPARATOR
+        separator = (
+            os.path.sep
+            if self.database_adaptor.is_file_system_based
+            else constants.DB_SEPARATOR
+        )
         self.backtesting_run_path_identifier = {
             f"{separator}{enums.RunDatabases.BACKTESTING.value}{separator}",
-            f"{separator}{enums.RunDatabases.OPTIMIZER.value}{separator}"
+            f"{separator}{enums.RunDatabases.OPTIMIZER.value}{separator}",
         }
         self._run_db = f"{enums.RunDatabases.RUN_DATA_DB.value}{self.database_adaptor.get_db_file_ext()}"
 
@@ -45,13 +49,19 @@ class RunDatabasesPruner:
         if self.database_adaptor.is_file_system_based():
             self._explore_file_system_databases()
         else:
-            raise errors.UnsupportedError("Only file system based databases are supported for now")
+            raise errors.UnsupportedError(
+                "Only file system based databases are supported for now"
+            )
         total_time = round(time.time() - t0, 2)
         if total_time > 1:
-            self.logger.debug(f"Explored run databases for pruning in {total_time} seconds.")
+            self.logger.debug(
+                f"Explored run databases for pruning in {total_time} seconds."
+            )
 
     async def prune_oldest_run_databases(self):
-        self.all_db_data = sorted(self.all_db_data, key=lambda data: data.last_modified_time)
+        self.all_db_data = sorted(
+            self.all_db_data, key=lambda data: data.last_modified_time
+        )
         removed_databases = []
         while self._get_total_db_size() > self.max_databases_size:
             if self._prune_database(self.all_db_data[0]):
@@ -76,8 +86,9 @@ class RunDatabasesPruner:
                 int(identifier)
                 for identifier in await run_db_identifier.get_backtesting_run_ids()
             }
-            async with databases.DBWriterReader.database(run_db_identifier.get_backtesting_metadata_identifier()) \
-                    as reader_writer:
+            async with databases.DBWriterReader.database(
+                run_db_identifier.get_backtesting_metadata_identifier()
+            ) as reader_writer:
                 found_runs = await reader_writer.all(enums.DBTables.METADATA.value)
                 metadata = [
                     run
@@ -92,7 +103,9 @@ class RunDatabasesPruner:
             if split_path[-2] == enums.RunDatabases.OPTIMIZER.value:
                 # in optimizer
                 # ex: [..., 'DipAnalyserTradingMode', 'Dip Analyser strat designer test', 'optimizer', 'optimizer_1']
-                optimizer_id = databases.RunDatabasesIdentifier.parse_optimizer_id(split_path[-1])
+                optimizer_id = databases.RunDatabasesIdentifier.parse_optimizer_id(
+                    split_path[-1]
+                )
                 campaign_name = split_path[-3]
                 trading_mode = split_path[-4]
                 return databases.RunDatabasesIdentifier(
@@ -111,7 +124,9 @@ class RunDatabasesPruner:
                 backtesting_id=0,
             )
         except IndexError as e:
-            self.logger.exception(e, True, f"Unhandled backtesting data path format: {runs_identifier}")
+            self.logger.exception(
+                e, True, f"Unhandled backtesting data path format: {runs_identifier}"
+            )
             return None
 
     def _log_summary(self, removed_databases):
@@ -124,11 +139,7 @@ class RunDatabasesPruner:
     def _explore_file_system_databases(self):
         self.all_db_data = [
             DBData(
-                directory,
-                [
-                    DBPartData(f, True)
-                    for f in self._get_all_files(directory)
-                ]
+                directory, [DBPartData(f, True) for f in self._get_all_files(directory)]
             )
             for directory in self._get_file_system_runs(self.databases_root_path)
         ]
@@ -152,7 +163,9 @@ class RunDatabasesPruner:
         if self.database_adaptor.is_file_system_based():
             return self._prune_file_system_database(db_data)
         else:
-            raise errors.UnsupportedError("Only file system based databases are supported for now")
+            raise errors.UnsupportedError(
+                "Only file system based databases are supported for now"
+            )
 
     def _prune_file_system_database(self, db_data):
         try:
@@ -166,8 +179,10 @@ class RunDatabasesPruner:
         return sum(db_data.size for db_data in self.all_db_data)
 
     def _is_run_top_level_folder(self, dir_entry):
-        return os.path.isfile(os.path.join(dir_entry, self._run_db)) and \
-               any(identifier in dir_entry.path for identifier in self.backtesting_run_path_identifier)
+        return os.path.isfile(os.path.join(dir_entry, self._run_db)) and any(
+            identifier in dir_entry.path
+            for identifier in self.backtesting_run_path_identifier
+        )
 
     def _get_run_top_level_folder(self, parent_path, path):
         folder_path = os.path.join(parent_path, path)
@@ -184,7 +199,9 @@ class DBData:
         self.last_modified_time = max(part.last_modified_time for part in self.parts)
 
     def get_human_readable_last_modified_time(self):
-        return time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(time.ctime(self.last_modified_time)))
+        return time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.strptime(time.ctime(self.last_modified_time))
+        )
 
 
 class DBPartData:
