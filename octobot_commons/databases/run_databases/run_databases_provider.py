@@ -41,6 +41,12 @@ class RunDatabasesProvider(singleton.Singleton):
         """
         return bot_id in self.run_databases
 
+    def get_any_run_databases_identifier(self):
+        """
+        :return: the first added run_dbs_identifier
+        """
+        return next(iter(self.run_databases.values())).run_dbs_identifier
+
     def get_run_databases_identifier(self, bot_id):
         """
         :return: the bot_id associated run_dbs_identifier

@@ -65,6 +65,7 @@ from octobot_commons.databases.run_databases import (
     RunDatabasesProvider,
     init_bot_storage,
     close_bot_storage,
+    RunDatabasesPruner,
 )
 
 from octobot_commons.databases.cache_manager import (
@@ -100,6 +101,7 @@ __all__ = [
     "RunDatabasesProvider",
     "init_bot_storage",
     "close_bot_storage",
+    "RunDatabasesPruner",
     "CacheManager",
     "CacheWrapper",
     "CacheClient",
