@@ -27,9 +27,12 @@ class BaseDatabase:
         file_path: str,
         database_adaptor=adaptors.TinyDBAdaptor,
         cache_size=None,
+        enable_storage=True,
         **kwargs,
     ):
-        if database_adaptor is not None:
+        self.enable_storage = enable_storage
+        self._database = None
+        if self.enable_storage and database_adaptor is not None:
             self._database = document_database.DocumentDatabase(
                 database_adaptor(file_path, cache_size=cache_size, **kwargs)
             )
@@ -87,8 +90,9 @@ class BaseDatabase:
         """
         Closes the database, flushes it first
         """
-        await self.flush()
-        await self._database.close()
+        if self.enable_storage:
+            await self.flush()
+            await self._database.close()
 
     async def clear(self):
         """

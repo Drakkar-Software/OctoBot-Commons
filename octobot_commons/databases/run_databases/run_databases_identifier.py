@@ -33,6 +33,7 @@ class RunDatabasesIdentifier:
         live_id=None,
         optimizer_id=None,
         context=None,
+        enable_storage=True,
     ):
         self.database_adaptor = database_adaptor
         self.optimization_campaign_name = optimization_campaign_name
@@ -40,6 +41,7 @@ class RunDatabasesIdentifier:
         self.live_id = live_id
         self.optimizer_id = optimizer_id
         self.tentacle_class = tentacle_class if isinstance(tentacle_class, str) else tentacle_class.__name__
+        self.enable_storage = enable_storage
         self.context = context
         self.data_path = self._merge_parts(constants.USER_FOLDER, constants.DATA_FOLDER)
         self.base_path = self._merge_parts(self.data_path, self.tentacle_class)
@@ -55,6 +57,8 @@ class RunDatabasesIdentifier:
         :param exchange: name of the associated exchange
         Used for live trading cross trading mode stats (such as profitability)
         """
+        if not self.enable_storage:
+            return
         # global history is a live only feature
         from_global_history = self.backtesting_id is None
         deepest_identifier = (
