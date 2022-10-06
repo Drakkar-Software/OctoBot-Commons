@@ -111,12 +111,6 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
                 and folder.name not in ignored_identifiers
             ):
                 yield folder.name
-        # return (
-        #     folder.name
-        #     for folder in os.scandir(identifier)
-        #     if await TinyDBAdaptor.identifier_exists(folder, False)
-        #     and folder.name not in ignored_identifiers
-        # )
 
     @staticmethod
     async def get_single_sub_identifier(identifier, ignored_identifiers) -> str:

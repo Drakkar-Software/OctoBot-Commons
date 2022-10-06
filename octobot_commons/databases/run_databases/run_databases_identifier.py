@@ -39,10 +39,10 @@ class RunDatabasesIdentifier:
         self.backtesting_id = backtesting_id
         self.live_id = live_id
         self.optimizer_id = optimizer_id
-        self.tentacle_class = tentacle_class
+        self.tentacle_class = tentacle_class if isinstance(tentacle_class, str) else tentacle_class.__name__
         self.context = context
         self.data_path = self._merge_parts(constants.USER_FOLDER, constants.DATA_FOLDER)
-        self.base_path = self._merge_parts(self.data_path, tentacle_class.__name__)
+        self.base_path = self._merge_parts(self.data_path, self.tentacle_class)
         self.suffix = (
             self.database_adaptor.get_db_file_ext()
             if self.database_adaptor.is_file_system_based()
@@ -265,7 +265,7 @@ class RunDatabasesIdentifier:
             optimization_campaign_folder, False
         ):
             return [
-                self._parse_optimizer_id(element)
+                self.parse_optimizer_id(element)
                 async for element in self.database_adaptor.get_sub_identifiers(
                     optimization_campaign_folder, [enums.RunDatabases.LIVE.value]
                 )
@@ -282,14 +282,33 @@ class RunDatabasesIdentifier:
         )
         if await self.database_adaptor.identifier_exists(optimizer_runs_path, False):
             return [
-                self._parse_optimizer_id(element)
+                self.parse_optimizer_id(element)
                 async for element in self.database_adaptor.get_sub_identifiers(
                     optimizer_runs_path, []
                 )
             ]
 
+    async def get_backtesting_run_ids(self) -> list:
+        """
+        :return: a list of every backtesting id in the current campaign
+        """
+        runs_path = self._base_folder(
+            ignore_backtesting_id=True
+        )
+        if await self.database_adaptor.identifier_exists(runs_path, False):
+            return [
+                self.parse_backtesting_id(element)
+                async for element in self.database_adaptor.get_sub_identifiers(
+                    runs_path, []
+                )
+            ]
+
     @staticmethod
-    def _parse_optimizer_id(identifier) -> str:
+    def parse_optimizer_id(identifier) -> str:
+        return identifier.split(constants.DB_SEPARATOR)[-1]
+
+    @staticmethod
+    def parse_backtesting_id(identifier) -> str:
         return identifier.split(constants.DB_SEPARATOR)[-1]
 
     def _get_base_path(self, from_global_history, backtesting_id, optimizer_id):
