@@ -109,10 +109,18 @@ class UserInputFactory:
         self.tentacle_config_proxy = None
 
     def set_tentacle_class(self, tentacle_class):
+        """
+        set the associated tentacle class
+        :return: self
+        """
         self.tentacle_class = tentacle_class
         return self
 
     def set_tentacle_config_proxy(self, tentacle_config_proxy):
+        """
+        set the associated tentacle configuration proxy function
+        :return: self
+        """
         self.tentacle_config_proxy = tentacle_config_proxy
         return self
 
@@ -196,6 +204,9 @@ class UserInputFactory:
 
     @contextlib.contextmanager
     def local_factory(self, tentacle_class, tentacle_config_proxy):
+        """
+        temporarily set the associated tentacle class and tentacle config proxy
+        """
         previous_tentacle_class = self.tentacle_class
         previous_tentacle_config_proxy = self.tentacle_config_proxy
         try:
@@ -290,6 +301,9 @@ async def clear_user_inputs(writer, tentacle_name=None):
 
 
 def _find_parent_config_node(tentacle_config, parent_input_name, array_indexes):
+    """
+    :return: the found parent node from tentacles_config
+    """
     if parent_input_name is not None:
         found, nested_parent = dict_util.find_nested_value(
             tentacle_config,
@@ -298,9 +312,8 @@ def _find_parent_config_node(tentacle_config, parent_input_name, array_indexes):
         )
         if found and isinstance(nested_parent, dict):
             return nested_parent
-        elif found and isinstance(nested_parent, list) and array_indexes:
+        if found and isinstance(nested_parent, list) and array_indexes:
             return nested_parent[array_indexes[-1]]
-        else:
-            # non dict or list with array_indexes nested parents are not supported
-            return None
+        # non dict or list with array_indexes nested parents are not supported
+        return None
     return tentacle_config
