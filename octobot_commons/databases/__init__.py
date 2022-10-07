@@ -1,3 +1,4 @@
+# pylint: disable=R0801
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -65,7 +66,9 @@ from octobot_commons.databases.run_databases import (
     RunDatabasesProvider,
     init_bot_storage,
     close_bot_storage,
-    RunDatabasesPruner,
+    AbstractRunDatabasesPruner,
+    FileSystemRunDatabasesPruner,
+    run_databases_pruner_factory,
 )
 
 from octobot_commons.databases.cache_manager import (
@@ -101,7 +104,9 @@ __all__ = [
     "RunDatabasesProvider",
     "init_bot_storage",
     "close_bot_storage",
-    "RunDatabasesPruner",
+    "AbstractRunDatabasesPruner",
+    "FileSystemRunDatabasesPruner",
+    "run_databases_pruner_factory",
     "CacheManager",
     "CacheWrapper",
     "CacheClient",

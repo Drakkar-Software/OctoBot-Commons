@@ -13,7 +13,8 @@
 from octobot_commons.databases.run_databases import run_databases_identifier
 from octobot_commons.databases.run_databases import run_databases_provider
 from octobot_commons.databases.run_databases import storage
-from octobot_commons.databases.run_databases import run_databases_pruner
+from octobot_commons.databases.run_databases import abstract_run_databases_pruner
+from octobot_commons.databases.run_databases import file_system_run_databases_pruner
 
 from octobot_commons.databases.run_databases.run_databases_identifier import (
     RunDatabasesIdentifier,
@@ -25,8 +26,14 @@ from octobot_commons.databases.run_databases.storage import (
     init_bot_storage,
     close_bot_storage,
 )
-from octobot_commons.databases.run_databases.run_databases_pruner import (
-    RunDatabasesPruner,
+from octobot_commons.databases.run_databases.abstract_run_databases_pruner import (
+    AbstractRunDatabasesPruner,
+)
+from octobot_commons.databases.run_databases.file_system_run_databases_pruner import (
+    FileSystemRunDatabasesPruner,
+)
+from octobot_commons.databases.run_databases.run_databases_pruning_factory import (
+    run_databases_pruner_factory,
 )
 
 
@@ -35,5 +42,7 @@ __all__ = [
     "RunDatabasesProvider",
     "init_bot_storage",
     "close_bot_storage",
-    "RunDatabasesPruner",
+    "AbstractRunDatabasesPruner",
+    "FileSystemRunDatabasesPruner",
+    "run_databases_pruner_factory",
 ]

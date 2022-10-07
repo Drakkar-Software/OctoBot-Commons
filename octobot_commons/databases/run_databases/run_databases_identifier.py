@@ -144,13 +144,19 @@ class RunDatabasesIdentifier:
         if exchange is None:
             return self._merge_parts(
                 self._base_folder(**base_folder_kwargs),
-                f"{run_database_name}{self.suffix}",
+                self.get_db_full_name(run_database_name),
             )
         return self._merge_parts(
             self._base_folder(**base_folder_kwargs),
             exchange,
-            f"{run_database_name}{self.suffix}",
+            self.get_db_full_name(run_database_name),
         )
+
+    def get_db_full_name(self, db_name):
+        """
+        :return: the db_name's associated database name including suffix
+        """
+        return f"{db_name}{self.suffix}"
 
     async def exchange_base_identifier_exists(self, exchange) -> bool:
         """
@@ -184,7 +190,7 @@ class RunDatabasesIdentifier:
         identifier = self._merge_parts(
             self._base_folder(),
             exchange,
-            f"{symbol_util.merge_symbol(symbol)}{self.suffix}",
+            self.get_db_full_name(symbol_util.merge_symbol(symbol)),
         )
         return await self.database_adaptor.identifier_exists(identifier, True)
 
@@ -202,7 +208,7 @@ class RunDatabasesIdentifier:
             self.base_path,
             self.optimization_campaign_name,
             enums.RunDatabases.OPTIMIZER.value,
-            f"{enums.RunDatabases.OPTIMIZER_RUNS_SCHEDULE_DB.value}" f"{self.suffix}",
+            self.get_db_full_name(enums.RunDatabases.OPTIMIZER_RUNS_SCHEDULE_DB.value),
         )
 
     async def generate_new_backtesting_id(self) -> int:

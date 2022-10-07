@@ -82,7 +82,7 @@ class EventProvider(singleton.Singleton):
 
     async def wait_for_event(self, bot_id, path, timeout) -> bool:
         """
-        Wait for the vent at the given path for the given bot_id.
+        Wait for the event at the given path for the given bot_id.
         Returns instantly if the path doesn't lead to an event or if timeout is 0
         :return: False if the event is not triggered after timeout
         """
