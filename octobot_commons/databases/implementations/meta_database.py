@@ -15,6 +15,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import contextlib
+import os
 
 import octobot_commons.databases.implementations.db_writer_reader as db_writer_reader
 import octobot_commons.enums as enums
@@ -124,6 +125,24 @@ class MetaDatabase:
                 self.run_dbs_identifier.get_symbol_db_identifier(exchange, symbol)
             )
         return self.symbol_dbs[key]
+
+    async def get_all_symbol_dbs(self, exchange):
+        """
+        :return: an iterable over each symbol database for the given exchange
+        """
+        if self.run_dbs_identifier.database_adaptor.is_file_system_based():
+            return [
+                self.get_symbol_db(
+                    exchange, self.run_dbs_identifier.get_symbol_db_name(db.name)
+                )
+                for db in os.scandir(
+                    self.run_dbs_identifier.get_exchange_based_identifier(exchange)
+                )
+                if self.run_dbs_identifier.is_symbol_database(db.name)
+            ]
+        raise NotImplementedError(
+            "get_all_symbol_dbs is not implemented for non is_file_system_based databases"
+        )
 
     def all_basic_run_db(self, exchange=None):
         """

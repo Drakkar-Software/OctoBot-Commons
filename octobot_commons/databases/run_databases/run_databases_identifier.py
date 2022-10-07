@@ -162,8 +162,15 @@ class RunDatabasesIdentifier:
         """
         :return: True if there are data under this exchange name
         """
-        identifier = self._merge_parts(self._base_folder(), exchange)
-        return await self.database_adaptor.identifier_exists(identifier, False)
+        return await self.database_adaptor.identifier_exists(
+            self.get_exchange_based_identifier(exchange), False
+        )
+
+    def get_exchange_based_identifier(self, exchange):
+        """
+        :return: the database identifier associated to the given exchange
+        """
+        return self._merge_parts(self._base_folder(), exchange)
 
     async def get_single_existing_exchange(self) -> str:
         """
@@ -228,6 +235,21 @@ class RunDatabasesIdentifier:
         :return: a new unique optimizer id
         """
         return await self._generate_new_id(back_list=back_list, is_optimizer=True)
+
+    def is_symbol_database(self, database_identifier: str) -> bool:
+        """
+        :return: True if the given identifier is related to a symbol database
+        """
+        return database_identifier.endswith(self.suffix) and all(
+            not other_identifier.value in database_identifier
+            for other_identifier in enums.RunDatabases
+        )
+
+    def get_symbol_db_name(self, symbol_db_identifier):
+        """
+        :return: the given identifier's database name (without suffix if any)
+        """
+        return symbol_db_identifier.split(self.suffix)[0]
 
     def remove_all(self):
         """

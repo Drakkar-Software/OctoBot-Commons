@@ -101,6 +101,12 @@ class RunDatabasesProvider(singleton.Singleton):
             raise errors.DatabaseNotFoundError("symbol parameter has to be provided")
         return self.run_databases[bot_id].get_symbol_db(exchange, symbol)
 
+    async def get_all_symbol_dbs(self, bot_id, exchange):
+        """
+        :return: an iterable over each symbol database for the given exchange
+        """
+        return await self.run_databases[bot_id].get_all_symbol_dbs(exchange)
+
     def get_historical_portfolio_value_db(self, bot_id, exchange, portfolio_suffix):
         """
         :return: the bot_id, exchange and portfolio_suffix associated transactions database.
