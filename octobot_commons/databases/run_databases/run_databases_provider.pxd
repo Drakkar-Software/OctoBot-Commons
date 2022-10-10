@@ -17,6 +17,7 @@
 cimport octobot_commons.singleton as singleton
 
 cdef class RunDatabasesProvider(singleton.Singleton):
+    cdef object logger
     cdef public dict run_databases
 
     cpdef bint has_bot_id(self, str bot_id)
