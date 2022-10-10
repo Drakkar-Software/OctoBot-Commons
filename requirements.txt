@@ -9,3 +9,4 @@ sortedcontainers
 
 # async sqlite connection
 aiosqlite>=0.16.0, <0.17
+
