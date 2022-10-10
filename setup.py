@@ -58,6 +58,7 @@ packages_list = [
     "octobot_commons.databases.relational_databases.sqlite.cursor_pool",
     "octobot_commons.databases.relational_databases.sqlite.cursor_wrapper",
     "octobot_commons.databases.relational_databases.sqlite.sqlite_database",
+    "octobot_commons.databases.run_databases.run_databases_provider",
 ]
 
 ext_modules = [
