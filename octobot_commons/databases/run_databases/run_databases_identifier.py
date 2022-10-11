@@ -304,6 +304,7 @@ class RunDatabasesIdentifier:
                     optimization_campaign_folder, [enums.RunDatabases.LIVE.value]
                 )
             ]
+        return []
 
     async def get_optimizer_run_ids(self) -> list:
         """

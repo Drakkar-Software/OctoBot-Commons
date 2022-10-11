@@ -22,10 +22,13 @@ def test_parse_symbol():
 
 def test_merge_symbol():
     assert octobot_commons.symbols.merge_symbol("BTC/USDT") == "BTCUSDT"
+    assert octobot_commons.symbols.merge_symbol("BTC/USDT:USDT") == "BTCUSDT_USDT"
 
 
 def test_merge_currencies():
     assert octobot_commons.symbols.merge_currencies("BTC", "USDT") == "BTC/USDT"
+    assert octobot_commons.symbols.merge_currencies("BTC", "USDT", "BTC") == "BTC/USDT:BTC"
+    assert octobot_commons.symbols.merge_currencies("BTC", "USDT", "XXX", "g", "d") == "BTCgUSDTdXXX"
 
 
 def test_convert_symbol():

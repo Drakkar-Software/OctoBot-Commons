@@ -30,3 +30,4 @@ cdef class Symbol:
     cpdef tuple base_and_quote(self)
     cpdef bint is_linear(self)
     cpdef bint is_inverse(self)
+    cpdef str merged_str_symbol(self, str market_separator=*, str settlement_separator=*)
