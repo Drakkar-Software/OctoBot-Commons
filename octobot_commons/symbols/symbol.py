@@ -61,7 +61,7 @@ class Symbol:
         Parse the specified symbol
         :param symbol_str: the symbol to parse
         """
-        if ":" in symbol_str:
+        if octobot_commons.SETTLEMENT_ASSET_SEPARATOR in symbol_str:
             (
                 self.base,
                 self.quote,
@@ -83,12 +83,26 @@ class Symbol:
         """
         return self.base, self.quote
 
-    def legacy_symbol(self):
+    def merged_str_symbol(
+        self,
+        market_separator=octobot_commons.MARKET_SEPARATOR,
+        settlement_separator=octobot_commons.SETTLEMENT_ASSET_SEPARATOR
+    ):
         """
-        return the base/quote representation of this symbol
-        TODO: remove when ccxt symbol migration is complete
+        return the base/quote representation of this symbol. includes settlement asset if set
         """
-        return f"{self.base}{octobot_commons.MARKET_SEPARATOR}{self.quote}"
+        if self.settlement_asset:
+            return f"{self.base}{market_separator}{self.quote}{settlement_separator}{self.settlement_asset}"
+        return f"{self.base}{market_separator}{self.quote}"
+
+    def merged_str_base_and_quote_only_symbol(
+        self,
+        market_separator=octobot_commons.MARKET_SEPARATOR,
+    ):
+        """
+        return the base/quote representation of this symbol. includes settlement asset if set
+        """
+        return f"{self.base}{market_separator}{self.quote}"
 
     def is_perpetual_future(self):
         """
@@ -98,13 +112,18 @@ class Symbol:
             self.identifier or self.strike_price or self.option_type
         )
 
+    def is_spot(self):
+        """
+        return True when this symbol is related to a spot asset
+        """
+        return self.base and self.quote and not self.settlement_asset
+
     def is_future(self):
         """
         return True when this symbol is related to a non-perpetual future contract
         """
-        return (
+        return bool(
             self.settlement_asset
-            and self.identifier
             and not (self.strike_price or self.option_type)
         )
 
@@ -112,7 +131,7 @@ class Symbol:
         """
         return True when this symbol is related to an option contract
         """
-        return (
+        return bool(
             self.settlement_asset
             and self.identifier
             and self.strike_price
@@ -130,6 +149,12 @@ class Symbol:
         return True when this symbol is related to an inverse contract based on the settlement_asset
         """
         return self.base == self.settlement_asset if self.settlement_asset else False
+
+    def is_same_base_and_quote(self, other):
+        return (
+            self.base == other.base
+            and self.quote == other.quote
+        )
 
     def __eq__(self, other):
         return self is other or (

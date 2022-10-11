@@ -33,18 +33,27 @@ def merge_symbol(symbol):
     :param symbol: the specified symbol
     :return: merged currency and market without /
     """
-    return symbol.replace(octobot_commons.MARKET_SEPARATOR, "")
+    return symbol.replace(octobot_commons.MARKET_SEPARATOR, "").replace(octobot_commons.SETTLEMENT_ASSET_SEPARATOR, "_")
 
 
-def merge_currencies(currency, market, separator=octobot_commons.MARKET_SEPARATOR):
+def merge_currencies(currency, market, settlement_asset=None, market_separator=octobot_commons.MARKET_SEPARATOR,
+                     settlement_separator=octobot_commons.SETTLEMENT_ASSET_SEPARATOR):
     """
     Merge currency and market
-    :param currency: the currency
-    :param market: the currency
-    :param separator: the separator
+    :param currency: the base currency
+    :param market: the quote currency
+    :param settlement_asset: the settlement asset currency (unused for spot trading)
+    :param market_separator: the separator between currency and market
+    :param settlement_separator: the separator between the pair and reference market
     :return: currency and market merged
     """
-    return f"{currency}{separator}{market}"
+    symbol = octobot_commons.symbols.symbol.Symbol(f"{currency}{market_separator}{market}")
+    if settlement_asset is not None:
+        symbol.settlement_asset = settlement_asset
+    return symbol.merged_str_symbol(
+        market_separator=market_separator,
+        settlement_separator=settlement_separator,
+    )
 
 
 def convert_symbol(
@@ -53,6 +62,7 @@ def convert_symbol(
     new_symbol_separator=octobot_commons.MARKET_SEPARATOR,
     should_uppercase=False,
     should_lowercase=False,
+    base_and_quote_only=False,
 ):
     """
     Convert symbol according to parameter
@@ -63,6 +73,8 @@ def convert_symbol(
     :param should_lowercase: if it should be concerted to lowercase
     :return:
     """
+    if base_and_quote_only:
+        symbol = symbol.split(octobot_commons.SETTLEMENT_ASSET_SEPARATOR)[0]
     if should_uppercase:
         return symbol.replace(symbol_separator, new_symbol_separator).upper()
     if should_lowercase:
