@@ -13,6 +13,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import math
 
 
 def round_into_str_with_max_digits(number: float, digits_count: int) -> str:
@@ -35,3 +36,11 @@ def round_into_float_with_max_digits(number: float, digits_count: int) -> float:
     return float(
         round_into_str_with_max_digits(number=number, digits_count=digits_count)
     )
+
+
+def get_digits_count(value):
+    """
+    :param value: a float number
+    :return: the number of digits in the given float
+    """
+    return round(abs(math.log(value, 10)))
