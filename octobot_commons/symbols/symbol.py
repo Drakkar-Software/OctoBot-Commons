@@ -45,7 +45,12 @@ class Symbol:
     # 'ETH/USDT:USDT-210625-5000-C'  // ETH/USDT call option contract strike price 5000 USDT settled in USDT (linear,
     # vanilla) on 2021-06-25
 
-    def __init__(self, symbol_str):
+    def __init__(
+        self,
+        symbol_str,
+        market_separator=octobot_commons.MARKET_SEPARATOR,
+        settlement_separator=octobot_commons.SETTLEMENT_ASSET_SEPARATOR,
+    ):
         self.symbol_str = symbol_str
         self.base = None
         self.quote = None
@@ -54,6 +59,8 @@ class Symbol:
         self.strike_price = None
         self.option_type = None
         self.full_symbol_regex = self.FULL_SYMBOL_GROUPS_REGEX
+        self.market_separator = market_separator
+        self.settlement_separator = settlement_separator
         self.parse_symbol(self.symbol_str)
 
     def parse_symbol(self, symbol_str):
@@ -61,7 +68,7 @@ class Symbol:
         Parse the specified symbol
         :param symbol_str: the symbol to parse
         """
-        if octobot_commons.SETTLEMENT_ASSET_SEPARATOR in symbol_str:
+        if self.settlement_separator in symbol_str:
             (
                 self.base,
                 self.quote,
@@ -72,7 +79,7 @@ class Symbol:
             ) = re.search(self.full_symbol_regex, symbol_str).groups()
         else:
             # simple (probably spot) pair, use str.split as it is much faster
-            self.base, self.quote = symbol_str.split(octobot_commons.MARKET_SEPARATOR)
+            self.base, self.quote = symbol_str.split(self.market_separator)
             self.settlement_asset = (
                 self.identifier
             ) = self.strike_price = self.option_type = ""
@@ -86,7 +93,7 @@ class Symbol:
     def merged_str_symbol(
         self,
         market_separator=octobot_commons.MARKET_SEPARATOR,
-        settlement_separator=octobot_commons.SETTLEMENT_ASSET_SEPARATOR
+        settlement_separator=octobot_commons.SETTLEMENT_ASSET_SEPARATOR,
     ):
         """
         return the base/quote representation of this symbol. includes settlement asset if set
@@ -123,8 +130,7 @@ class Symbol:
         return True when this symbol is related to a non-perpetual future contract
         """
         return bool(
-            self.settlement_asset
-            and not (self.strike_price or self.option_type)
+            self.settlement_asset and not (self.strike_price or self.option_type)
         )
 
     def is_option(self):
@@ -151,10 +157,10 @@ class Symbol:
         return self.base == self.settlement_asset if self.settlement_asset else False
 
     def is_same_base_and_quote(self, other):
-        return (
-            self.base == other.base
-            and self.quote == other.quote
-        )
+        """*
+        :return: True if the given symbol has the same base and quote as self
+        """
+        return self.base == other.base and self.quote == other.quote
 
     def __eq__(self, other):
         return self is other or (

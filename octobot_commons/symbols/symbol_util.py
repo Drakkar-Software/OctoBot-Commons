@@ -1,3 +1,4 @@
+# pylint: disable=R0913
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -33,11 +34,18 @@ def merge_symbol(symbol):
     :param symbol: the specified symbol
     :return: merged currency and market without /
     """
-    return symbol.replace(octobot_commons.MARKET_SEPARATOR, "").replace(octobot_commons.SETTLEMENT_ASSET_SEPARATOR, "_")
+    return symbol.replace(octobot_commons.MARKET_SEPARATOR, "").replace(
+        octobot_commons.SETTLEMENT_ASSET_SEPARATOR, "_"
+    )
 
 
-def merge_currencies(currency, market, settlement_asset=None, market_separator=octobot_commons.MARKET_SEPARATOR,
-                     settlement_separator=octobot_commons.SETTLEMENT_ASSET_SEPARATOR):
+def merge_currencies(
+    currency,
+    market,
+    settlement_asset=None,
+    market_separator=octobot_commons.MARKET_SEPARATOR,
+    settlement_separator=octobot_commons.SETTLEMENT_ASSET_SEPARATOR,
+):
     """
     Merge currency and market
     :param currency: the base currency
@@ -47,7 +55,9 @@ def merge_currencies(currency, market, settlement_asset=None, market_separator=o
     :param settlement_separator: the separator between the pair and reference market
     :return: currency and market merged
     """
-    symbol = octobot_commons.symbols.symbol.Symbol(f"{currency}{market_separator}{market}")
+    symbol = octobot_commons.symbols.symbol.Symbol(
+        f"{currency}{market_separator}{market}", market_separator=market_separator
+    )
     if settlement_asset is not None:
         symbol.settlement_asset = settlement_asset
     return symbol.merged_str_symbol(
@@ -71,6 +81,7 @@ def convert_symbol(
     :param new_symbol_separator: the new symbol separator
     :param should_uppercase: if it should be concerted to uppercase
     :param should_lowercase: if it should be concerted to lowercase
+    :param base_and_quote_only: if it should only contain base and quote from the given symbol
     :return:
     """
     if base_and_quote_only:

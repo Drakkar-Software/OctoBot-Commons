@@ -18,10 +18,18 @@
 
 cpdef object parse_symbol(str symbol)   # return object to allow exception propagation
 cpdef str merge_symbol(str symbol)
-cpdef str merge_currencies(str currency, str market, str separator=*)
+cpdef str merge_currencies(
+        str currency,
+        str market,
+        str settlement_asset=*,
+        str market_separator=*,
+        str settlement_separator=*
+)
 cpdef str convert_symbol(
     str symbol,
     str symbol_separator,
     str new_symbol_separator=*,
     bint should_uppercase=*,
-    bint should_lowercase=*)
+    bint should_lowercase=*,
+    bint base_and_quote_only=*
+)

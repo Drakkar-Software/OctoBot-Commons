@@ -25,6 +25,8 @@ cdef class Symbol:
     cdef public str strike_price
     cdef public str option_type
     cdef public str full_symbol_regex
+    cdef public str market_separator
+    cdef public str settlement_separator
 
     cpdef object parse_symbol(self, str symbol_str)
     cpdef tuple base_and_quote(self)
