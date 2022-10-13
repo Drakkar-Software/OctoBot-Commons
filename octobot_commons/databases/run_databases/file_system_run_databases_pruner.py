@@ -47,12 +47,16 @@ class FileSystemRunDatabasesPruner(
         }
 
     def _get_file_system_runs(self, root):
-        # use os.scandir as it is much faster than os.walk
-        for entry in os.scandir(root):
-            if self._is_run_top_level_folder(entry):
-                yield entry
-            elif entry.is_dir():
-                yield from self._get_file_system_runs(entry)
+        try:
+            # use os.scandir as it is much faster than os.walk
+            for entry in os.scandir(root):
+                if self._is_run_top_level_folder(entry):
+                    yield entry
+                elif entry.is_dir():
+                    yield from self._get_file_system_runs(entry)
+        except FileNotFoundError:
+            # nothing to explore
+            pass
 
     def _get_all_files(self, root):
         for entry in os.scandir(root):
