@@ -148,6 +148,7 @@ class UserInputFactory:
         order=None,
         array_indexes=None,
         return_value_only=True,
+        update_parent_value=True,
     ):
         """
         Set and return a user input value.
@@ -198,7 +199,7 @@ class UserInputFactory:
         if input_key not in registered_inputs:
             # do not register user input multiple times
             registered_inputs[input_key] = created_input
-        if parent is not None:
+        if parent is not None and update_parent_value:
             parent[sanitized_name] = used_value
         return used_value if return_value_only else created_input
 
