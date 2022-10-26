@@ -18,6 +18,7 @@
 import sys
 import os
 import platform
+import ctypes
 
 import octobot_commons.constants as constants
 import octobot_commons.enums as enums
@@ -65,6 +66,16 @@ def get_os():
     :return: the OS name
     """
     return enums.PlatformsName(os.name)
+
+
+def has_admin_rights() -> bool:
+    """
+    :return: True if the current thread has admin rights
+    """
+    try:
+        return os.getuid() == 0
+    except AttributeError:
+        return ctypes.windll.shell32.IsUserAnAdmin()
 
 
 def is_machine_64bit() -> bool:
