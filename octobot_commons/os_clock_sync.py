@@ -54,7 +54,7 @@ class ClockSynchronizer(singleton.Singleton):
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode == 0:
-            self.logger.debug("Successful time synchronization")
+            self.logger.info("Successful os clock synchronization")
         else:
             self.logger.warning(
                 f"Error: Time synchronization command exited with {proc.returncode}] "
