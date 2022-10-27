@@ -110,4 +110,4 @@ async def stop_clock_synchronizer():
     """
     Stop the synchronization loop
     """
-    return await ClockSynchronizer.instance().stop()
+    return ClockSynchronizer.instance().stop()
