@@ -20,6 +20,7 @@ import time
 
 import octobot_commons.singleton as singleton
 import octobot_commons.logging as logging
+import octobot_commons.errors as errors
 import octobot_commons.signals.signals_emitter as signals_emitter
 import octobot_commons.signals.signal_bundle_builder as signal_bundle_builder
 import octobot_commons.signals.signal_builder_wrapper as signal_builder_wrapper
@@ -38,7 +39,10 @@ class SignalPublisher(singleton.Singleton):
         """
         Return the SignalBuilderWrapper registered under the given key
         """
-        return self._signal_builder_wrappers[wrapper_key].signal_bundle_builder
+        try:
+            return self._signal_builder_wrappers[wrapper_key].signal_bundle_builder
+        except KeyError as err:
+            raise errors.MissingSignalBuilder from err
 
     @contextlib.asynccontextmanager
     async def remote_signal_bundle_builder(
