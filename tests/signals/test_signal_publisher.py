@@ -17,9 +17,8 @@ import time
 import mock
 import pytest
 import asyncio
-import pytest_asyncio
 
-import octobot_commons.enums
+import octobot_commons.errors
 import octobot_commons.signals as signals
 import octobot_commons.signals.signals_emitter as signals_emitter
 import octobot_commons.asyncio_tools as asyncio_tools
@@ -37,10 +36,10 @@ def publisher():
 
 
 def test_get_signal_bundle_builder(publisher, signal_builder_wrapper):
-    with pytest.raises(KeyError):
+    with pytest.raises(octobot_commons.errors.MissingSignalBuilder):
         signals.SignalPublisher.instance().get_signal_bundle_builder("")
     signals.SignalPublisher.instance()._signal_builder_wrappers["Hi"] = signal_builder_wrapper
-    with pytest.raises(KeyError):
+    with pytest.raises(octobot_commons.errors.MissingSignalBuilder):
         signals.SignalPublisher.instance().get_signal_bundle_builder("")
     assert signals.SignalPublisher.instance().get_signal_bundle_builder("Hi") \
            is signal_builder_wrapper.signal_bundle_builder

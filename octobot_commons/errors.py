@@ -109,3 +109,9 @@ class InvalidUserInputError(Exception):
     """
     Raised when a user input in invalid
     """
+
+
+class MissingSignalBuilder(Exception):
+    """
+    Raised when a signal builder is not found
+    """
