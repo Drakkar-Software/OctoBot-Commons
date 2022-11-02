@@ -218,6 +218,17 @@ class RunDatabasesIdentifier:
             self.get_db_full_name(enums.RunDatabases.OPTIMIZER_RUNS_SCHEDULE_DB.value),
         )
 
+    def get_optimizer_runs_schedule_config_identifier(self) -> str:
+        """
+        :return: the identifier associated to the optimizer run schedule config database
+        """
+        return self._merge_parts(
+            self.base_path,
+            self.optimization_campaign_name,
+            enums.RunDatabases.OPTIMIZER.value,
+            self.get_db_full_name(enums.RunDatabases.OPTIMIZER_RUNS_SCHEDULE_CONFIG_DB.value),
+        )
+
     async def generate_new_backtesting_id(self) -> int:
         """
         :return: a new unique backtesting id
