@@ -241,6 +241,36 @@ class BacktestingMetadata(enum.Enum):
     EXCHANGE = "exchange"
 
 
+class OptimizerModes:
+    NORMAL = "normal"
+    GENETIC = "genetic"
+
+
+class OptimizerConfig:
+    EXCHANGE_ID = "exchange_id"
+    OPTIMIZER_ID = "optimizer_id"
+    RANDOMLY_CHOSE_RUNS = "randomly_chose_runs"
+    DATA_SOURCE = "data_source"
+    CONFIG = "config"
+    EXCHANGE_TYPE = "exchange_type"
+    QUEUE_SIZE = "queue_size"
+    START_TIMESTAMP = "start_timestamp"
+    END_TIMESTAMP = "end_timestamp"
+    IDLE_CORES = "idle_cores"
+    NOTIFY_WHEN_COMPLETE = "notify_when_complete"
+    MODE = "mode"
+    MAX_OPTIMIZER_RUNS = "max_optimizer_runs"
+    DEFAULT_GENERATIONS_COUNT = "default_generations_count"
+    DEFAULT_RUN_PER_GENERATION = "default_run_per_generation"
+    DEFAULT_SCORING_PARAMETERS = "default_scoring_parameters"
+    DEFAULT_MUTATION_PERCENT = "default_mutation_percent"
+    MAX_MUTATION_PROBABILITY_PERCENT = "max_mutation_probability_percent"
+    MIN_MUTATION_PROBABILITY_PERCENT = "min_mutation_probability_percent"
+    DEFAULT_MAX_MUTATION_NUMBER_MULTIPLIER = "default_max_mutation_number_multiplier"
+    DEFAULT_CROSSOVER_PERCENT = "default_crossover_percent"
+    DB_UPDATE_PERIOD = "db_update_period"
+
+
 class DBRows(enum.Enum):
     REFERENCE_MARKET = "ref_market"
     EXCHANGE = "exchange"
@@ -324,6 +354,7 @@ class RunDatabases(enum.Enum):
     BACKTESTING = "backtesting"
     OPTIMIZER = "optimizer"
     OPTIMIZER_RUNS_SCHEDULE_DB = "runs_schedule"
+    OPTIMIZER_RUNS_SCHEDULE_CONFIG_DB = "runs_schedule_config"
     RUN_DATA_DB = "run_data"
     PORTFOLIO_VALUE_DB = "portfolio_value"
     HISTORICAL_PORTFOLIO_VALUE = "historical_portfolio_value"
