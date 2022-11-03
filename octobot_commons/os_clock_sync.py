@@ -37,14 +37,17 @@ class ClockSynchronizer(singleton.Singleton):
 
     def _get_sync_cmd(self):
         platform = os_util.get_os()
+        bot_type = os_util.get_octobot_type()
+        if bot_type == commons_enums.OctoBotTypes.DOCKER.value:
+            raise NotImplementedError(bot_type)
         if platform is commons_enums.PlatformsName.WINDOWS:
             # use 2x w32tm /resync as the 1st one often fails
             return "net stop w32time && net start w32time && w32tm /resync & w32tm /resync && w32tm /query /status"
         if platform is commons_enums.PlatformsName.LINUX:
             return "sudo service ntp stop && sudo ntpd -gq && sudo service ntp start"
         if platform is commons_enums.PlatformsName.MAC:
-            raise NotImplementedError
-        raise NotImplementedError
+            raise NotImplementedError(platform.value)
+        raise NotImplementedError("Unidentified platform")
 
     async def _sync_clock(self):
         proc = await asyncio.create_subprocess_shell(
@@ -72,9 +75,9 @@ class ClockSynchronizer(singleton.Singleton):
         """
         try:
             self._get_sync_cmd()
-        except NotImplementedError:
+        except NotImplementedError as e:
             self.logger.debug(
-                "Disable clock synchronizer: not implemented on this system."
+                f"Disable clock synchronizer: not implemented on {e}."
             )
             return False
         if os_util.has_admin_rights():
