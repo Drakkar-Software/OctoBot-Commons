@@ -34,4 +34,4 @@ cdef class SQLiteDatabase:
     cdef str __quote_value(self, str value)
     cdef str __selected_columns(self, list columns=*)
     cdef str __where_clauses_from_operations(self, list keys, list values, list operations, bint should_quote_value=*)
-    cdef str __where_clauses_from_operation(self, str key, str value, str operation=*, bint should_quote_value=*)
+    cdef str __where_clauses_from_operation(self, str key, object value, str operation=*, bint should_quote_value=*)
