@@ -52,25 +52,23 @@ def export_profile(profile, export_path: str) -> str:
     return export_path_with_ext
 
 
-def import_profile(
+def install_profile(
     import_path: str,
-    name: str = None,
-    bot_install_path: str = ".",
-    replace_if_exists: bool = False,
+    profile_name: str,
+    bot_install_path: str,
+    replace_if_exists: bool,
+    is_imported: bool,
 ) -> Profile:
     """
-    Imports the given profile export archive into the user's profile directory with the "imported_" prefix
+    Installs the given profile export archive into the user's profile directory
     :param import_path: path to the profile zipped archive
-    :param name: name of the profile folder
+    :param profile_name: name of the profile folder
     :param bot_install_path: path to the octobot installation
     :param replace_if_exists: when True erase the profile with the same name if it exists
-    :return: None
+    :param is_imported: when True erase the profile is set as imported
+    :return: The created profile
     """
     logger = bot_logging.get_logger("ProfileSharing")
-    profile_name = name or (
-        f"{constants.IMPORTED_PROFILE_PREFIX}_{os.path.split(import_path)[-1]}"
-    )
-    profile_name = profile_name.split(f".{constants.PROFILE_EXPORT_FORMAT}")[0]
     target_import_path, replaced = _get_target_import_path(
         bot_install_path, profile_name, replace_if_exists
     )
@@ -80,10 +78,33 @@ def import_profile(
     logger.info(f"{action}ing {profile_name} profile.")
     _import_profile_files(import_path, target_import_path)
     profile = Profile(target_import_path).read_config()
-    profile.imported = True
+    profile.imported = is_imported
     _ensure_unique_profile_id(profile)
     logger.info(f"{action}ed {profile.name} ({profile_name}) profile.")
     return profile
+
+
+def import_profile(
+    import_path: str,
+    name: str = None,
+    bot_install_path: str = ".",
+) -> Profile:
+    """
+    Imports the given profile export archive into the user's profile directory with the "imported_" prefix
+    :param import_path: path to the profile zipped archive
+    :param name: name of the profile folder
+    :param bot_install_path: path to the octobot installation
+    :return: The created profile
+    """
+    profile_name = _get_profile_name(name, import_path)
+    return install_profile(import_path, profile_name, bot_install_path, False, True)
+
+
+def _get_profile_name(name, import_path):
+    profile_name = name or (
+        f"{constants.IMPORTED_PROFILE_PREFIX}_{os.path.split(import_path)[-1]}"
+    )
+    return profile_name.split(f".{constants.PROFILE_EXPORT_FORMAT}")[0]
 
 
 def _filter_profile_export(profile_path: str):

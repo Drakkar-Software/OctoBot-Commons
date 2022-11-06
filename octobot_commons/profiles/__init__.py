@@ -22,7 +22,11 @@ from octobot_commons.profiles.profile import (
 )
 
 from octobot_commons.profiles import profile_sharing
-from octobot_commons.profiles.profile_sharing import export_profile, import_profile
+from octobot_commons.profiles.profile_sharing import (
+    export_profile,
+    install_profile,
+    import_profile,
+)
 
 
-__all__ = ["Profile", "export_profile", "import_profile"]
+__all__ = ["Profile", "export_profile", "install_profile", "import_profile"]

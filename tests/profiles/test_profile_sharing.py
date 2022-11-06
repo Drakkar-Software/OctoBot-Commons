@@ -22,7 +22,8 @@ import pathlib
 import octobot_commons.constants as constants
 import octobot_commons.profiles as profiles
 import octobot_commons.profiles.profile_sharing as profile_sharing
-from octobot_commons.profiles.profile_sharing import _get_unique_profile_folder, _ensure_unique_profile_id
+from octobot_commons.profiles.profile_sharing import _get_unique_profile_folder, _ensure_unique_profile_id, \
+    _get_profile_name
 import octobot_commons.tests.test_config as test_config
 
 from tests.profiles import profile, get_profile_path
@@ -92,7 +93,7 @@ def test_export_profile_with_existing_file(profile):
             )
 
 
-def test_import_profile(profile):
+def test_import_install_profile(profile):
     export_path = os.path.join(test_config.TEST_FOLDER, "super_profile")
     exported_file = f"{export_path}.zip"
     spec_tentacles_config = os.path.join(get_profile_path(), "specific_config")
@@ -132,7 +133,11 @@ def test_import_profile(profile):
         assert isinstance(profiles.import_profile(exported_file), profiles.Profile)
         assert os.path.isdir(f"{imported_profile_path}_2")
         with mock.patch.object(shutil, "rmtree", mock.Mock()) as shutil_rmtree_mock:
-            assert isinstance(profiles.import_profile(exported_file, replace_if_exists=True), profiles.Profile)
+            assert isinstance(profiles.install_profile(exported_file,
+                                                       _get_profile_name(None, exported_file),
+                                                       ".",
+                                                       True,
+                                                       False), profiles.Profile)
             shutil_rmtree_mock.assert_called_once()
         assert os.path.isdir(imported_profile_path)
         assert not os.path.isdir(f"{imported_profile_path}_3")
