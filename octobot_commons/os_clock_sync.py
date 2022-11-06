@@ -50,23 +50,28 @@ class ClockSynchronizer(singleton.Singleton):
         raise NotImplementedError("Unidentified platform")
 
     async def _sync_clock(self):
-        proc = await asyncio.create_subprocess_shell(
-            self._get_sync_cmd(),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, stderr = await proc.communicate()
-        if proc.returncode == 0:
-            self.logger.info("Successful os clock synchronization")
-        else:
-            self.logger.warning(
-                f"Error: Time synchronization command exited with {proc.returncode}] "
-                f'command: "{self._get_sync_cmd()}"'
+        command = self._get_sync_cmd()
+        try:
+            proc = await asyncio.create_subprocess_shell(
+                command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
-        if stdout:
-            self.logger.debug(f"[stdout] {stdout}")
-        if stderr:
-            self.logger.debug(f"[stderr] {stderr}")
+            stdout, stderr = await proc.communicate()
+            if proc.returncode == 0:
+                self.logger.info("Successful os clock synchronization")
+            else:
+                self.logger.warning(
+                    f"Error: Time synchronization command exited with {proc.returncode}] "
+                    f'command: "{self._get_sync_cmd()}"'
+                )
+            if stdout:
+                self.logger.debug(f"[stdout] {stdout}")
+            if stderr:
+                self.logger.debug(f"[stderr] {stderr}")
+        except NotImplementedError as e:
+            self.logger.warning(f"Error running clock synchronizer: {e}, stopping")
+            self.stop()
 
     async def start(self) -> bool:
         """
@@ -76,9 +81,7 @@ class ClockSynchronizer(singleton.Singleton):
         try:
             self._get_sync_cmd()
         except NotImplementedError as e:
-            self.logger.debug(
-                f"Disable clock synchronizer: not implemented on {e}."
-            )
+            self.logger.debug(f"Disable clock synchronizer: not implemented on {e}.")
             return False
         if os_util.has_admin_rights():
             self.logger.debug("Starting clock synchronizer")
