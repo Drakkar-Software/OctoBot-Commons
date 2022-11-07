@@ -50,50 +50,61 @@ class ClockSynchronizer(singleton.Singleton):
         raise NotImplementedError("Unidentified platform")
 
     async def _sync_clock(self):
-        command = self._get_sync_cmd()
-        try:
-            proc = await asyncio.create_subprocess_shell(
-                command,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
+        # should only be called when the initial _sync_clock worked
+        proc = await asyncio.create_subprocess_shell(
+            self._get_sync_cmd(),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, stderr = await proc.communicate()
+        if proc.returncode == 0:
+            self.logger.info("Successful os clock synchronization")
+        else:
+            self.logger.warning(
+                f"Warning: Time synchronization command exited with {proc.returncode}] "
+                f'command: "{self._get_sync_cmd()}"'
             )
-            stdout, stderr = await proc.communicate()
-            if proc.returncode == 0:
-                self.logger.info("Successful os clock synchronization")
-            else:
-                self.logger.warning(
-                    f"Error: Time synchronization command exited with {proc.returncode}] "
-                    f'command: "{self._get_sync_cmd()}"'
-                )
-            if stdout:
-                self.logger.debug(f"[stdout] {stdout}")
-            if stderr:
-                self.logger.debug(f"[stderr] {stderr}")
-        except NotImplementedError as e:
-            self.logger.warning(f"Error running clock synchronizer: {e}, stopping")
-            self.stop()
+        if stdout:
+            self.logger.debug(f"[stdout] {stdout}")
+        if stderr:
+            self.logger.debug(f"[stderr] {stderr}")
+
+    async def _ensure_clock_synch_availability(self):
+        try:
+            # make sure the command is available on this platform
+            self._get_sync_cmd()
+        except NotImplementedError as err:
+            self.logger.debug(f"Clock synchronizer: not implemented on {err}.")
+            return False
+        if not os_util.has_admin_rights():
+            self.logger.debug(
+                "Admin rights are required to synchronize the computer clock"
+            )
+            return False
+        try:
+            # make sure the command is usable on this platform
+            await self._sync_clock()
+        except NotImplementedError as err:
+            self.logger.warning(f"Error when synchronizing clock: {err}")
+            return False
+        return True
 
     async def start(self) -> bool:
         """
-        Start the clock synchronization loop if possible on this system
+        Synch the clock and start the clock synchronization loop if possible on this system
         :return: True if the loop has been started
         """
-        try:
-            self._get_sync_cmd()
-        except NotImplementedError as e:
-            self.logger.debug(f"Disable clock synchronizer: not implemented on {e}.")
+        if not await self._ensure_clock_synch_availability():
+            self.logger.debug("Clock synch loop disabled")
             return False
-        if os_util.has_admin_rights():
-            self.logger.debug("Starting clock synchronizer")
-            self.sync_job = async_job.AsyncJob(
-                self._sync_clock, execution_interval_delay=self.sync_interval
-            )
-            await self.sync_job.run()
-            return True
-        self.logger.debug(
-            "Clock synch loop disabled: admin rights are required to synchronize the computer clock"
+        self.logger.debug("Starting clock synchronizer")
+        self.sync_job = async_job.AsyncJob(
+            self._sync_clock,
+            first_execution_delay=self.sync_interval,
+            execution_interval_delay=self.sync_interval,
         )
-        return False
+        await self.sync_job.run()
+        return True
 
     def stop(self):
         """
