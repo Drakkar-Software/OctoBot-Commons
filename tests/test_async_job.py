@@ -70,6 +70,20 @@ async def test_should_run_with_dependencies():
     job.stop()
 
 
+async def test_first_execution_delay():
+    callback_mock = AsyncMock(__name__="callback_mock")
+    job = AsyncJob(callback_mock, first_execution_delay=0.4, execution_interval_delay=5, min_execution_delay=5)
+    await wait_asyncio_next_cycle()
+    callback_mock.assert_not_called()
+    await job.run()
+    await wait_asyncio_next_cycle()
+    await asyncio.sleep(0.1)
+    callback_mock.assert_not_called()
+    await asyncio.sleep(0.4)
+    callback_mock.assert_called_once()
+    job.stop()
+
+
 async def test_clear():
     job = AsyncJob(callback)
     job.clear()

@@ -36,6 +36,7 @@ class AsyncJob:
         callback,
         execution_interval_delay=NO_DELAY,
         min_execution_delay=NO_DELAY,
+        first_execution_delay=NO_DELAY,
         is_periodic=True,
         enable_multiple_runs=False,
         max_successive_failures=MAXIMUM_ALLOWED_SUCCESSIVE_FAILURES,
@@ -57,6 +58,7 @@ class AsyncJob:
         self.last_execution_time = 0
         self.execution_interval_delay = execution_interval_delay
         self.min_execution_delay = min_execution_delay
+        self.first_execution_delay = first_execution_delay
 
         self.job_dependencies = []
         self.idle_task_event = asyncio.Event()
@@ -107,12 +109,22 @@ class AsyncJob:
         """
         while not self.should_stop:
             self.is_started = True
-            await asyncio.sleep(
-                0
-                if time.time() - self.last_execution_time
-                >= self.execution_interval_delay
-                else self.execution_interval_delay
-            )
+            if self.last_execution_time == 0:
+                # first execution
+                sleep_time = (
+                    0
+                    if self.first_execution_delay == self.NO_DELAY
+                    else self.first_execution_delay
+                )
+            else:
+                # other executions
+                sleep_time = (
+                    0
+                    if time.time() - self.last_execution_time
+                    >= self.execution_interval_delay
+                    else self.execution_interval_delay
+                )
+            await asyncio.sleep(sleep_time)
             await self._run_task_as_soon_as_possible(
                 error_on_single_failure=False, **kwargs
             )
