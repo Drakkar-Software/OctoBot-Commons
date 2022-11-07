@@ -33,6 +33,7 @@ cdef class AsyncJob:
     cdef double last_execution_time
     cdef double execution_interval_delay
     cdef double min_execution_delay
+    cdef double first_execution_delay
 
     cdef list job_dependencies
 
