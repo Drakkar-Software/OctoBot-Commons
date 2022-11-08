@@ -48,7 +48,7 @@ def unregister_lock_and_shared_elements(
 
 @contextlib.contextmanager
 def registered_lock_and_shared_elements(
-    name: str, lock: multiprocessing.RLock, shared_elements: dict
+    name, lock: multiprocessing.RLock, shared_elements: dict
 ):
     """
     Add and remove elements to the globally available elements
@@ -60,7 +60,7 @@ def registered_lock_and_shared_elements(
         unregister_lock_and_shared_elements(name, shared_elements)
 
 
-def get_lock(name: str) -> multiprocessing.RLock:
+def get_lock(name) -> multiprocessing.RLock:
     """
     Returns a shared lock
     """
