@@ -128,11 +128,11 @@ class Configuration:
         self,
         temp_restore_config_file=commons_constants.TEMP_RESTORE_CONFIG_FILE,
         schema_file=None,
+        sync_all_profiles=False,
     ) -> None:
         """
-        Save the current self.config and self.profile
-        :param temp_restore_config_file:
-        :param schema_file:
+        Save the current self.config and self.profile.
+        Synchronize all profiles if sync_all_profiles
         :return: None
         """
         config_to_save = self._get_config_without_profile_elements()
@@ -143,6 +143,20 @@ class Configuration:
             schema_file=schema_file,
         )
         self.profile.save_config(self.config)
+        if sync_all_profiles:
+            self._sync_other_profiles()
+
+    def _sync_other_profiles(self):
+        """
+        Update profile partially managed elements for all profiles except self.profile
+        with self.config
+        """
+        for profile in self.profile_by_id.values():
+            if profile is self.profile:
+                # do not synchronize self.profile
+                continue
+            profile.sync_partially_managed_elements(self.config)
+            profile.validate_and_save_config()
 
     def is_loaded(self) -> bool:
         """
@@ -239,7 +253,7 @@ class Configuration:
         :param delete: if the data should be removed
         """
         config_operations.filter_to_update_data(to_update_fields, in_backtesting)
-
+        removed_configs = []
         if delete:
             removed_configs = [
                 config_operations.parse_and_update(
@@ -265,7 +279,9 @@ class Configuration:
             )
 
         # save config
-        self.save(schema_file=self.config_schema_path)
+        self.save(
+            schema_file=self.config_schema_path, sync_all_profiles=bool(removed_configs)
+        )
 
     def _get_selected_profile(self):
         selected_profile_id = self._read_config.get(
