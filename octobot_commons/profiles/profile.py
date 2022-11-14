@@ -89,13 +89,20 @@ class Profile:
 
     def save_config(self, global_config: dict):
         """
-        Save ths profile config
+        Save this profile config
         :param global_config: the bot config containing profile data
         :return: None
         """
         for element in self.FULLY_MANAGED_ELEMENTS:
             if element in global_config:
                 self.config[element] = global_config[element]
+        self.sync_partially_managed_elements(global_config)
+        self.validate_and_save_config()
+
+    def sync_partially_managed_elements(self, global_config):
+        """
+        Update the partially managed elements of this profile using the given configuration
+        """
         for element in self.PARTIALLY_MANAGED_ELEMENTS:
             if element in global_config:
                 allowed_keys = self.PARTIALLY_MANAGED_ELEMENTS_ALLOWED_KEYS.get(
@@ -105,7 +112,6 @@ class Profile:
                     self._filter_fill_elements(
                         global_config, self.config, element, allowed_keys
                     )
-        self.validate_and_save_config()
 
     def validate(self):
         """
