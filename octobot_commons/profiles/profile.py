@@ -45,6 +45,11 @@ class Profile:
             constants.CONFIG_EXCHANGE_TYPE: constants.DEFAULT_EXCHANGE_TYPE,
         }
     }
+    PARTIALLY_MANAGED_ELEMENTS_FORCED_DEFAULT_KEYS = {
+        constants.CONFIG_EXCHANGES: {
+            constants.CONFIG_ENABLED_OPTION: False,
+        }
+    }
     PARTIALLY_MANAGED_ELEMENTS_ALLOWED_KEYS = {
         constants.CONFIG_EXCHANGES: [
             constants.CONFIG_ENABLED_OPTION,
@@ -217,32 +222,59 @@ class Profile:
         config: dict, profile_config: dict, element: str, template: dict
     ):
         if element in config:
-            for key, val in profile_config[element].items():
-                if key in config[element]:
-                    if isinstance(config[element][key], dict):
-                        # merge profile values for element[key]
-                        Profile._merge_partially_managed_element(
-                            config[element], profile_config[element], key, template
-                        )
-                    else:
-                        # overwrite element[key] by profile value
-                        config[element][key] = copy.deepcopy(
-                            profile_config[element][key]
-                        )
-                else:
-                    # use profile value for element[key]
-                    if isinstance(val, dict):
-                        config[element][key] = Profile._get_element_from_template(
-                            template, val
-                        )
-                    else:
-                        config[element][key] = val
+            Profile._merge_profile_values(config, profile_config, element, template)
+            Profile._apply_forced_default_values(config, profile_config, element)
         else:
             # use profile value for element
             config[element] = {
                 key: Profile._get_element_from_template(template, val)
                 for key, val in profile_config[element].items()
             }
+
+    @staticmethod
+    def _merge_profile_values(
+        config: dict, profile_config: dict, element: str, template: dict
+    ):
+        for key, val in profile_config[element].items():
+            if key in config[element]:
+                if isinstance(config[element][key], dict):
+                    # merge profile values for element[key]
+                    Profile._merge_partially_managed_element(
+                        config[element], profile_config[element], key, template
+                    )
+                else:
+                    # overwrite element[key] by profile value
+                    config[element][key] = copy.deepcopy(profile_config[element][key])
+            else:
+                # use profile value for element[key]
+                if isinstance(val, dict):
+                    config[element][key] = Profile._get_element_from_template(
+                        template, val
+                    )
+                else:
+                    config[element][key] = val
+
+    @staticmethod
+    def _apply_forced_default_values(config: dict, profile_config: dict, element: str):
+        if element in Profile.PARTIALLY_MANAGED_ELEMENTS_FORCED_DEFAULT_KEYS:
+            for config_key, config_val in config[element].items():
+                if config_key not in profile_config[element]:
+                    for config_sub_element in config_val:
+                        if (
+                            config_sub_element
+                            in Profile.PARTIALLY_MANAGED_ELEMENTS_FORCED_DEFAULT_KEYS[
+                                element
+                            ]
+                        ):
+                            # item not in profile, it will be added to profile upon save
+                            # use forced default profile value for forced default keys
+                            config[element][config_key][
+                                config_sub_element
+                            ] = Profile.PARTIALLY_MANAGED_ELEMENTS_FORCED_DEFAULT_KEYS[
+                                element
+                            ][
+                                config_sub_element
+                            ]
 
     @staticmethod
     def _get_element_from_template(template: dict, profile_values: dict) -> dict:
