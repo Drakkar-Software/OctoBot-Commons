@@ -99,16 +99,20 @@ async def test_run_stop_run():
         with patch.object(job, 'callback', new=AsyncMock()) as mocked_test_job_callback:
             await wait_asyncio_next_cycle()
             mocked_test_job_callback.assert_not_called()
+            assert not job.is_stopped()
             assert not job.is_started
             await job.run()
             await wait_asyncio_next_cycle()
             mocked_test_job_callback.assert_called_once()
             assert job.is_started
+            assert not job.is_stopped()
             job.stop()
+            assert job.is_stopped()
             await wait_asyncio_next_cycle()
             assert not job.is_started
             mocked_test_job_callback.assert_called_once()
             await job.run()
+            assert not job.is_stopped()
             await asyncio.sleep(0.7)
             assert job.is_started
             assert mocked_test_job_callback.call_count == 2
@@ -116,6 +120,7 @@ async def test_run_stop_run():
             await asyncio.sleep(0.5)
             assert mocked_test_job_callback.call_count in (3, 4)    # can be 3 or 4 depending on the current computer
             job.stop()
+            assert job.is_stopped()
 
 
 async def test_run():

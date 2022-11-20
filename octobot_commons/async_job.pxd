@@ -40,6 +40,7 @@ cdef class AsyncJob:
     cpdef void add_job_dependency(self, AsyncJob job)
     cpdef bint is_job_idle(self)
     cpdef void clear(self)
+    cpdef bint is_stopped(self)
     cpdef void stop(self)
 
     cdef void _handle_run_exception(self, object exception, bint error_on_single_failure)

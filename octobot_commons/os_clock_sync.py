@@ -49,25 +49,32 @@ class ClockSynchronizer(singleton.Singleton):
             raise NotImplementedError(platform.value)
         raise NotImplementedError("Unidentified platform")
 
-    async def _sync_clock(self):
+    async def _sync_clock(self, raise_not_implemented=False):
         # should only be called when the initial _sync_clock worked
-        proc = await asyncio.create_subprocess_shell(
-            self._get_sync_cmd(),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, stderr = await proc.communicate()
-        if proc.returncode == 0:
-            self.logger.info("Successful os clock synchronization")
-        else:
-            self.logger.warning(
-                f"Warning: Time synchronization command exited with {proc.returncode}] "
-                f'command: "{self._get_sync_cmd()}"'
+        try:
+            proc = await asyncio.create_subprocess_shell(
+                self._get_sync_cmd(),
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
-        if stdout:
-            self.logger.debug(f"[stdout] {stdout}")
-        if stderr:
-            self.logger.debug(f"[stderr] {stderr}")
+            stdout, stderr = await proc.communicate()
+            if proc.returncode == 0:
+                self.logger.info("Successful os clock synchronization")
+            else:
+                self.logger.warning(
+                    f"Warning: Time synchronization command exited with {proc.returncode}] "
+                    f'command: "{self._get_sync_cmd()}"'
+                )
+            if stdout:
+                self.logger.debug(f"[stdout] {stdout}")
+            if stderr:
+                self.logger.debug(f"[stderr] {stderr}")
+        except NotImplementedError as err:
+            if raise_not_implemented:
+                raise
+            # might happen if event loop changed after initial check, in this case stop job
+            self.logger.exception(err, False)
+            self.stop()
 
     async def _ensure_clock_synch_availability(self):
         try:
@@ -83,7 +90,7 @@ class ClockSynchronizer(singleton.Singleton):
             return False
         try:
             # make sure the command is usable on this platform
-            await self._sync_clock()
+            await self._sync_clock(raise_not_implemented=True)
         except NotImplementedError as err:
             self.logger.warning(f"Error when synchronizing clock: {err}")
             return False
@@ -111,7 +118,7 @@ class ClockSynchronizer(singleton.Singleton):
         Stop the synchronization loop
         """
         self.logger.debug("Stopping clock synchronizer")
-        if self.sync_job is not None and not self.sync_job.should_stop:
+        if self.sync_job is not None and not self.sync_job.is_stopped():
             self.sync_job.stop()
 
 
