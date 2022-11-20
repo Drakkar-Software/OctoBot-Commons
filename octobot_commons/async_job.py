@@ -257,6 +257,12 @@ class AsyncJob:
         """
         return all([job.is_job_idle() for job in self.job_dependencies])
 
+    def is_stopped(self):
+        """
+        Return True when the AsyncJob has stopped
+        """
+        return self.should_stop
+
     def stop(self):
         """
         Stop the job by cancelling the execution task
