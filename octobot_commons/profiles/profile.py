@@ -104,6 +104,19 @@ class Profile:
         self.sync_partially_managed_elements(global_config)
         self.validate_and_save_config()
 
+    def remove_deleted_elements(self, global_config):
+        """
+        Removes elements from self.PARTIALLY_MANAGED_ELEMENTS
+        that are in profile but not in global config
+        """
+        for element in self.PARTIALLY_MANAGED_ELEMENTS:
+            if element in global_config and element in self.config:
+                current_elements = list(self.config[element])
+                to_keep_elements = set(global_config[element])
+                for key in current_elements:
+                    if key not in to_keep_elements:
+                        self.config[element].pop(key)
+
     def sync_partially_managed_elements(self, global_config):
         """
         Update the partially managed elements of this profile using the given configuration

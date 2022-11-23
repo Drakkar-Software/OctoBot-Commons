@@ -289,6 +289,30 @@ def test_merge_partially_managed_element(profile):
     }
 
 
+def test_remove_deleted_elements(profile):
+    profile.read_config()
+    element = next(iter(profile.PARTIALLY_MANAGED_ELEMENTS))
+    config = {
+        constants.CONFIG_EXCHANGES: {
+            "binance": {
+                constants.CONFIG_EXCHANGE_KEY: constants.DEFAULT_API_KEY,
+                constants.CONFIG_EXCHANGE_SECRET: constants.DEFAULT_API_SECRET,
+                constants.CONFIG_ENABLED_OPTION: True,
+            }
+        }
+    }
+    before_sync_elements_count = len(profile.config[element])
+    profile.remove_deleted_elements(config)
+    # did not remove any element
+    assert before_sync_elements_count == len(profile.config[element])
+    profile.config[element]["plop"] = config[constants.CONFIG_EXCHANGES]["binance"]
+    assert len(profile.config[element]) == before_sync_elements_count + 1
+    profile.remove_deleted_elements(config)
+    assert before_sync_elements_count == len(profile.config[element])
+    # removed "plop" element
+    assert list(profile.config[element]) == ["binance"]
+
+
 def test_get_element_from_template(profile):
     element = next(iter(profile.PARTIALLY_MANAGED_ELEMENTS))
     template = profile.PARTIALLY_MANAGED_ELEMENTS[element]

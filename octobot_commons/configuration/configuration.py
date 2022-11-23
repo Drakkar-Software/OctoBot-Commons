@@ -155,7 +155,7 @@ class Configuration:
             if profile is self.profile:
                 # do not synchronize self.profile
                 continue
-            profile.sync_partially_managed_elements(self.config)
+            profile.remove_deleted_elements(self.config)
             profile.validate_and_save_config()
 
     def is_loaded(self) -> bool:
