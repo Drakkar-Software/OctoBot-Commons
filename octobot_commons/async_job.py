@@ -203,6 +203,10 @@ class AsyncJob:
         self.simultaneous_calls += 1
         try:
             await self.callback(**kwargs)
+            if self.successive_failures > self.max_successive_failures:
+                self.logger.info(
+                    f"Job successfully run after {self.successive_failures} failures."
+                )
             self.successive_failures = 0
         except Exception as exception:
             self._handle_run_exception(exception, error_on_single_failure)
