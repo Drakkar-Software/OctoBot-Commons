@@ -19,6 +19,7 @@ import sys
 import os
 import platform
 import ctypes
+import psutil
 
 import octobot_commons.constants as constants
 import octobot_commons.enums as enums
@@ -119,3 +120,18 @@ def parse_boolean_environment_var(env_key: str, default_value: str) -> bool:
     :return: True when the var value is "True" or "true" else false
     """
     return bool(os.getenv(env_key, default_value).lower() == "true")
+
+
+def get_cpu_and_ram_usage(cpu_watching_seconds):
+    """
+    WARNING: blocking the current thread for the given cpu_watching_seconds seconds
+    :return: the CPU usage percent, RAM usaage %, total RAM used and total RAM used by this process
+    """
+    _, _, percent_used, used, _ = psutil.virtual_memory()
+    process_used_ram = psutil.Process(os.getpid()).memory_info().rss
+    return (
+        psutil.cpu_percent(cpu_watching_seconds),
+        percent_used,
+        used / constants.BYTES_BY_GB,
+        process_used_ram / constants.BYTES_BY_GB,
+    )
