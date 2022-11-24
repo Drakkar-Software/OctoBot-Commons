@@ -127,11 +127,11 @@ def get_cpu_and_ram_usage(cpu_watching_seconds):
     WARNING: blocking the current thread for the given cpu_watching_seconds seconds
     :return: the CPU usage percent, RAM usaage %, total RAM used and total RAM used by this process
     """
-    _, _, percent_used, used, _ = psutil.virtual_memory()
+    mem_ret = psutil.virtual_memory()
     process_used_ram = psutil.Process(os.getpid()).memory_info().rss
     return (
         psutil.cpu_percent(cpu_watching_seconds),
-        percent_used,
-        used / constants.BYTES_BY_GB,
+        mem_ret[2],
+        mem_ret[3] / constants.BYTES_BY_GB,
         process_used_ram / constants.BYTES_BY_GB,
     )
