@@ -58,6 +58,7 @@ def install_profile(
     bot_install_path: str,
     replace_if_exists: bool,
     is_imported: bool,
+    origin_url: str = None,
 ) -> Profile:
     """
     Installs the given profile export archive into the user's profile directory
@@ -66,6 +67,7 @@ def install_profile(
     :param bot_install_path: path to the octobot installation
     :param replace_if_exists: when True erase the profile with the same name if it exists
     :param is_imported: when True erase the profile is set as imported
+    :param origin_url: url the profile is coming from (if relevant)
     :return: The created profile
     """
     logger = bot_logging.get_logger("ProfileSharing")
@@ -79,6 +81,7 @@ def install_profile(
     _import_profile_files(import_path, target_import_path)
     profile = Profile(target_import_path).read_config()
     profile.imported = is_imported
+    profile.origin_url = origin_url
     _ensure_unique_profile_id(profile)
     logger.info(f"{action}ed {profile.name} ({profile_name}) profile.")
     return profile
@@ -88,16 +91,28 @@ def import_profile(
     import_path: str,
     name: str = None,
     bot_install_path: str = ".",
+    origin_url: str = None,
 ) -> Profile:
     """
     Imports the given profile export archive into the user's profile directory with the "imported_" prefix
     :param import_path: path to the profile zipped archive
     :param name: name of the profile folder
     :param bot_install_path: path to the octobot installation
+    :param origin_url: url the profile is coming from
     :return: The created profile
     """
-    profile_name = _get_profile_name(name, import_path)
-    return install_profile(import_path, profile_name, bot_install_path, False, True)
+    temp_profile_name = _get_profile_name(name, import_path)
+    profile = install_profile(
+        import_path,
+        temp_profile_name,
+        bot_install_path,
+        False,
+        True,
+        origin_url=origin_url,
+    )
+    if profile.name != temp_profile_name:
+        profile.rename_folder(profile.name)
+    return profile
 
 
 def _get_profile_name(name, import_path):

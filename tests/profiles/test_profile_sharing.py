@@ -114,13 +114,14 @@ def test_import_install_profile(profile):
         imported_profile_path = os.path.join(constants.USER_PROFILES_FOLDER, "imported_super_profile")
         with mock.patch.object(profile_sharing, "_ensure_unique_profile_id", mock.Mock()) \
                 as _ensure_unique_profile_id_mock:
-            imported_profile = profiles.import_profile(exported_file)
+            imported_profile = profiles.import_profile(exported_file, origin_url="plop.wow")
             assert isinstance(imported_profile, profiles.Profile)
             profile.read_config()
             assert profile.name == imported_profile.name
             assert profile.path != imported_profile.path
             assert profile.imported is False
             assert imported_profile.imported is True
+            assert imported_profile.origin_url == "plop.wow"
             _ensure_unique_profile_id_mock.assert_called_once()
         assert os.path.isdir(imported_profile_path)
         # ensure all files got imported
@@ -137,7 +138,8 @@ def test_import_install_profile(profile):
                                                        _get_profile_name(None, exported_file),
                                                        ".",
                                                        True,
-                                                       False), profiles.Profile)
+                                                       False,
+                                                       origin_url="hello"), profiles.Profile)
             shutil_rmtree_mock.assert_called_once()
         assert os.path.isdir(imported_profile_path)
         assert not os.path.isdir(f"{imported_profile_path}_3")

@@ -65,6 +65,7 @@ class Profile:
         self.description: str = None
         self.avatar: str = None
         self.avatar_path: str = None
+        self.origin_url: str = None
         self.read_only: bool = False
         self.imported: bool = False
 
@@ -82,6 +83,7 @@ class Profile:
             self.name = profile_config.get(constants.CONFIG_NAME, "")
             self.description = profile_config.get(constants.CONFIG_DESCRIPTION, "")
             self.avatar = profile_config.get(constants.CONFIG_AVATAR, "")
+            self.origin_url = profile_config.get(constants.CONFIG_ORIGIN_URL, None)
             self.read_only = profile_config.get(constants.CONFIG_READ_ONLY, False)
             self.imported = profile_config.get(constants.CONFIG_IMPORTED, False)
             self.config = parsed_profile[constants.PROFILE_CONFIG]
@@ -165,6 +167,8 @@ class Profile:
             raise RuntimeError(
                 "Skipping folder renaming: a profile already exists at this path"
             )
+        self.path = new_path
+        return self.path
 
     def duplicate(self, name: str = None, description: str = None):
         """
@@ -179,6 +183,7 @@ class Profile:
         clone.profile_id = str(uuid.uuid4())
         clone.read_only = False
         clone.imported = False
+        clone.origin_url = None
         try:
             clone.path = os.path.join(
                 os.path.split(self.path)[0], f"{clone.name}_{clone.profile_id}"
@@ -207,6 +212,7 @@ class Profile:
                 constants.CONFIG_NAME: self.name,
                 constants.CONFIG_DESCRIPTION: self.description,
                 constants.CONFIG_AVATAR: self.avatar,
+                constants.CONFIG_ORIGIN_URL: self.origin_url,
                 constants.CONFIG_READ_ONLY: self.read_only,
                 constants.CONFIG_IMPORTED: self.imported,
             },
