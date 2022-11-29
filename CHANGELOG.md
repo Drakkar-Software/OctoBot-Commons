@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.35] 2022-11-29
+### Added
+- Profiles origin url
+
 ## [1.7.34] 2022-11-24
 ### Fixed
 - OSUtil get_cpu_and_ram_usage on different platforms
