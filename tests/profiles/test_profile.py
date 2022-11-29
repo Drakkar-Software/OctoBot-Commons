@@ -35,6 +35,7 @@ def test_read_config(profile):
     assert profile.description == "OctoBot default profile."
     assert profile.avatar == "default_profile.png"
     assert profile.avatar_path == os.path.join(test_config.TEST_CONFIG_FOLDER, "default_profile.png")
+    assert profile.origin_url == "https://default.url"
     assert len(profile.config) == 5
     assert isinstance(profile.config, dict)
 
@@ -131,6 +132,8 @@ def test_duplicate(profile):
     with mock.patch.object(shutil, "copytree", mock.Mock()) as copytree_mock, \
             mock.patch.object(profiles.Profile, "save", mock.Mock()) as save_mock:
         profile.read_only = True
+        profile.imported = True
+        profile.origin_url = "hello"
         clone = profile.duplicate()
         assert clone.name == profile.name
         assert clone.description == profile.description
@@ -140,6 +143,9 @@ def test_duplicate(profile):
         assert clone.profile_id is not None
         # duplicates are not read_only
         assert clone.read_only is False
+        # duplicates are never imported nor have an origin url
+        assert clone.imported is False
+        assert clone.origin_url is None
         copytree_mock.assert_called_with(profile.path, clone.path)
         save_mock.assert_called_once()
 
@@ -157,6 +163,7 @@ def test_as_dict(profile):
             constants.CONFIG_NAME: None,
             constants.CONFIG_DESCRIPTION: None,
             constants.CONFIG_AVATAR: None,
+            constants.CONFIG_ORIGIN_URL: None,
             constants.CONFIG_READ_ONLY: False,
             constants.CONFIG_IMPORTED: False,
         },
@@ -172,6 +179,7 @@ def test_as_dict(profile):
             constants.CONFIG_NAME: "default",
             constants.CONFIG_DESCRIPTION: "OctoBot default profile.",
             constants.CONFIG_AVATAR: "default_profile.png",
+            constants.CONFIG_ORIGIN_URL: "https://default.url",
             constants.CONFIG_READ_ONLY: False,
             constants.CONFIG_IMPORTED: True,
         },

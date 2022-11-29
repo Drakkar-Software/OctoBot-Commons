@@ -3,7 +3,8 @@
     "avatar": "default_profile.png",
     "description": "OctoBot default profile.",
     "id": "default",
-    "name": "default"
+    "name": "default",
+    "origin_url": "https://default.url"
   },
   "config": {
     "crypto-currencies": {
