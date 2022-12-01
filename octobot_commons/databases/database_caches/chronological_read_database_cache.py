@@ -41,6 +41,14 @@ class ChronologicalReadDatabaseCache:
         data[self.DATA_KEY] = sorted(values, key=lambda x: x[sort_key])
         data[self.CHRONO_INDEX_KEY] = 0
 
+    def reset_cached_indexes(self, parent=None):
+        for cached_data in (parent or self.timestamped_sorted_data).values():
+            if isinstance(cached_data, dict):
+                if self.CHRONO_INDEX_KEY in cached_data:
+                    cached_data[self.CHRONO_INDEX_KEY] = 0
+                else:
+                    self.reset_cached_indexes(cached_data)
+
     def get(self, inferior_timestamp, superior_timestamp, identifiers):
         """
         Returns a cache values
