@@ -1,3 +1,4 @@
+# pylint: disable=R0913,W0703
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -20,6 +21,7 @@ import shutil
 import pathlib
 import uuid
 import time
+import requests
 import octobot_commons.constants as constants
 import octobot_commons.logging as bot_logging
 
@@ -113,6 +115,46 @@ def import_profile(
     if profile.name != temp_profile_name:
         profile.rename_folder(profile.name)
     return profile
+
+
+def download_profile(url, target_file, timeout=60):
+    """
+    Downloads a profile from the given url
+    :param url: profile url
+    :param target_file: path to save the file
+    :param timeout: time given to the request before timeout
+    :return: saved file path
+    """
+    # unauthenticated download
+    with requests.get(url, stream=True, timeout=timeout) as req:
+        req.raise_for_status()
+        with open(target_file, "wb") as write_file:
+            for chunk in req.iter_content(chunk_size=8192):
+                write_file.write(chunk)
+    return target_file
+
+
+def download_and_install_profile(download_url):
+    """
+    :param download_url: profile url
+    :return: the installed profile, None if an error occurred
+    """
+    logger = bot_logging.get_logger("ProfileSharing")
+    name = download_url.split("/")[-1]
+    file_path = None
+    try:
+        file_path = download_profile(download_url, name)
+        profile = import_profile(file_path, name=name, origin_url=download_url)
+        logger.info(
+            f"Downloaded and installed {profile.name} from {profile.origin_url}"
+        )
+        return profile
+    except Exception as err:
+        logger.exception(err, True, f"Error when installing profile: {err}")
+        return None
+    finally:
+        if file_path is not None and os.path.isfile(file_path):
+            os.remove(file_path)
 
 
 def _get_profile_name(name, import_path):
