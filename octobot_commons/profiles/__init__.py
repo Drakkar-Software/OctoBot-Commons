@@ -26,7 +26,16 @@ from octobot_commons.profiles.profile_sharing import (
     export_profile,
     install_profile,
     import_profile,
+    download_profile,
+    download_and_install_profile,
 )
 
 
-__all__ = ["Profile", "export_profile", "install_profile", "import_profile"]
+__all__ = [
+    "Profile",
+    "export_profile",
+    "install_profile",
+    "import_profile",
+    "download_profile",
+    "download_and_install_profile",
+]
