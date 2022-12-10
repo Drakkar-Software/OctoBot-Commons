@@ -22,6 +22,7 @@ import uuid
 import octobot_commons.constants as constants
 import octobot_commons.logging as commons_logging
 import octobot_commons.json_util as json_util
+import octobot_commons.errors as errors
 
 
 class Profile:
@@ -156,18 +157,28 @@ class Profile:
         with open(self.config_file(), "w") as profile_file:
             json.dump(self.as_dict(), profile_file, indent=4, sort_keys=True)
 
-    def rename_folder(self, new_name) -> str:
+    def rename_folder(self, new_name, should_raise) -> str:
         """
         rename the profile folder
         :param new_name: name of the new folder
+        :param should_raise: raises ProfileConflictError if the profile can't be renamed
         :return: the new profile path
         """
         new_path = os.path.join(os.path.split(self.path)[0], new_name)
         if os.path.exists(new_path):
-            raise RuntimeError(
-                "Skipping folder renaming: a profile already exists at this path"
+            if should_raise:
+                raise errors.ProfileConflictError(
+                    "Skipping folder renaming: a profile already exists at this path"
+                )
+            return self.path
+        try:
+            os.rename(self.path, new_path)
+            self.path = new_path
+        except Exception as err:
+            commons_logging.get_logger("ProfileRenamer").error(
+                f"Error when renaming profile: {err}"
             )
-        self.path = new_path
+            raise errors.ProfileConflictError from err
         return self.path
 
     def duplicate(self, name: str = None, description: str = None):

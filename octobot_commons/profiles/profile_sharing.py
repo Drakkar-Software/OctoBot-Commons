@@ -113,7 +113,7 @@ def import_profile(
         origin_url=origin_url,
     )
     if profile.name != temp_profile_name:
-        profile.rename_folder(profile.name)
+        profile.rename_folder(_get_unique_profile_folder_from_name(profile), False)
     return profile
 
 
@@ -220,6 +220,13 @@ def _import_profile_files(profile_path: str, target_profile_path: str) -> None:
             zipped.extractall(target_profile_path)
     else:
         shutil.copytree(profile_path, target_profile_path)
+
+
+def _get_unique_profile_folder_from_name(profile) -> str:
+    folder = _get_unique_profile_folder(
+        os.path.join(os.path.split(profile.path)[0], profile.name)
+    )
+    return os.path.split(folder)[1]
 
 
 def _get_unique_profile_folder(target_import_path: str) -> str:
