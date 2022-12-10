@@ -27,6 +27,12 @@ class NoProfileError(Exception):
     """
 
 
+class ProfileConflictError(Exception):
+    """
+    Profile related Exception: raised when the current profile can't be renamed as expected
+    """
+
+
 class ProfileRemovalError(Exception):
     """
     Profile related Exception: raised when the current profile can't be can't be removed

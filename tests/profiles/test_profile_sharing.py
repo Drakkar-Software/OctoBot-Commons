@@ -98,7 +98,7 @@ def test_import_install_profile(profile):
     exported_file = f"{export_path}.zip"
     spec_tentacles_config = os.path.join(get_profile_path(), "specific_config")
     tentacles_config = os.path.join(get_profile_path(), "tentacles_config.json")
-    other_profile = os.path.join(constants.USER_PROFILES_FOLDER, "imported_super_profile")
+    other_profile = os.path.join(constants.USER_PROFILES_FOLDER, "default")
     with _cleaned_tentacles(export_path,
                             exported_file,
                             tentacles_config,
@@ -111,7 +111,7 @@ def test_import_install_profile(profile):
         shutil.copy(profile.config_file(), os.path.join(spec_tentacles_config, "t1.json"))
         shutil.copy(profile.config_file(), os.path.join(spec_tentacles_config, "t2.json"))
         profiles.export_profile(profile, export_path)
-        imported_profile_path = os.path.join(constants.USER_PROFILES_FOLDER, "imported_super_profile")
+        imported_profile_path = os.path.join(constants.USER_PROFILES_FOLDER, "default")
         with mock.patch.object(profile_sharing, "_ensure_unique_profile_id", mock.Mock()) \
                 as _ensure_unique_profile_id_mock:
             imported_profile = profiles.import_profile(exported_file, origin_url="plop.wow")
@@ -132,6 +132,7 @@ def test_import_install_profile(profile):
                 for f in files
             )
         assert isinstance(profiles.import_profile(exported_file), profiles.Profile)
+        # todo
         assert os.path.isdir(f"{imported_profile_path}_2")
         with mock.patch.object(shutil, "rmtree", mock.Mock()) as shutil_rmtree_mock:
             assert isinstance(profiles.install_profile(exported_file,
