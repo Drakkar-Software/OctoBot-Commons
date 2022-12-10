@@ -299,7 +299,7 @@ class RunDatabasesIdentifier:
             optimization_campaign_folder, False
         ):
             return [
-                self.parse_optimizer_id(element)
+                element
                 async for element in self.database_adaptor.get_sub_identifiers(
                     optimization_campaign_folder, [enums.RunDatabases.LIVE.value]
                 )
