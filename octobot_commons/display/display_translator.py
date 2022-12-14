@@ -70,6 +70,9 @@ class DisplayTranslator:
             },
         }
 
+    def add_parts_from_other(self, other_element):
+        self.nested_elements.update(other_element.nested_elements)
+
     def is_empty(self):
         """
         :return: True if there is no element in self.elements or self.nested_elements
