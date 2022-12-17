@@ -72,8 +72,8 @@ class SystemResourcesWatcher(singleton.Singleton):
         """
         Stop the synchronization loop
         """
-        self.logger.debug("Stopping system resources watcher")
         if self.watcher_job is not None and not self.watcher_job.is_stopped():
+            self.logger.debug("Stopping system resources watcher")
             self.watcher_job.stop()
 
 

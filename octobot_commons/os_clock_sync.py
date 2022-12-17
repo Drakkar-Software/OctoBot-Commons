@@ -117,8 +117,8 @@ class ClockSynchronizer(singleton.Singleton):
         """
         Stop the synchronization loop
         """
-        self.logger.debug("Stopping clock synchronizer")
         if self.sync_job is not None and not self.sync_job.is_stopped():
+            self.logger.debug("Stopping clock synchronizer")
             self.sync_job.stop()
 
 
