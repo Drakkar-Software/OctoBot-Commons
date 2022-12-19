@@ -61,6 +61,7 @@ def install_profile(
     replace_if_exists: bool,
     is_imported: bool,
     origin_url: str = None,
+    quite: bool = False,
 ) -> Profile:
     """
     Installs the given profile export archive into the user's profile directory
@@ -70,6 +71,7 @@ def install_profile(
     :param replace_if_exists: when True erase the profile with the same name if it exists
     :param is_imported: when True erase the profile is set as imported
     :param origin_url: url the profile is coming from (if relevant)
+    :param quite: when True, only log errors
     :return: The created profile
     """
     logger = bot_logging.get_logger("ProfileSharing")
@@ -79,13 +81,15 @@ def install_profile(
     action = "Creat"
     if replaced:
         action = "Updat"
-    logger.info(f"{action}ing {profile_name} profile.")
+    if not quite:
+        logger.info(f"{action}ing {profile_name} profile.")
     _import_profile_files(import_path, target_import_path)
     profile = Profile(target_import_path).read_config()
     profile.imported = is_imported
     profile.origin_url = origin_url
     _ensure_unique_profile_id(profile)
-    logger.info(f"{action}ed {profile.name} ({profile_name}) profile.")
+    if not quite:
+        logger.info(f"{action}ed {profile.name} ({profile_name}) profile.")
     return profile
 
 
