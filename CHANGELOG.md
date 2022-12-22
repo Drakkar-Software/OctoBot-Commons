@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.37] - 2022-12-22
+### Added
+- [Symbols] use cache for repetitive operations
+- [Profiles] quite mode in install
+- [DisplayTranslator] add_parts_from_other
+- [ChronologicalReadDatabaseCache] reset_cached_indexes
+### Updated
+- [Constants] increase MAX_BACKTESTING_RUNS
+
 ## [1.7.36] 2022-12-10
 ### Fixed
 - Profile rename
