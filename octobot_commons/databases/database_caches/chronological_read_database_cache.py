@@ -42,6 +42,10 @@ class ChronologicalReadDatabaseCache:
         data[self.CHRONO_INDEX_KEY] = 0
 
     def reset_cached_indexes(self, parent=None):
+        """
+        Set the cache index of each cached element at 0
+        :param parent: current cached element
+        """
         for cached_data in (parent or self.timestamped_sorted_data).values():
             if isinstance(cached_data, dict):
                 if self.CHRONO_INDEX_KEY in cached_data:
