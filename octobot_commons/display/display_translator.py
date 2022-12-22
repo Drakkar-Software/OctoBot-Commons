@@ -367,6 +367,8 @@ class DisplayTranslator:
                 return default_type
         except IndexError:
             pass
+        except TypeError as error:
+            raise TypeError("a user input element is malformed.") from error
         return default_type
 
     def add_user_inputs_element(
