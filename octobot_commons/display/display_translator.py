@@ -71,6 +71,9 @@ class DisplayTranslator:
         }
 
     def add_parts_from_other(self, other_element):
+        """
+        Adds the given "other_element" to the local nested elements
+        """
         self.nested_elements.update(other_element.nested_elements)
 
     def is_empty(self):
