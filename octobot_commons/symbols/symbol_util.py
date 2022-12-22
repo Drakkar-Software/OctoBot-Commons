@@ -14,11 +14,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import functools
 
 import octobot_commons
 import octobot_commons.symbols.symbol
 
 
+@functools.lru_cache(maxsize=None)
 def parse_symbol(symbol):
     """
     Parse the specified symbol into a Symbol object
@@ -28,6 +30,7 @@ def parse_symbol(symbol):
     return octobot_commons.symbols.symbol.Symbol(symbol)
 
 
+@functools.lru_cache(maxsize=None)
 def merge_symbol(symbol):
     """
     Return merged currency and market without /
@@ -39,6 +42,7 @@ def merge_symbol(symbol):
     )
 
 
+@functools.lru_cache(maxsize=None)
 def merge_currencies(
     currency,
     market,
@@ -66,6 +70,7 @@ def merge_currencies(
     )
 
 
+@functools.lru_cache(maxsize=None)
 def convert_symbol(
     symbol,
     symbol_separator,

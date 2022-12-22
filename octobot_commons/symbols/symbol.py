@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import re
+import functools
 
 import octobot_commons
 
@@ -58,7 +59,6 @@ class Symbol:
         self.identifier = None
         self.strike_price = None
         self.option_type = None
-        self.full_symbol_regex = self.FULL_SYMBOL_GROUPS_REGEX
         self.market_separator = market_separator
         self.settlement_separator = settlement_separator
         self.parse_symbol(self.symbol_str)
@@ -76,10 +76,12 @@ class Symbol:
                 self.identifier,
                 self.strike_price,
                 self.option_type,
-            ) = re.search(self.full_symbol_regex, symbol_str).groups()
+            ) = _parse_symbol_full(self.FULL_SYMBOL_GROUPS_REGEX, symbol_str)
         else:
             # simple (probably spot) pair, use str.split as it is much faster
-            self.base, self.quote = symbol_str.split(self.market_separator)
+            self.base, self.quote = _parse_spot_symbol(
+                self.market_separator, symbol_str
+            )
             self.settlement_asset = (
                 self.identifier
             ) = self.strike_price = self.option_type = ""
@@ -176,3 +178,13 @@ class Symbol:
 
     def __str__(self):
         return self.symbol_str
+
+
+@functools.lru_cache(maxsize=None)
+def _parse_symbol_full(full_symbol_regex, symbol_str):
+    return re.search(full_symbol_regex, symbol_str).groups()
+
+
+@functools.lru_cache(maxsize=None)
+def _parse_spot_symbol(separator, symbol_str):
+    return symbol_str.split(separator)
