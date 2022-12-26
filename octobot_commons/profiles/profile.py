@@ -331,6 +331,18 @@ class Profile:
                         profile_config[element][key] = value
 
     @staticmethod
+    def load_profile(profiles_path, profile_id, schema_path: str = None):
+        """
+        :param profiles_path: the path to look for the profile
+        :param profile_id: the required profile id
+        :return: the loaded profile
+        """
+        for profile in Profile.get_all_profiles(profiles_path, schema_path=schema_path):
+            if profile.profile_id == profile_id:
+                return profile
+        raise errors.NoProfileError(f"No profile with id: {profile_id}")
+
+    @staticmethod
     def get_all_profiles(profiles_path, ignore: str = None, schema_path: str = None):
         """
         Loads profiles found in the given directory
