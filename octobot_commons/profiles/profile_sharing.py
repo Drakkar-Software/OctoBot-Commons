@@ -24,6 +24,7 @@ import time
 import requests
 import octobot_commons.constants as constants
 import octobot_commons.logging as bot_logging
+import octobot_commons.errors as errors
 
 # avoid cyclic import
 from octobot_commons.profiles.profile import Profile
@@ -153,6 +154,9 @@ def download_and_install_profile(download_url):
             f"Downloaded and installed {profile.name} from {profile.origin_url}"
         )
         return profile
+    except errors.UnsupportedError as err:
+        logger.error(f"Error when installing profile: {err}")
+        return None
     except Exception as err:
         logger.exception(err, True, f"Error when installing profile: {err}")
         return None
@@ -223,6 +227,10 @@ def _import_profile_files(profile_path: str, target_profile_path: str) -> None:
         with zipfile.ZipFile(profile_path) as zipped:
             zipped.extractall(target_profile_path)
     else:
+        if not os.path.isdir(profile_path):
+            raise errors.UnsupportedError(
+                f"Profile format not supported ({profile_path})"
+            )
         shutil.copytree(profile_path, target_profile_path)
 
 

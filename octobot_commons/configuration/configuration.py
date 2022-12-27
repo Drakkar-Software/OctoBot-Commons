@@ -142,7 +142,8 @@ class Configuration:
             temp_restore_config_file=temp_restore_config_file,
             schema_file=schema_file,
         )
-        self.profile.save_config(self.config)
+        if self.profile is not None:
+            self.profile.save_config(self.config)
         if sync_all_profiles:
             self._sync_other_profiles()
 
@@ -310,7 +311,7 @@ class Configuration:
     def _get_config_without_profile_elements(self) -> dict:
         filtered_config = copy.deepcopy(self.config)
         # do not include profile fully managed elements into filtered config
-        for profile_managed_element in self.profile.FULLY_MANAGED_ELEMENTS:
+        for profile_managed_element in profiles.Profile.FULLY_MANAGED_ELEMENTS:
             filtered_config.pop(profile_managed_element, None)
         return filtered_config
 

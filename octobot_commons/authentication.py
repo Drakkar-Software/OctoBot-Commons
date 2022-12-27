@@ -37,11 +37,12 @@ class Authenticator(singleton.Singleton):
         singleton.Singleton._instances[Authenticator] = self
 
     @abc.abstractmethod
-    async def login(self, username, password):
+    async def login(self, username, password, password_token=None):
         """
         Used to trigger a login
         :param username: authentication username
         :param password: authentication password
+        :param password: (optional) authentication password token
         :return:
         """
         raise NotImplementedError
