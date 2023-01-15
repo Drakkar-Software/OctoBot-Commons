@@ -19,5 +19,5 @@ cimport numpy as np
 
 cpdef object normalize_data(object data)
 cpdef double mean(object number_list)
-cpdef np.float64_t[::1] shift_value_array(np.float64_t[::1] array, int shift_count=*,
-                                          object fill_value=*, object dtype=*)
+cpdef np.ndarray shift_value_array(np.ndarray array, int shift_count=*,
+                                   object fill_value=*, object dtype=*)
