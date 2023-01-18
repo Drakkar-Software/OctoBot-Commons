@@ -1,3 +1,4 @@
+# pylint: disable=R0913
 #  Drakkar-Software OctoBot
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -111,6 +112,26 @@ class Authenticator(singleton.Singleton):
         :return:
         """
         await asyncio.wait_for(self.initialized_event.wait(), timeout)
+
+    async def update_trades(self, trades: list):
+        """
+        Updates authenticated account trades
+        """
+        raise NotImplementedError
+
+    async def update_portfolio(
+        self,
+        current_value: dict,
+        initial_value: dict,
+        unit: str,
+        content: dict,
+        history: dict,
+        price_by_asset: dict,
+    ):
+        """
+        Updates authenticated account portfolio
+        """
+        raise NotImplementedError
 
 
 class FailedAuthentication(Exception):
