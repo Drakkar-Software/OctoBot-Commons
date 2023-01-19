@@ -43,7 +43,7 @@ class Authenticator(singleton.Singleton):
         Used to trigger a login
         :param username: authentication username
         :param password: authentication password
-        :param password: (optional) authentication password token
+        :param password_token: (optional) authentication password token
         :return:
         """
         raise NotImplementedError
@@ -52,6 +52,16 @@ class Authenticator(singleton.Singleton):
     def logout(self):
         """
         Used to clear a logged in session
+        :return:
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def register(self, username, password):
+        """
+        Used to create a user account
+        :param username: authentication username
+        :param password: authentication password
         :return:
         """
         raise NotImplementedError
