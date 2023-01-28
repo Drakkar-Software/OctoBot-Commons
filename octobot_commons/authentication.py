@@ -162,6 +162,12 @@ class AuthenticationError(Exception):
     """
 
 
+class AccountUpdateError(Exception):
+    """
+    Raised upon account update error
+    """
+
+
 class AuthenticationRequired(Exception):
     """
     Raised when an authentication is required

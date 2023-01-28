@@ -260,7 +260,7 @@ class DisplayTranslator:
                 properties["minLength"] = properties.get("minLength", 1)
             properties["type"] = schema_type
         except KeyError as err:
-            self.logger.error(f"Unknown input type: {err}")
+            self.logger.exception(err, True, f"Unknown input type: {err}")
 
     def _adapt_to_specific_array_user_input(
         self,
