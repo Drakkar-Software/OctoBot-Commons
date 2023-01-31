@@ -201,6 +201,9 @@ class DisplayTranslator:
         if editor_options := user_input_element.get("editor_options"):
             properties["options"].update(editor_options)
         if other_schema_values := user_input_element.get("other_schema_values"):
+            if "options" in other_schema_values:
+                properties["options"].update(other_schema_values["options"])
+                del other_schema_values["options"]
             properties.update(other_schema_values)
         return properties
 
