@@ -68,7 +68,10 @@ class ClockSynchronizer(singleton.Singleton):
             if stdout:
                 self.logger.debug(f"[stdout] {stdout}")
             if stderr:
-                self.logger.debug(f"[stderr] {stderr}")
+                message = f"[stderr] {stderr}"
+                if raise_not_implemented:
+                    raise NotImplementedError(message)
+                self.logger.debug(message)
         except NotImplementedError as err:
             if raise_not_implemented:
                 raise
@@ -92,7 +95,9 @@ class ClockSynchronizer(singleton.Singleton):
             # make sure the command is usable on this platform
             await self._sync_clock(raise_not_implemented=True)
         except NotImplementedError as err:
-            self.logger.warning(f"Error when synchronizing clock: {err}")
+            self.logger.debug(
+                f"Error when synchronizing clock: {err}. Disabling synchronizer."
+            )
             return False
         return True
 
