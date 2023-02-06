@@ -65,26 +65,28 @@ class RunDatabasesProvider(singleton.Singleton):
         """
         return self.run_databases[bot_id].get_run_db()
 
-    def get_orders_db(self, bot_id, exchange=None):
+    def get_orders_db(self, bot_id, account_type, exchange=None):
         """
-        :return: the bot_id and exchange associated orders database.
+        :return: the bot_id and exchange associated orders database and account_type.
         Use local run_database_identifier.context for exchange if not provided.
         """
-        return self.run_databases[bot_id].get_orders_db(exchange=exchange)
+        return self.run_databases[bot_id].get_orders_db(account_type, exchange=exchange)
 
-    def get_trades_db(self, bot_id, exchange=None):
+    def get_trades_db(self, bot_id, account_type, exchange=None):
         """
-        :return: the bot_id and exchange associated trades database.
+        :return: the bot_id and exchange associated trades database and account_type.
         Use local run_database_identifier.context for exchange if not provided.
         """
-        return self.run_databases[bot_id].get_trades_db(exchange=exchange)
+        return self.run_databases[bot_id].get_trades_db(account_type, exchange=exchange)
 
-    def get_transactions_db(self, bot_id, exchange=None):
+    def get_transactions_db(self, bot_id, account_type, exchange=None):
         """
-        :return: the bot_id and exchange associated transactions database.
+        :return: the bot_id and exchange associated transactions database and account_type.
         Use local run_database_identifier.context for exchange if not provided.
         """
-        return self.run_databases[bot_id].get_transactions_db(exchange=exchange)
+        return self.run_databases[bot_id].get_transactions_db(
+            account_type, exchange=exchange
+        )
 
     def get_backtesting_metadata_db(self, bot_id):
         """
@@ -107,12 +109,12 @@ class RunDatabasesProvider(singleton.Singleton):
         """
         return await self.run_databases[bot_id].get_all_symbol_dbs(exchange)
 
-    def get_historical_portfolio_value_db(self, bot_id, exchange, portfolio_suffix):
+    def get_historical_portfolio_value_db(self, bot_id, account_type, exchange):
         """
-        :return: the bot_id, exchange and portfolio_suffix associated transactions database.
+        :return: the bot_id, exchange and account_type associated transactions database.
         """
         return self.run_databases[bot_id].get_historical_portfolio_value_db(
-            exchange, portfolio_suffix
+            account_type, exchange
         )
 
     async def close(self, bot_id):

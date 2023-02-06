@@ -80,27 +80,34 @@ class RunDatabasesIdentifier:
         """
         return self._get_db_identifier(enums.RunDatabases.RUN_DATA_DB.value, None)
 
-    def get_orders_db_identifier(self, exchange) -> str:
+    def get_orders_db_identifier(self, account_type, exchange) -> str:
         """
         :return: the database identifier associated to this exchange's orders
-        :param exchange: name of the associated exchange
-        """
-        return self._get_db_identifier(enums.RunDatabases.ORDERS_DB.value, exchange)
-
-    def get_trades_db_identifier(self, exchange) -> str:
-        """
-        :return: the database identifier associated to this exchange's trades
-        :param exchange: name of the associated exchange
-        """
-        return self._get_db_identifier(enums.RunDatabases.TRADES_DB.value, exchange)
-
-    def get_transactions_db_identifier(self, exchange) -> str:
-        """
-        :return: the database identifier associated to this exchange's transactions
+        :param account_type: type of account
         :param exchange: name of the associated exchange
         """
         return self._get_db_identifier(
-            enums.RunDatabases.TRANSACTIONS_DB.value, exchange
+            f"{enums.RunDatabases.ORDERS_DB.value}{account_type}", exchange
+        )
+
+    def get_trades_db_identifier(self, account_type, exchange) -> str:
+        """
+        :return: the database identifier associated to this exchange's trades
+        :param account_type: type of account
+        :param exchange: name of the associated exchange
+        """
+        return self._get_db_identifier(
+            f"{enums.RunDatabases.TRADES_DB.value}{account_type}", exchange
+        )
+
+    def get_transactions_db_identifier(self, account_type, exchange) -> str:
+        """
+        :return: the database identifier associated to this exchange's transactions
+        :param account_type: type of account
+        :param exchange: name of the associated exchange
+        """
+        return self._get_db_identifier(
+            f"{enums.RunDatabases.TRANSACTIONS_DB.value}{account_type}", exchange
         )
 
     def get_symbol_db_identifier(self, exchange, symbol) -> str:
@@ -112,15 +119,15 @@ class RunDatabasesIdentifier:
         return self._get_db_identifier(symbol_util.merge_symbol(symbol), exchange)
 
     def get_historical_portfolio_value_db_identifier(
-        self, exchange, portfolio_type_suffix
+        self, account_type, exchange
     ) -> str:
         """
         :return: the database identifier associated to this exchange's historical portfolio value
+        :param account_type: a suffix identifying the type of portfolio (future / sandbox etc)
         :param exchange: name of the associated exchange
-        :param portfolio_type_suffix: a suffix identifying the type of portfolio (future / sandbox etc)
         """
         return self._get_db_identifier(
-            f"{enums.RunDatabases.PORTFOLIO_VALUE_DB.value}{portfolio_type_suffix}",
+            f"{enums.RunDatabases.PORTFOLIO_VALUE_DB.value}{account_type}",
             exchange,
         )
 

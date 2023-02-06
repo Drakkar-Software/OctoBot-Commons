@@ -45,50 +45,53 @@ class MetaDatabase:
             )
         return self.run_db
 
-    def get_orders_db(self, exchange=None):
+    def get_orders_db(self, account_type, exchange=None):
         """
         :return: the orders database. Opens it if not open already
         """
         if self.orders_db is None:
             self.orders_db = self._get_db(
                 self.run_dbs_identifier.get_orders_db_identifier(
-                    exchange or self.run_dbs_identifier.context.exchange_name
+                    account_type,
+                    exchange or self.run_dbs_identifier.context.exchange_name,
                 )
             )
         return self.orders_db
 
-    def get_trades_db(self, exchange=None):
+    def get_trades_db(self, account_type, exchange=None):
         """
         :return: the trades database. Opens it if not open already
         """
         if self.trades_db is None:
             self.trades_db = self._get_db(
                 self.run_dbs_identifier.get_trades_db_identifier(
-                    exchange or self.run_dbs_identifier.context.exchange_name
+                    account_type,
+                    exchange or self.run_dbs_identifier.context.exchange_name,
                 )
             )
         return self.trades_db
 
-    def get_transactions_db(self, exchange=None):
+    def get_transactions_db(self, account_type, exchange=None):
         """
         :return: the transactions database. Opens it if not open already
         """
         if self.transactions_db is None:
             self.transactions_db = self._get_db(
                 self.run_dbs_identifier.get_transactions_db_identifier(
-                    exchange or self.run_dbs_identifier.context.exchange_name
+                    account_type,
+                    exchange or self.run_dbs_identifier.context.exchange_name,
                 )
             )
         return self.transactions_db
 
-    def get_historical_portfolio_value_db(self, exchange, portfolio_type_suffix):
+    def get_historical_portfolio_value_db(self, account_type, exchange):
         """
         :return: the historical portfolio database. Opens it if not open already
         """
         if self.historical_portfolio_value_db is None:
             self.historical_portfolio_value_db = self._get_db(
                 self.run_dbs_identifier.get_historical_portfolio_value_db_identifier(
-                    exchange, portfolio_type_suffix
+                    account_type, exchange
                 )
             )
         return self.historical_portfolio_value_db
@@ -144,14 +147,14 @@ class MetaDatabase:
             "get_all_symbol_dbs is not implemented for non is_file_system_based databases"
         )
 
-    def all_basic_run_db(self, exchange=None):
+    def all_basic_run_db(self, account_type, exchange=None):
         """
         yields the run, orders, trades and transactions databases
         """
         yield self.get_run_db()
-        yield self.get_orders_db(exchange)
-        yield self.get_trades_db(exchange)
-        yield self.get_transactions_db(exchange)
+        yield self.get_orders_db(account_type, exchange)
+        yield self.get_trades_db(account_type, exchange)
+        yield self.get_transactions_db(account_type, exchange)
 
     @staticmethod
     def _get_symbol_db_key(exchange, symbol):
