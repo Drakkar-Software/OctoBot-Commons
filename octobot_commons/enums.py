@@ -137,6 +137,7 @@ class UserCommands(enum.Enum):
     Allowed user commands
     """
 
+    MANUAL_TRIGGER = "manual_trigger"
     RELOAD_CONFIG = "reload_config"
     RELOAD_SCRIPT = "reload_script"
     CLEAR_PLOTTING_CACHE = "clear_plotting_cache"
@@ -291,6 +292,22 @@ class ActivationTopics(enum.Enum):
     IN_CONSTRUCTION_CANDLES = "once per second (Live Price)"
     RECENT_TRADES = "recent trades"
     EVALUATION_CYCLE = "after evaluators"
+
+
+class TriggerSource(enum.Enum):
+    INITIALIZATION = "initialization"
+    EVALUATION_MATRIX = "evaluation_matrix"
+    EVALUATOR_REFRESH = "evaluator_refresh"
+    OHLCV = "ohlcv"
+    KLINE = "kline"
+    ORDER = "order"
+    TRADE = "trade"
+    PRICE = "price"
+    BALANCE = "balance"
+    POSITION = "position"
+    CONFIGURATION_UPDATE = "configuration_update"
+    MANUAL = "manual"
+    UNDEFINED = "undefined"
 
 
 class DataBaseOrderBy(enum.Enum):
