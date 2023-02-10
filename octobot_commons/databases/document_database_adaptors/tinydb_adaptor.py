@@ -1,4 +1,4 @@
-# pylint: disable=C0301, R0904
+# pylint: disable=C0301, R0904, R1732, C0116
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -54,7 +54,9 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
         """
         Initialize the database: opens the database file.
         """
-        middleware = tinydb.middlewares.CachingMiddleware(tinydb.storages.JSONStorage)
+
+        storage = self._get_storage()
+        middleware = tinydb.middlewares.CachingMiddleware(storage)
         middleware.WRITE_CACHE_SIZE = self.cache_size or self.DEFAULT_WRITE_CACHE_SIZE
         try:
             self.database = tinydb.TinyDB(self.db_path, storage=middleware)
@@ -62,6 +64,66 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
             raise errors.DatabaseNotFoundError(
                 f'Can\'t open database at "{self.db_path}"'
             ) from err
+
+    @staticmethod
+    def _get_storage():
+        class LazyJSONStorage(tinydb.storages.JSONStorage):
+            def __init__(
+                self,
+                path: str,
+                create_dirs=False,
+                encoding=None,
+                access_mode="r+",
+                **kwargs,
+            ):
+                """
+                Only creates the json file when actually needing to access it
+                # from tinydb.storages.JSONStorage
+                Create a new instance.
+
+                Also creates the storage file, if it doesn't exist and the access mode is appropriate for writing.
+
+                :param path: Where to store the JSON data.
+                :param access_mode: mode in which the file is opened (r, r+, w, a, x, b, t, +, U)
+                :type access_mode: str
+                """
+
+                tinydb.storages.Storage.__init__(self)
+
+                self._mode = access_mode
+                self.kwargs = kwargs
+
+                # custom
+                self._path = path
+                self._create_dirs = create_dirs
+                self._encoding = encoding
+                self._lazy_handle = None
+
+            @property
+            def _handle(self):
+                # create and open file once and only when self._handle is used
+                if self._lazy_handle is None:
+                    # Create the file if it doesn't exist and creating is allowed by the
+                    # access mode
+                    if any(
+                        character in self._mode for character in ("+", "w", "a")
+                    ):  # any of the writing modes
+                        tinydb.storages.touch(self._path, create_dirs=self._create_dirs)
+
+                    # Open the file for reading/writing
+                    self._lazy_handle = open(
+                        self._path, mode=self._mode, encoding=self._encoding
+                    )
+                return self._lazy_handle
+
+            def close(self) -> None:
+                if self._lazy_handle is None:
+                    # never opened the file: don't call self._handle (that would create it)
+                    return
+                self._handle.close()
+                self._lazy_handle = None
+
+        return LazyJSONStorage
 
     @staticmethod
     def is_file_system_based() -> bool:
