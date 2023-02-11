@@ -99,6 +99,15 @@ class TinyDBAdaptor(abstract_document_database_adaptor.AbstractDocumentDatabaseA
                 self._encoding = encoding
                 self._lazy_handle = None
 
+                # ensure path
+                if not self._create_dirs:
+                    self._ensure_path()
+
+            def _ensure_path(self):
+                dir_path = os.path.dirname(self._path)
+                if dir_path and not os.path.exists(dir_path):
+                    raise FileNotFoundError(self._path)
+
             @property
             def _handle(self):
                 # create and open file once and only when self._handle is used
