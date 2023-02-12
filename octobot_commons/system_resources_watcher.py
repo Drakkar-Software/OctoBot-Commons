@@ -15,9 +15,12 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import threading
+import csv
+import gc
 
 import octobot_commons.constants as commons_constants
 import octobot_commons.singleton as singleton
+import octobot_commons.timestamp_util as timestamp_util
 import octobot_commons.logging as logging
 import octobot_commons.async_job as async_job
 import octobot_commons.os_util as os_util
@@ -30,22 +33,29 @@ class SystemResourcesWatcher(singleton.Singleton):
     )
     CPU_WATCHING_SECONDS = 2
 
-    def __init__(self):
+    def __init__(self, dump_resources, output_file):
         super().__init__()
         self.watcher_job = None
         self.watcher_interval = self.DEFAULT_WATCHER_INTERVAL
         self.logger = logging.get_logger(self.__class__.__name__)
+        self.dump_resources = dump_resources
+        self.output_file = output_file
+        self.initialized_output = False
 
     def _exec_log_used_resources(self):
         try:
+            # trigger garbage collector to get a fresh memory picture
+            gc.collect()
             # warning: blocking to monitor CPU usage, to be used in a thread
             cpu, percent_ram, ram, process_ram = os_util.get_cpu_and_ram_usage(
                 self.CPU_WATCHING_SECONDS
             )
             self.logger.debug(
                 f"Used system resources: {cpu}% CPU, {round(ram, 3)} GB in RAM ({percent_ram}% of total "
-                f"including {round(process_ram, 3)} GB from this process). "
+                f"including {process_ram} GB from this process). "
             )
+            if self.dump_resources:
+                self._dump_resources(cpu, percent_ram, ram, process_ram)
         except Exception as err:
             self.logger.exception(err, False)
             self.logger.debug(f"Error when checking system resources: {err}")
@@ -56,6 +66,34 @@ class SystemResourcesWatcher(singleton.Singleton):
             daemon=True,
             name=f"{self.__class__.__name__}-_exec_log_used_resources",
         ).start()
+
+    def _dump_resources(self, cpu, percent_ram, ram, process_ram):
+        reset_file = not self.initialized_output
+        self.initialized_output = True
+        mode = "w" if reset_file else "a"
+        row = (
+            str(element).replace(".", ",")
+            for element in (
+                timestamp_util.get_now_time(),
+                process_ram,
+                cpu,
+                percent_ram,
+                ram,
+            )
+        )
+        with open(self.output_file, mode, newline="") as csv_file:
+            writer = csv.writer(csv_file, delimiter=";")
+            if reset_file:
+                writer.writerow(
+                    [
+                        "TIME",
+                        "PROCESS USED RAM",
+                        "% USED CPU",
+                        "% USED RAM",
+                        "TOTAL USED RAM",
+                    ]
+                )
+            writer.writerow(row)
 
     async def start(self):
         """
@@ -77,11 +115,11 @@ class SystemResourcesWatcher(singleton.Singleton):
             self.watcher_job.stop()
 
 
-async def start_system_resources_watcher():
+async def start_system_resources_watcher(dump_resources, output_file):
     """
     Start the resources watcher loop
     """
-    await SystemResourcesWatcher.instance().start()
+    await SystemResourcesWatcher.instance(dump_resources, output_file).start()
 
 
 async def stop_system_resources_watcher():
