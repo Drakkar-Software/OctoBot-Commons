@@ -77,17 +77,16 @@ class Profile:
         Reads a profile from self.path
         :return: self
         """
-        with open(self.config_file()) as profile_file:
-            parsed_profile = json.load(profile_file)
-            profile_config = parsed_profile.get(constants.CONFIG_PROFILE, {})
-            self.profile_id = profile_config.get(constants.CONFIG_ID, str(uuid.uuid4()))
-            self.name = profile_config.get(constants.CONFIG_NAME, "")
-            self.description = profile_config.get(constants.CONFIG_DESCRIPTION, "")
-            self.avatar = profile_config.get(constants.CONFIG_AVATAR, "")
-            self.origin_url = profile_config.get(constants.CONFIG_ORIGIN_URL, None)
-            self.read_only = profile_config.get(constants.CONFIG_READ_ONLY, False)
-            self.imported = profile_config.get(constants.CONFIG_IMPORTED, False)
-            self.config = parsed_profile[constants.PROFILE_CONFIG]
+        parsed_profile = json_util.read_file(self.config_file())
+        profile_config = parsed_profile.get(constants.CONFIG_PROFILE, {})
+        self.profile_id = profile_config.get(constants.CONFIG_ID, str(uuid.uuid4()))
+        self.name = profile_config.get(constants.CONFIG_NAME, "")
+        self.description = profile_config.get(constants.CONFIG_DESCRIPTION, "")
+        self.avatar = profile_config.get(constants.CONFIG_AVATAR, "")
+        self.origin_url = profile_config.get(constants.CONFIG_ORIGIN_URL, None)
+        self.read_only = profile_config.get(constants.CONFIG_READ_ONLY, False)
+        self.imported = profile_config.get(constants.CONFIG_IMPORTED, False)
+        self.config = parsed_profile[constants.PROFILE_CONFIG]
 
         if self.avatar:
             avatar_path = os.path.join(self.path, self.avatar)
