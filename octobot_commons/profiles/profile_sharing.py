@@ -25,6 +25,7 @@ import requests
 import octobot_commons.constants as constants
 import octobot_commons.logging as bot_logging
 import octobot_commons.errors as errors
+import octobot_commons.json_util as json_util
 
 # avoid cyclic import
 from octobot_commons.profiles.profile import Profile
@@ -175,8 +176,7 @@ def _get_profile_name(name, import_path):
 def _filter_profile_export(profile_path: str):
     profile_file = os.path.join(profile_path, constants.PROFILE_CONFIG_FILE)
     if os.path.isfile(profile_file):
-        with open(profile_file) as open_file:
-            parsed_profile = json.load(open_file)
+        parsed_profile = json_util.read_file(profile_file)
         _filter_disabled(parsed_profile, constants.CONFIG_EXCHANGES)
         with open(profile_file, "w") as open_file:
             json.dump(parsed_profile, open_file, indent=4, sort_keys=True)

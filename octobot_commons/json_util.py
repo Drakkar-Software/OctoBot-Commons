@@ -1,3 +1,4 @@
+# pylint: disable=W0718
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -33,7 +34,12 @@ def validate(config, schema_file) -> None:
     jsonschema.validate(instance=config, schema=loaded_schema)
 
 
-def read_file(file_path: str, raise_errors: bool = True, on_error_value: dict = None, open_mode="r") -> dict:
+def read_file(
+    file_path: str,
+    raise_errors: bool = True,
+    on_error_value: dict = None,
+    open_mode="r",
+) -> dict:
     """
     Read a load the given file with json.load()
     :param file_path: file to read

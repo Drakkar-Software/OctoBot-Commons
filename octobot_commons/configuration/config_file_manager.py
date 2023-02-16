@@ -45,10 +45,7 @@ def load(config_file, should_raise=True, fill_missing_fields=False) -> dict:
     logger = logging.get_logger(LOGGER_NAME)
     basic_error = "Error when load config file {0}".format(config_file)
     try:
-        with open(config_file) as json_data_file:
-            config = json.load(json_data_file)
-            # if fill_missing_fields: TODO
-            #     _fill_missing_config_fields(config)
+        config = json_util.read_file(config_file)
         return config
     except ValueError as value_error:
         error_str = f"{basic_error} : json decoding failed ({value_error})"
@@ -85,6 +82,15 @@ def dump(
         # prepare a restoration config file
         prepare_restore_file(temp_restore_config_file, config_file)
 
+    # when failing to create the restore config
+    except Exception as err:
+        error_details = (
+            f"Failed to create the backup configuration file. Is your {commons_constants.USER_FOLDER} "
+            f"folder accessible ? : {err} ({err.__class__.__name__})"
+        )
+        logging.get_logger(LOGGER_NAME).error(error_details)
+        raise err.__class__(error_details) from err
+    try:
         new_content = jsonify_config(config)
 
         # edit the config file
@@ -98,7 +104,7 @@ def dump(
         # remove temp file
         remove_restore_file(temp_restore_config_file)
 
-    # when fail restore the old config
+    # when failing to restore the previous config
     except Exception as global_exception:
         logging.get_logger(LOGGER_NAME).error(
             f"Save config failed : {global_exception}"
