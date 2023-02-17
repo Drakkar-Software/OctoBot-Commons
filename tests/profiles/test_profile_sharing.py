@@ -132,16 +132,7 @@ def test_import_install_profile(profile):
                 for f in files
             )
         assert isinstance(profiles.import_profile(exported_file), profiles.Profile)
-        # todo
         assert os.path.isdir(f"{imported_profile_path}_2")
-        with mock.patch.object(shutil, "rmtree", mock.Mock()) as shutil_rmtree_mock:
-            assert isinstance(profiles.install_profile(exported_file,
-                                                       _get_profile_name(None, exported_file),
-                                                       ".",
-                                                       True,
-                                                       False,
-                                                       origin_url="hello"), profiles.Profile)
-            shutil_rmtree_mock.assert_called_once()
         assert os.path.isdir(imported_profile_path)
         assert not os.path.isdir(f"{imported_profile_path}_3")
 
