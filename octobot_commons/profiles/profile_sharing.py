@@ -31,6 +31,17 @@ import octobot_commons.json_util as json_util
 from octobot_commons.profiles.profile import Profile
 
 
+NON_OVERWRITTEN_PROFILE_FOLDERS = []
+try:
+    import octobot_tentacles_manager.constants as tentacles_manager_constants
+
+    NON_OVERWRITTEN_PROFILE_FOLDERS.append(
+        tentacles_manager_constants.TENTACLES_SPECIFIC_CONFIG_FOLDER
+    )
+except ImportError:
+    pass
+
+
 def export_profile(profile, export_path: str) -> str:
     """
     Exports the given profile into export_path, appends ".zip" as a file extension
@@ -77,11 +88,11 @@ def install_profile(
     :return: The created profile
     """
     logger = bot_logging.get_logger("ProfileSharing")
-    target_import_path, replaced = _get_target_import_path(
+    target_import_path = _get_target_import_path(
         bot_install_path, profile_name, replace_if_exists
     )
     action = "Creat"
-    if replaced:
+    if replace_if_exists:
         action = "Updat"
     if not quite:
         logger.info(f"{action}ing {profile_name} profile.")
@@ -195,7 +206,7 @@ def _filter_disabled(profile_config: dict, element):
 
 def _get_target_import_path(
     bot_install_path: str, profile_name: str, replace_if_exists: bool
-) -> (str, bool):
+) -> str:
     """
     Get the target profile folder path
     :param bot_install_path: path to the octobot installation
@@ -207,31 +218,60 @@ def _get_target_import_path(
         bot_install_path, constants.USER_PROFILES_FOLDER, profile_name
     )
     if replace_if_exists:
-        try:
-            replaced = True
-            shutil.rmtree(target_import_path)
-        except FileNotFoundError:
-            replaced = False
-        return target_import_path, replaced
-    return _get_unique_profile_folder(target_import_path), False
+        return target_import_path
+    return _get_unique_profile_folder(target_import_path)
 
 
 def _import_profile_files(profile_path: str, target_profile_path: str) -> None:
     """
-    Copy or extract profile files to destination
+    Copy or extract profile files to destination. Does not override local tentacles configuration
     :param profile_path: the current profile path
     :param target_profile_path: the target profile path
     :return: None
     """
     if zipfile.is_zipfile(profile_path):
-        with zipfile.ZipFile(profile_path) as zipped:
-            zipped.extractall(target_profile_path)
+        with zipfile.ZipFile(profile_path) as zipped_profile:
+            for archive_member in zipped_profile.namelist():
+                if _should_profile_file_be_imported(
+                    target_profile_path, archive_member
+                ):
+                    zipped_profile.extract(archive_member, target_profile_path)
     else:
         if not os.path.isdir(profile_path):
             raise errors.UnsupportedError(
                 f"Profile format not supported ({profile_path})"
             )
-        shutil.copytree(profile_path, target_profile_path)
+
+        def _get_ignored_elements(current_dir, sub_elements):
+            return [
+                element
+                for element in sub_elements
+                if not _should_profile_file_be_imported(
+                    target_profile_path,
+                    os.path.join(current_dir, element).replace(
+                        f"{profile_path}{os.path.sep}", ""
+                    ),  # force local path
+                )
+            ]
+
+        shutil.copytree(
+            profile_path,
+            target_profile_path,
+            ignore=_get_ignored_elements,
+            dirs_exist_ok=True,
+        )
+
+
+def _should_profile_file_be_imported(
+    target_profile_path: str, profile_file_path: str
+) -> bool:
+    for non_overwritten_element in NON_OVERWRITTEN_PROFILE_FOLDERS:
+        # ignore files in NON_OVERWRITTEN_PROFILE_FOLDERS that already exist
+        if non_overwritten_element in pathlib.Path(profile_file_path).parts[
+            :-1
+        ] and os.path.isfile(os.path.join(target_profile_path, profile_file_path)):
+            return False
+    return True
 
 
 def _get_unique_profile_folder_from_name(profile) -> str:
