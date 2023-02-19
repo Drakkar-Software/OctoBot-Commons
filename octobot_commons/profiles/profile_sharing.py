@@ -32,6 +32,7 @@ from octobot_commons.profiles.profile import Profile
 
 
 NON_OVERWRITTEN_PROFILE_FOLDERS = []
+NON_OVERWRITTEN_PROFILE_FILES = [constants.PROFILE_CONFIG_FILE]
 try:
     import octobot_tentacles_manager.constants as tentacles_manager_constants
 
@@ -267,9 +268,11 @@ def _should_profile_file_be_imported(
 ) -> bool:
     for non_overwritten_element in NON_OVERWRITTEN_PROFILE_FOLDERS:
         # ignore files in NON_OVERWRITTEN_PROFILE_FOLDERS that already exist
-        if non_overwritten_element in pathlib.Path(profile_file_path).parts[
-            :-1
-        ] and os.path.isfile(os.path.join(target_profile_path, profile_file_path)):
+        element_path = pathlib.Path(profile_file_path)
+        if (
+            element_path.name in NON_OVERWRITTEN_PROFILE_FILES
+            or non_overwritten_element in element_path.parts[:-1]
+        ) and os.path.isfile(os.path.join(target_profile_path, profile_file_path)):
             return False
     return True
 
