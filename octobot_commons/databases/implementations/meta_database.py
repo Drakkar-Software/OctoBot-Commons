@@ -112,7 +112,7 @@ class MetaDatabase:
         """
         :return: an iterable over each symbol database for the given exchange
         """
-        return self._get_exchange_db(exchange).get_all_symbol_dbs()
+        return await self._get_exchange_db(exchange).get_all_symbol_dbs()
 
     def all_basic_run_db(self, account_type, exchange=None):
         """
