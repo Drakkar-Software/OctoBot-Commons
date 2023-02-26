@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import contextlib
+import octobot_commons.logging
 
 
 class DocumentDatabase:
@@ -133,19 +134,28 @@ class DocumentDatabase:
         """
         Completely reset the database
         """
+        self.get_logger().debug("hard resetting database")
         return await self.adaptor.hard_reset()
 
     async def flush(self):
         """
         Flushes the database cache
         """
+        self.get_logger().debug("flushing database")
         return await self.adaptor.flush()
 
     async def close(self):
         """
         Closes the database
         """
+        self.get_logger().debug("closing database")
         return await self.adaptor.close()
+
+    def get_logger(self):
+        """
+        :return: the database logger
+        """
+        return octobot_commons.logging.get_logger(str(self))
 
     def __str__(self):
         return f"{self.__class__.__name__} with adaptor: {self.adaptor}"
