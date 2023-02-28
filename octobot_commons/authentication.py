@@ -123,7 +123,7 @@ class Authenticator(singleton.Singleton):
         """
         await asyncio.wait_for(self.initialized_event.wait(), timeout)
 
-    async def update_trades(self, trades: list):
+    async def update_trades(self, trades: list, reset: bool):
         """
         Updates authenticated account trades
         """
@@ -137,6 +137,7 @@ class Authenticator(singleton.Singleton):
         content: dict,
         history: dict,
         price_by_asset: dict,
+        reset: bool,
     ):
         """
         Updates authenticated account portfolio
