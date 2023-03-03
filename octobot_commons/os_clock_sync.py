@@ -44,6 +44,8 @@ class ClockSynchronizer(singleton.Singleton):
             # use 2x w32tm /resync as the 1st one often fails
             return "net stop w32time && net start w32time && w32tm /resync & w32tm /resync && w32tm /query /status"
         if platform is commons_enums.PlatformsName.LINUX:
+            if os_util.has_admin_rights():
+                return "service ntp stop && ntpd -gq && service ntp start"
             return "sudo service ntp stop && sudo ntpd -gq && sudo service ntp start"
         if platform is commons_enums.PlatformsName.MAC:
             raise NotImplementedError(platform.value)
