@@ -22,6 +22,7 @@ import pathlib
 import uuid
 import time
 import requests
+import jsonschema
 import octobot_commons.constants as constants
 import octobot_commons.logging as bot_logging
 import octobot_commons.errors as errors
@@ -76,6 +77,7 @@ def install_profile(
     is_imported: bool,
     origin_url: str = None,
     quite: bool = False,
+    profile_schema: str = None,
 ) -> Profile:
     """
     Installs the given profile export archive into the user's profile directory
@@ -83,9 +85,10 @@ def install_profile(
     :param profile_name: name of the profile folder
     :param bot_install_path: path to the octobot installation
     :param replace_if_exists: when True erase the profile with the same name if it exists
-    :param is_imported: when True erase the profile is set as imported
+    :param is_imported: when True the profile is set as imported
     :param origin_url: url the profile is coming from (if relevant)
     :param quite: when True, only log errors
+    :param profile_schema: the schema to validate profile against
     :return: The created profile
     """
     logger = bot_logging.get_logger("ProfileSharing")
@@ -98,10 +101,19 @@ def install_profile(
     if not quite:
         logger.info(f"{action}ing {profile_name} profile.")
     _import_profile_files(import_path, target_import_path)
-    profile = Profile(target_import_path).read_config()
+    profile = Profile(target_import_path, schema_path=profile_schema).read_config()
     profile.imported = is_imported
     profile.origin_url = origin_url
     _ensure_unique_profile_id(profile)
+    if is_imported:
+        try:
+            profile.validate()
+        except jsonschema.exceptions.ValidationError as err:
+            shutil.rmtree(target_import_path)
+            raise errors.ProfileImportError(
+                f"Invalid imported profile: {err.message} in '{'/'.join(err.absolute_path)}'"
+            ) from err
+    profile.save()
     if not quite:
         logger.info(f"{action}ed {profile.name} ({profile_name}) profile.")
     return profile
@@ -109,6 +121,7 @@ def install_profile(
 
 def import_profile(
     import_path: str,
+    profile_schema: str,
     name: str = None,
     bot_install_path: str = ".",
     origin_url: str = None,
@@ -116,6 +129,7 @@ def import_profile(
     """
     Imports the given profile export archive into the user's profile directory with the "imported_" prefix
     :param import_path: path to the profile zipped archive
+    :param profile_schema: the schema to validate profile against
     :param name: name of the profile folder
     :param bot_install_path: path to the octobot installation
     :param origin_url: url the profile is coming from
@@ -129,6 +143,7 @@ def import_profile(
         False,
         True,
         origin_url=origin_url,
+        profile_schema=profile_schema,
     )
     if profile.name != temp_profile_name:
         profile.rename_folder(_get_unique_profile_folder_from_name(profile), False)
@@ -152,9 +167,10 @@ def download_profile(url, target_file, timeout=60):
     return target_file
 
 
-def download_and_install_profile(download_url):
+def download_and_install_profile(download_url, profile_schema):
     """
     :param download_url: profile url
+    :param profile_schema: the schema to validate profile against
     :return: the installed profile, None if an error occurred
     """
     logger = bot_logging.get_logger("ProfileSharing")
@@ -162,7 +178,9 @@ def download_and_install_profile(download_url):
     file_path = None
     try:
         file_path = download_profile(download_url, name)
-        profile = import_profile(file_path, name=name, origin_url=download_url)
+        profile = import_profile(
+            file_path, profile_schema, name=name, origin_url=download_url
+        )
         logger.info(
             f"Downloaded and installed {profile.name} from {profile.origin_url}"
         )
@@ -311,4 +329,3 @@ def _ensure_unique_profile_id(profile) -> None:
     while profile.profile_id in ids and iteration < 100:
         profile.profile_id = str(uuid.uuid4())
         iteration += 1
-    profile.save()

@@ -19,14 +19,18 @@ import zipfile
 import contextlib
 import mock
 import pathlib
+
+import pytest
+
 import octobot_commons.constants as constants
+import octobot_commons.errors as commons_errors
 import octobot_commons.profiles as profiles
 import octobot_commons.profiles.profile_sharing as profile_sharing
 from octobot_commons.profiles.profile_sharing import _get_unique_profile_folder, _ensure_unique_profile_id, \
     _get_profile_name
 import octobot_commons.tests.test_config as test_config
 
-from tests.profiles import profile, get_profile_path
+from tests.profiles import profile, get_profile_path, invalid_profile
 
 
 def test_export_profile(profile):
@@ -93,12 +97,13 @@ def test_export_profile_with_existing_file(profile):
             )
 
 
-def test_import_install_profile(profile):
+def test_import_install_profile(profile, invalid_profile):
     export_path = os.path.join(test_config.TEST_FOLDER, "super_profile")
     exported_file = f"{export_path}.zip"
     spec_tentacles_config = os.path.join(get_profile_path(), "specific_config")
     tentacles_config = os.path.join(get_profile_path(), "tentacles_config.json")
     other_profile = os.path.join(constants.USER_PROFILES_FOLDER, "default")
+    profile_schema = os.path.join(test_config.TEST_CONFIG_FOLDER, "profile_schema.json")
     with _cleaned_tentacles(export_path,
                             exported_file,
                             tentacles_config,
@@ -114,7 +119,7 @@ def test_import_install_profile(profile):
         imported_profile_path = os.path.join(constants.USER_PROFILES_FOLDER, "default")
         with mock.patch.object(profile_sharing, "_ensure_unique_profile_id", mock.Mock()) \
                 as _ensure_unique_profile_id_mock:
-            imported_profile = profiles.import_profile(exported_file, origin_url="plop.wow")
+            imported_profile = profiles.import_profile(exported_file, profile_schema, origin_url="plop.wow")
             assert isinstance(imported_profile, profiles.Profile)
             profile.read_config()
             assert profile.name == imported_profile.name
@@ -131,10 +136,15 @@ def test_import_install_profile(profile):
                 os.path.isfile(os.path.join(dir_path, f))
                 for f in files
             )
-        assert isinstance(profiles.import_profile(exported_file), profiles.Profile)
+        assert isinstance(profiles.import_profile(exported_file, profile_schema), profiles.Profile)
         assert os.path.isdir(f"{imported_profile_path}_2")
         assert os.path.isdir(imported_profile_path)
         assert not os.path.isdir(f"{imported_profile_path}_3")
+
+        # now with invalid profile
+        profiles.export_profile(invalid_profile, export_path)
+        with pytest.raises(commons_errors.ProfileImportError):
+            profiles.import_profile(exported_file, profile_schema)
 
 
 def test_get_unique_profile_folder(profile):
@@ -159,6 +169,7 @@ def test_ensure_unique_profile_id(profile):
         shutil.copytree(profile.path, other_profile_path)
         other_profile = profiles.Profile(other_profile_path).read_config()
         _ensure_unique_profile_id(other_profile)
+        other_profile.save()
         ids = profiles.Profile.get_all_profiles_ids(profiles_path)
         assert len(ids) == 2
         # changed new profile id

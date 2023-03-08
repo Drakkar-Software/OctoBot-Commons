@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import os
+
 import pytest
 import pathlib
 import octobot_commons.profiles as profiles
@@ -30,3 +32,8 @@ def get_profiles_path():
 @pytest.fixture
 def profile():
     return profiles.Profile(get_profile_path())
+
+
+@pytest.fixture
+def invalid_profile():
+    return profiles.Profile(os.path.join(get_profile_path(), "invalid_profile"))

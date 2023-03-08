@@ -39,6 +39,12 @@ class ProfileRemovalError(Exception):
     """
 
 
+class ProfileImportError(Exception):
+    """
+    Profile related Exception: raised when the imported profile is invalid
+    """
+
+
 class ConfigEvaluatorError(Exception):
     """
     Evaluator config related Exception
