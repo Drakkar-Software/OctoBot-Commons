@@ -231,6 +231,31 @@ class CacheClient:
             if flush_if_necessary and self._flush_cache_when_necessary and cache:
                 await cache.flush()
 
+    async def reset_cached_values(
+        self,
+        value_keys: list,
+        flush_if_necessary=False,
+        tentacle_name=None,
+        config_name=None,
+    ):
+        """
+        Reset value_keys on the current cache
+        :param value_keys: identifiers of the values
+        :param flush_if_necessary: flush the cache after set (write into database)
+        :param tentacle_name: name of the tentacle to get cache from
+        :param config_name: name of the tentacle configuration as used in nested tentacle calls
+        :return: None
+        """
+        cache = None
+        try:
+            cache = self.get_cache(tentacle_name=tentacle_name, config_name=config_name)
+            await cache.reset_values(
+                value_keys=value_keys,
+            )
+        finally:
+            if flush_if_necessary and self._flush_cache_when_necessary and cache:
+                await cache.flush()
+
     def ensure_no_missing_cached_value(self, is_missing):
         """
         Raises NoCacheValue when is_missing is True
