@@ -178,6 +178,7 @@ class PlotAttributes(enum.Enum):
     KIND = "kind"
     X = "x"
     Y = "y"
+    Z = "z"
     OPEN = "open"
     HIGH = "high"
     LOW = "low"
@@ -209,6 +210,7 @@ class PlotAttributes(enum.Enum):
     COLOR = "color"
     HTML = "html"
     SIZE = "size"
+    SHAPE = "shape"
     SYMBOL = "symbol"
 
 
@@ -243,6 +245,7 @@ class BacktestingMetadata(enum.Enum):
 
 
 class DBRows(enum.Enum):
+    ID = "id"
     REFERENCE_MARKET = "ref_market"
     EXCHANGE = "exchange"
     EXCHANGES = "exchanges"
@@ -253,7 +256,11 @@ class DBRows(enum.Enum):
     START_TIME = "start_time"
     END_TIME = "end_time"
     TRADING_TYPE = "trading_type"
+    TRADING_MODE = "trading_mode"
+    SYMBOL = "symbol"
     SYMBOLS = "symbols"
+    FEES_AMOUNT = "fees_amount"
+    FEES_CURRENCY = "fees_currency"
 
 
 class PlotCharts(enum.Enum):
@@ -278,9 +285,6 @@ class DBTables(enum.Enum):
     CANDLES = "candles"
     CANDLES_SOURCE = "candles_source"
     CACHE_SOURCE = "cache_source"
-    SYMBOL = "symbol"
-    FEES_AMOUNT = "fees_amount"
-    FEES_CURRENCY = "fees_currency"
 
 
 class ActivationTopics(enum.Enum):
