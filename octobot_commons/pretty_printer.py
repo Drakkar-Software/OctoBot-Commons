@@ -60,8 +60,10 @@ def open_order_pretty_printer(exchange_name, dict_order, markdown=False) -> str:
 
         return (
             f"{code}{order_type.name.replace('_', ' ')}{code}: {code}"
-            f"{get_min_string_from_number(quantity)} {quantity_currency}{code} at {code}"
-            f"{get_min_string_from_number(price)} {market}{code} on {exchange_name.capitalize()}"
+            f"{get_min_string_from_number(quantity)} "
+            f"{quantity_currency}{code} at {code}"
+            f"{get_min_string_from_number(price)} {market}{code} "
+            f"on {exchange_name.capitalize()}"
         )
     except ImportError:
         LOGGER.error(
@@ -95,7 +97,8 @@ def trade_pretty_printer(exchange_name, trade, markdown=False) -> str:
         )
         return (
             f"{code}{trade_type.name.replace('_', ' ')}{code}: {code}"
-            f"{get_min_string_from_number(trade.executed_quantity)} {trade.quantity_currency}{code} at {code}"
+            f"{get_min_string_from_number(trade.executed_quantity)} "
+            f"{trade.quantity_currency}{code} at {code}"
             f"{get_min_string_from_number(trade.executed_price)} {trade.market}{code} "
             f"{exchange_name.capitalize()} "
             f"{trade_executed_time_str} "
@@ -131,11 +134,17 @@ def cryptocurrency_alert(result, final_eval) -> (str, str):
 
 
 def global_portfolio_pretty_print(
-    global_portfolio, separator="\n", markdown=False
+    global_portfolio,
+    currency_values=None,
+    ref_market_name=None,
+    separator="\n",
+    markdown=False,
 ) -> str:
     """
     Global portfolio pretty printer
     :param global_portfolio: the global portfolio
+    :param currency_values: dict of current currency values {"BTC": 20000, "ETH": 1000 }
+    :param ref_market_name: current ref market "USD"
     :param separator: the printer separator
     :param markdown: if printer use markdown
     :return: the global portfolio pretty printed
@@ -147,11 +156,25 @@ def global_portfolio_pretty_print(
             total = get_min_string_from_number(asset_dict[constants.PORTFOLIO_TOTAL])
             if markdown:
                 total = "{:<10}".format(total)
-            available = f"({get_min_string_from_number(asset_dict[constants.PORTFOLIO_AVAILABLE])})"
-            if markdown:
-                available = "{:<12}".format(available)
+            ref_value = ""
+            if currency_values and ref_market_name:
+                try:
+                    _ref_value = get_min_string_from_number(
+                        currency_values[currency]
+                        * asset_dict[constants.PORTFOLIO_TOTAL]
+                    )
+                    ref_value = (
+                        f" - ({_ref_value} {ref_market_name})"
+                        if ref_market_name != currency
+                        else ""
+                    )
+                    if markdown:
+                        ref_value = "{:<12}".format(ref_value)
+                except KeyError:
+                    # no currency value
+                    pass
 
-            holding_str = f"{total} {available} {currency}"
+            holding_str = f"{total} {currency}{ref_value}"
             result.append(holding_str)
 
     return separator.join(result)
