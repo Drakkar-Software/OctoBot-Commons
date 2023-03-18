@@ -115,14 +115,14 @@ def cryptocurrency_alert(result, final_eval) -> (str, str):
     :return: alert and the markdown alert
     """
     try:
-        from telegram.utils.helpers import escape_markdown
+        import telegram.helpers
 
         _, _, code = get_markers(True)
         display_result = str(result).split(".")[1].replace("_", " ")
         alert = f"Result : {display_result}\n" f"Evaluation : {final_eval}"
         alert_markdown = (
             f"Result : {code}{display_result}{code}\n"
-            f"Evaluation : {code}{escape_markdown(str(final_eval))}{code}"
+            f"Evaluation : {code}{telegram.helpers.escape_markdown(str(final_eval))}{code}"
         )
         return alert, alert_markdown
     except ImportError:
