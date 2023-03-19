@@ -156,8 +156,15 @@ class Configuration:
             if profile is self.profile:
                 # do not synchronize self.profile
                 continue
-            profile.remove_deleted_elements(self.config)
-            profile.validate_and_save_config()
+            try:
+                profile.remove_deleted_elements(self.config)
+                profile.validate_and_save_config()
+            except Exception as err:
+                self.logger.exception(
+                    f"Error when synchronizing '{profile.name}' profile at '{profile.path}': {err}",
+                    False,
+                    err,
+                )
 
     def is_loaded(self) -> bool:
         """
