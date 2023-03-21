@@ -74,6 +74,12 @@ class RunDatabasesIdentifier:
         )
         await self.database_adaptor.create_identifier(deepest_identifier)
 
+    def is_backtesting(self) -> bool:
+        """
+        :return: True when the database identifier associated to a backtesting run
+        """
+        return self.backtesting_id is not None
+
     def get_run_data_db_identifier(self) -> str:
         """
         :return: the database identifier associated to the run database
