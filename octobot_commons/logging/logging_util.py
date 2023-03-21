@@ -46,15 +46,16 @@ def _default_callback(*_, **__):
 _ERROR_CALLBACK = _default_callback
 
 
-def set_global_logger_level(level) -> None:
+def set_global_logger_level(level, handler_levels=None) -> None:
     """
     Set the global logger level
     :param level: the level to set
     """
     logger = logging.getLogger()
     logger.setLevel(level)
-    for handler in logger.handlers:
-        handler.setLevel(level)
+    levels = handler_levels or [level] * len(logger.handlers)
+    for handler, updated_level in zip(logger.handlers, levels):
+        handler.setLevel(updated_level)
 
 
 def get_global_logger_level() -> object:
@@ -63,6 +64,14 @@ def get_global_logger_level() -> object:
     :return: the global logger level
     """
     return logging.getLogger().getEffectiveLevel()
+
+
+def get_logger_level_per_handler() -> list:
+    """
+    Return the global logger level
+    :return: order handles logging levels
+    """
+    return [handler.level for handler in logging.getLogger().handlers]
 
 
 def get_logger(logger_name="Anonymous"):

@@ -24,8 +24,9 @@ cdef class BotLogger:
     cdef void _publish_log_if_necessary(self, str message, object level)
     cdef void _web_interface_publish_log(self, str message, object level)
 
-cpdef void set_global_logger_level(level)
+cpdef void set_global_logger_level(level, list handler_levels=*)
 cpdef object get_global_logger_level()
+cpdef list get_logger_level_per_handler()
 cpdef object get_logger(str logger_name=*)
 cpdef void set_logging_level(list logger_names, object level)
 cpdef int get_backtesting_errors_count()
