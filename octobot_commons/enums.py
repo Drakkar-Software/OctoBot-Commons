@@ -424,3 +424,58 @@ class UserInputTypes(enum.Enum):
     OBJECT = "object"
     OBJECT_ARRAY = "object_array"
     STRING_ARRAY = "string_array"
+
+
+class UserInputEditorOptionsTypes(enum.Enum):
+    # source for the available options:
+    # https://github.com/json-editor/json-editor#editor-options
+
+    # If set to true, the editor will start collapsed (works for objects and arrays)
+    COLLAPSED = "collapsed"
+    # If set to true, the "add row" button will be hidden (works for arrays)
+    DISABLE_ARRAY_ADD = "disable_array_add"
+    # If set to true, all of the "delete" buttons will be hidden (works for arrays)
+    DISABLE_ARRAY_DELETE = "disable_array_delete"
+    # If set to true, just the "delete all rows"
+    #   button will be hidden (works for arrays)
+    DISABLE_ARRAY_DELETE_ALL_ROWS = "disable_array_delete_all_rows"
+    # If set to true, just the "delete last row"
+    #   buttons will be hidden (works for arrays)
+    DISABLE_ARRAY_DELETE_LAST_ROW = "disable_array_delete_last_row"
+    # If set to true, the "move up/down" buttons will be hidden (works for arrays)
+    DISABLE_ARRAY_REORDER = "disable_array_reorder"
+    # If set to true, the collapse button will be hidden (works for objects and arrays)
+    DISABLE_COLLAPSE = "disable_collapse"
+    # If set to true, the Edit JSON button will be hidden (works for objects)
+    DISABLE_EDIT_JSON = "disable_edit_json"
+    # If set to true, the Edit Properties button will be hidden (works for objects)
+    DISABLE_PROPERTIES = "disable_properties"
+    # If set to true, array controls (add, delete etc) will be
+    #   displayed at top of list (works for arrays)
+    ARRAY_CONTROLS_TOP = "array_controls_top"
+    # See Enum options (https://github.com/json-editor/json-editor#enum-options)
+    ENUM = "enum"
+    # An array of display values to use for select box options in the same
+    #   order as defined with the enum keyword. Works with schema using enum values.
+    ENUM_TITLES = "enum_titles"
+    # If set to true, the input will auto expand/contract to fit the content.
+    #   Works best with textareas.
+    EXPAND_HEIGHT = "expand_height"
+    # Explicitly set the number of grid columns (1-12) for the editor
+    #   if it's within an object using a grid layout.
+    GRID_COLUMNS = "grid_columns"
+    # If set to true, the editor will not appear in the UI (works for all types)
+    HIDDEN = "hidden"
+    # Explicitly set the height of the input element. Should be a valid CSS
+    #    width string (e.g. "100px"). Works best with textareas.
+    INPUT_HEIGHT = "input_height"
+    # Explicitly set the width of the input element. Should be a valid CSS
+    #    width string (e.g. "100px"). Works for string, number, and integer data types.
+    INPUT_WIDTH = "input_width"
+    # If set to true for an object, empty object properties
+    #    (i.e. those with falsy values) will not be returned by getValue().
+    REMOVE_EMPTY_PROPERTIES = "remove_empty_properties"
+
+
+class UserInputOtherSchemaValuesTypes(enum.Enum):
+    DESCRIPTION = "description"
