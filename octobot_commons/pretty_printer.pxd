@@ -24,3 +24,6 @@ cpdef str portfolio_profitability_pretty_print(double profitability, object prof
 cpdef double round_with_decimal_count(object number, int max_digits=*)
 cpdef str get_min_string_from_number(object number, int max_digits=*)
 cpdef tuple get_markers(bint markdown=*)
+
+cdef str _get_row_pretty_portfolio_row(object holdings, str currency, str ref_market, object ref_market_value)
+cdef str _get_markdown_pretty_portfolio_row(object holdings, str currency, str ref_market, object ref_market_value)

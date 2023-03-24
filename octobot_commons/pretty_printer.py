@@ -14,7 +14,6 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-
 import octobot_commons
 import octobot_commons.enums as enums
 import octobot_commons.constants as constants
@@ -133,6 +132,32 @@ def cryptocurrency_alert(result, final_eval) -> (str, str):
     return "", ""
 
 
+def _get_row_pretty_portfolio_row(holdings, currency, ref_market, ref_market_value):
+    """
+    :return: the portfolio row adapted for a raw format
+    """
+    str_holdings = get_min_string_from_number(holdings)
+    if ref_market:
+        return f"{str_holdings} {currency}{get_min_string_from_number(ref_market_value)} {ref_market}"
+    return f"{str_holdings} {currency}"
+
+
+def _get_markdown_pretty_portfolio_row(
+    holdings, currency, ref_market, ref_market_value
+):
+    """
+    :return: the portfolio row adapted for a markdown format
+    """
+    str_currency = "{:<5}".format(currency)
+    str_holdings = "{:<14}".format(get_min_string_from_number(holdings))
+    str_ref_market_value = "{:<14}".format("")
+    if ref_market:
+        str_ref_market_value = "{:<14}".format(
+            get_min_string_from_number(ref_market_value) if ref_market_value else ""
+        )
+    return f"| {str_currency} | {str_holdings} | {str_ref_market_value} |"
+
+
 def global_portfolio_pretty_print(
     global_portfolio,
     currency_values=None,
@@ -149,35 +174,59 @@ def global_portfolio_pretty_print(
     :param markdown: if printer use markdown
     :return: the global portfolio pretty printed
     """
-    result = []
-    for currency, asset_dict in global_portfolio.items():
+    results = []
+    currency = "currency"
+    holdings = "holdings"
+    value = "value"
+    for asset, asset_dict in global_portfolio.items():
         if asset_dict[constants.PORTFOLIO_TOTAL] > 0:
             # fill lines with empty spaces if necessary
-            total = get_min_string_from_number(asset_dict[constants.PORTFOLIO_TOTAL])
-            if markdown:
-                total = "{:<10}".format(total)
-            ref_value = ""
+            holdings_value = 0
             if currency_values and ref_market_name:
-                try:
-                    _ref_value = get_min_string_from_number(
-                        currency_values[currency]
-                        * asset_dict[constants.PORTFOLIO_TOTAL]
-                    )
-                    ref_value = (
-                        f" - ({_ref_value} {ref_market_name})"
-                        if ref_market_name != currency
-                        else ""
-                    )
-                    if markdown:
-                        ref_value = "{:<12}".format(ref_value)
-                except KeyError:
-                    # no currency value
-                    pass
-
-            holding_str = f"{total} {currency}{ref_value}"
-            result.append(holding_str)
-
-    return separator.join(result)
+                if ref_market_name == asset:
+                    holdings_value = asset_dict[constants.PORTFOLIO_TOTAL]
+                else:
+                    try:
+                        holdings_value = (
+                            currency_values[asset]
+                            * asset_dict[constants.PORTFOLIO_TOTAL]
+                        )
+                    except KeyError:
+                        # no currency value
+                        pass
+            results.append(
+                {
+                    currency: asset,
+                    holdings: asset_dict[constants.PORTFOLIO_TOTAL],
+                    value: holdings_value,
+                }
+            )
+    # force "value" str for cythonization
+    results.sort(key=lambda r: r["value"], reverse=True)
+    if markdown:
+        header = (
+            f"| {'{:<5}'.format('Asset')} | "
+            f"{'{:<14}'.format('Holdings')} |"
+            f" {'{:<14}'.format(ref_market_name or '')} |"
+        )
+        header_separator = f"|{'-' * 7}|{'-' * 16}|{'-' * 16}|"
+        content = separator.join(
+            [
+                _get_markdown_pretty_portfolio_row(
+                    result[holdings], result[currency], ref_market_name, result[value]
+                )
+                for result in results
+            ]
+        )
+        return f"{header}\n{header_separator}\n{content}"
+    return separator.join(
+        [
+            _get_row_pretty_portfolio_row(
+                result[holdings], result[currency], ref_market_name, result[value]
+            )
+            for result in results
+        ]
+    )
 
 
 def portfolio_profitability_pretty_print(
