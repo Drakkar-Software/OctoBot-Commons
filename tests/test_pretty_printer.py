@@ -13,9 +13,12 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import decimal
 import os
 import mock
+
 import octobot_commons.pretty_printer as pretty_printer
+import octobot_commons.constants as constants
 
 
 def test_get_min_string_from_number():
@@ -49,3 +52,67 @@ def test_round_with_decimal_count():
             get_min_string_from_number_mock.assert_not_called()
             pretty_printer.round_with_decimal_count(1.011, max_digits=4)
             get_min_string_from_number_mock.assert_called_once_with(1.011, 4)
+
+
+def test_global_portfolio_pretty_print():
+    portfolio = {
+        "BTC": {constants.PORTFOLIO_TOTAL: decimal.Decimal(1)},
+        "ETH": {constants.PORTFOLIO_TOTAL: decimal.Decimal(2)},
+        "PLOP": {constants.PORTFOLIO_TOTAL: decimal.Decimal("0.444")},
+        "ADA": {constants.PORTFOLIO_TOTAL: decimal.Decimal(0)}
+    }
+    # without ref market
+    for res in (
+        pretty_printer.global_portfolio_pretty_print(portfolio),
+        pretty_printer.global_portfolio_pretty_print(portfolio, markdown=True)
+    ):
+        assert "BTC" in res
+        assert "1" in res
+        assert "ETH" in res
+        assert "2" in res
+        assert "PLOP" in res
+        assert "0.444" in res
+        assert "ADA" not in res
+    # with ref market
+    for res in (
+        pretty_printer.global_portfolio_pretty_print(portfolio, ref_market_name="BTC"),
+        pretty_printer.global_portfolio_pretty_print(portfolio, ref_market_name="BTC", markdown=True)
+    ):
+        assert "BTC" in res
+        assert "1" in res
+        assert "ETH" in res
+        assert "2" in res
+        assert "PLOP" in res
+        assert "0.444" in res
+        assert "ADA" not in res
+    currency_values = {"ETH": decimal.Decimal("1.5")}
+    for res in (
+        pretty_printer.global_portfolio_pretty_print(portfolio, currency_values=currency_values,
+                                                     ref_market_name="BTC"),
+        pretty_printer.global_portfolio_pretty_print(portfolio, currency_values=currency_values,
+                                                     ref_market_name="BTC", markdown=True)
+    ):
+        assert "BTC" in res
+        assert "1" in res
+        assert "ETH" in res
+        assert "2" in res
+        assert "3" in res
+        assert "PLOP" in res
+        assert "0.444" in res
+        assert "ADA" not in res
+    # with separator
+    for res in (
+        pretty_printer.global_portfolio_pretty_print(portfolio, currency_values=currency_values,
+                                                     ref_market_name="BTC", separator="111"),
+        pretty_printer.global_portfolio_pretty_print(portfolio, currency_values=currency_values,
+                                                     ref_market_name="BTC", markdown=True, separator="111")
+    ):
+        assert "BTC" in res
+        assert "1" in res
+        assert "ETH" in res
+        assert "2" in res
+        assert "3" in res
+        assert "PLOP" in res
+        assert "0.444" in res
+        assert "ADA" not in res
+        assert "111" in res
