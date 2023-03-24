@@ -148,14 +148,14 @@ def _get_markdown_pretty_portfolio_row(
     """
     :return: the portfolio row adapted for a markdown format
     """
-    str_currency = "{:<5}".format(currency)
-    str_holdings = "{:<14}".format(get_min_string_from_number(holdings))
-    str_ref_market_value = "{:<14}".format("")
+    str_currency = "{:<4}".format(currency)
+    str_holdings = "{:<12}".format(get_min_string_from_number(holdings, max_digits=6))
+    str_ref_market_value = "{:<12}".format("")
     if ref_market:
-        str_ref_market_value = "{:<14}".format(
+        str_ref_market_value = "{:<12}".format(
             get_min_string_from_number(ref_market_value) if ref_market_value else ""
         )
-    return f"| {str_currency} | {str_holdings} | {str_ref_market_value} |"
+    return f"{str_currency} {str_holdings} {str_ref_market_value}"
 
 
 def global_portfolio_pretty_print(
@@ -205,11 +205,11 @@ def global_portfolio_pretty_print(
     results.sort(key=lambda r: r["value"], reverse=True)
     if markdown:
         header = (
-            f"| {'{:<5}'.format('Asset')} | "
-            f"{'{:<14}'.format('Holdings')} |"
-            f" {'{:<14}'.format(ref_market_name or '')} |"
+            f"{'{:<4}'.format('')} "
+            f"{'  {:<9}'.format('Holdings')}  "
+            f"{'    {:<7}'.format(ref_market_name or '')}"
         )
-        header_separator = f"|{'-' * 7}|{'-' * 16}|{'-' * 16}|"
+        header_separator = f"{'-' * 4}|{'-' * 12}|{'-' * 12}"
         content = separator.join(
             [
                 _get_markdown_pretty_portfolio_row(
