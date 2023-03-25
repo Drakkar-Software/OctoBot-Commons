@@ -479,3 +479,15 @@ class UserInputEditorOptionsTypes(enum.Enum):
 
 class UserInputOtherSchemaValuesTypes(enum.Enum):
     DESCRIPTION = "description"
+
+
+class ProfileComplexity(enum.Enum):
+    EASY = 1
+    MEDIUM = 2
+    DIFFICULT = 3
+
+
+class ProfileRisk(enum.Enum):
+    LOW = 1
+    MODERATE = 2
+    HIGH = 3

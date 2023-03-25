@@ -22,6 +22,7 @@ import mock
 import octobot_commons.json_util
 import octobot_commons.profiles as profiles
 import octobot_commons.constants as constants
+import octobot_commons.enums as enums
 import octobot_commons.tests.test_config as test_config
 
 from tests.profiles import profile, get_profile_path, get_profiles_path
@@ -166,6 +167,8 @@ def test_as_dict(profile):
             constants.CONFIG_ORIGIN_URL: None,
             constants.CONFIG_READ_ONLY: False,
             constants.CONFIG_IMPORTED: False,
+            constants.CONFIG_COMPLEXITY: enums.ProfileComplexity.MEDIUM.value,
+            constants.CONFIG_RISK: enums.ProfileRisk.MODERATE.value,
         },
         constants.PROFILE_CONFIG: {},
     }
@@ -173,6 +176,8 @@ def test_as_dict(profile):
     # do not test read config
     profile.config = {"a": 1}
     profile.imported = True
+    profile.complexity = enums.ProfileComplexity.DIFFICULT
+    profile.risk = enums.ProfileRisk.LOW
     assert profile.as_dict() == {
         constants.CONFIG_PROFILE: {
             constants.CONFIG_ID: "default",
@@ -182,6 +187,8 @@ def test_as_dict(profile):
             constants.CONFIG_ORIGIN_URL: "https://default.url",
             constants.CONFIG_READ_ONLY: False,
             constants.CONFIG_IMPORTED: True,
+            constants.CONFIG_COMPLEXITY: enums.ProfileComplexity.DIFFICULT.value,
+            constants.CONFIG_RISK: enums.ProfileRisk.LOW.value,
         },
         constants.PROFILE_CONFIG: {
             "a": 1
