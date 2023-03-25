@@ -20,6 +20,7 @@ import os
 import shutil
 import uuid
 import octobot_commons.constants as constants
+import octobot_commons.enums as enums
 import octobot_commons.logging as commons_logging
 import octobot_commons.json_util as json_util
 import octobot_commons.errors as errors
@@ -69,6 +70,8 @@ class Profile:
         self.origin_url: str = None
         self.read_only: bool = False
         self.imported: bool = False
+        self.complexity: enums.ProfileComplexity = enums.ProfileComplexity.MEDIUM
+        self.risk: enums.ProfileRisk = enums.ProfileRisk.MODERATE
 
         self.config: dict = {}
 
@@ -86,8 +89,15 @@ class Profile:
         self.origin_url = profile_config.get(constants.CONFIG_ORIGIN_URL, None)
         self.read_only = profile_config.get(constants.CONFIG_READ_ONLY, False)
         self.imported = profile_config.get(constants.CONFIG_IMPORTED, False)
+        self.complexity = enums.ProfileComplexity(
+            profile_config.get(
+                constants.CONFIG_COMPLEXITY, enums.ProfileComplexity.MEDIUM.value
+            )
+        )
+        self.risk = enums.ProfileRisk(
+            profile_config.get(constants.CONFIG_RISK, enums.ProfileRisk.MODERATE.value)
+        )
         self.config = parsed_profile[constants.PROFILE_CONFIG]
-
         if self.avatar:
             avatar_path = os.path.join(self.path, self.avatar)
             if os.path.isfile(avatar_path):
@@ -225,6 +235,8 @@ class Profile:
                 constants.CONFIG_ORIGIN_URL: self.origin_url,
                 constants.CONFIG_READ_ONLY: self.read_only,
                 constants.CONFIG_IMPORTED: self.imported,
+                constants.CONFIG_COMPLEXITY: self.complexity.value,
+                constants.CONFIG_RISK: self.risk.value,
             },
             constants.PROFILE_CONFIG: self.config,
         }
