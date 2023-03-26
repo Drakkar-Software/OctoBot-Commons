@@ -18,6 +18,7 @@ from octobot_commons.configuration import config_file_manager
 from octobot_commons.configuration import config_operations
 from octobot_commons.configuration import fields_utils
 from octobot_commons.configuration import user_inputs
+from octobot_commons.configuration import user_input_configuration
 
 
 from octobot_commons.configuration.configuration import (
@@ -57,6 +58,10 @@ from octobot_commons.configuration.user_inputs import (
     get_user_inputs,
     clear_user_inputs,
 )
+from octobot_commons.configuration.user_input_configuration import (
+    load_user_inputs_from_class,
+    get_raw_config_and_user_inputs_from_class,
+)
 
 
 __all__ = [
@@ -87,4 +92,6 @@ __all__ = [
     "get_user_input_tentacle_type",
     "get_user_inputs",
     "clear_user_inputs",
+    "load_user_inputs_from_class",
+    "get_raw_config_and_user_inputs_from_class",
 ]
