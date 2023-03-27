@@ -28,7 +28,6 @@ def load_user_inputs_from_class(configured_class, tentacles_setup_config, to_fil
     and configured_class.get_name
     :return: the filled user input configuration
     """
-    logger = logging.get_logger(configured_class.get_name())
     inputs = {}
     try:
         to_fill_config.update(
@@ -40,9 +39,10 @@ def load_user_inputs_from_class(configured_class, tentacles_setup_config, to_fil
     except NotImplementedError:
         # get_name not implemented, no tentacle config
         return inputs
+    logger = logging.get_logger(configured_class.get_name())
     try:
         with configured_class.UI.local_factory(configured_class, lambda: to_fill_config):
-            configured_class.init_user_inputs(inputs)
+            configured_class.init_user_inputs_from_class(inputs)
     except Exception as e:
         logger.exception(e, True, f"Error when initializing user inputs: {e}")
     if to_fill_config:
@@ -56,5 +56,5 @@ def get_raw_config_and_user_inputs_from_class(configured_class, tentacles_setup_
     :return: the filled user input configuration of configured_class according to the given tentacles_setup_config
     """
     loaded_config = octobot_tentacles_manager.api.get_tentacle_config(tentacles_setup_config, configured_class)
-    user_inputs = configured_class.load_user_inputs(tentacles_setup_config, loaded_config)
+    user_inputs = configured_class.load_user_inputs_from_class(tentacles_setup_config, loaded_config)
     return loaded_config, list(user_input.to_dict() for user_input in user_inputs.values())
