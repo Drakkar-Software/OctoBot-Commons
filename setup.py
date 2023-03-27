@@ -55,6 +55,7 @@ packages_list = [
     "octobot_commons.singleton.singleton_class",
     "octobot_commons.logging.logging_util",
     "octobot_commons.tentacles_management.class_inspector",
+    "octobot_commons.tentacles_management.abstract_tentacle",
     "octobot_commons.databases.relational_databases.sqlite.cursor_pool",
     "octobot_commons.databases.relational_databases.sqlite.cursor_wrapper",
     "octobot_commons.databases.relational_databases.sqlite.sqlite_database",

@@ -61,6 +61,8 @@ from octobot_commons.configuration.user_inputs import (
 from octobot_commons.configuration.user_input_configuration import (
     load_user_inputs_from_class,
     get_raw_config_and_user_inputs_from_class,
+    get_raw_config_and_user_inputs,
+    load_and_save_user_inputs,
 )
 
 
@@ -94,4 +96,6 @@ __all__ = [
     "clear_user_inputs",
     "load_user_inputs_from_class",
     "get_raw_config_and_user_inputs_from_class",
+    "get_raw_config_and_user_inputs",
+    "load_and_save_user_inputs",
 ]
