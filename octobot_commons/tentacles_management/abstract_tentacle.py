@@ -31,9 +31,12 @@ class AbstractTentacle:
     __metaclass__ = abc.ABCMeta
     ALLOW_SUPER_CLASS_CONFIG = False
     USER_INPUT_TENTACLE_TYPE = commons_enums.UserInputTentacleTypes.UNDEFINED
+    HISTORIZE_USER_INPUT_CONFIG = False
+    UI = None
 
     def __init__(self):
         self.logger = None
+        self.__class__._init_class_UI()
         self.UI: configuration.UserInputFactory = configuration.UserInputFactory(
             self.USER_INPUT_TENTACLE_TYPE
         )
@@ -62,6 +65,13 @@ class AbstractTentacle:
         return subclasses_list
 
     @classmethod
+    def is_configurable(cls):
+        """
+        Override if the tentacle is allowed to be configured
+        """
+        return True
+
+    @classmethod
     def get_user_commands(cls) -> dict:
         """
         Return the dict of user commands for this tentacle
@@ -71,6 +81,7 @@ class AbstractTentacle:
 
     def get_local_config(self):
         """
+        Implementation required if cls.HISTORIZE_USER_INPUT_CONFIG is True
         :return: the config of the tentacle
         """
         raise NotImplementedError
@@ -78,6 +89,7 @@ class AbstractTentacle:
     @classmethod
     def create_local_instance(cls, config, tentacles_setup_config, tentacle_config):
         """
+        Implementation required if cls.HISTORIZE_USER_INPUT_CONFIG is True
         :param config: the global configuration to give to the tentacle
         :param tentacles_setup_config: the global tentacles setup configuration to give to the tentacle
         :param tentacle_config: the tentacle configuration to give to the tentacle
@@ -87,12 +99,14 @@ class AbstractTentacle:
 
     def init_user_inputs(self, inputs: dict) -> None:
         """
+        instance method API for user inputs
         Called right before starting the tentacle, should define all the tentacle's user inputs unless
         those are defined somewhere else.
         """
 
     async def load_and_save_user_inputs(self, bot_id: str):
         """
+        instance method API for user inputs
         Initialize and save the user inputs of the tentacle
         """
         try:
@@ -110,12 +124,30 @@ class AbstractTentacle:
             )
 
     @classmethod
+    def init_user_inputs_from_class(cls, inputs: dict) -> None:
+        """
+        classmethod API for user inputs
+        Called by load_user_inputs_from_class, should define all the tentacle user inputs.
+        """
+
+    @classmethod
+    def load_user_inputs_from_class(cls, tentacles_setup_config, tentacle_config):
+        """
+        classmethod API for user inputs
+        Called by get_raw_config_and_user_inputs
+        """
+        return configuration.load_user_inputs_from_class(cls, tentacles_setup_config, tentacle_config)
+
+    @classmethod
     async def get_raw_config_and_user_inputs(
         cls, config, tentacles_setup_config, bot_id
     ):
         """
         :return: the tentacle configuration and its list of user inputs
         """
+        cls._init_class_UI()
+        if not cls.HISTORIZE_USER_INPUT_CONFIG:
+            return configuration.get_raw_config_and_user_inputs_from_class(cls, tentacles_setup_config)
         try:
             import octobot_tentacles_manager.api as api
 
@@ -138,3 +170,11 @@ class AbstractTentacle:
         return specific_config, list(
             user_input.to_dict() for user_input in user_inputs.values()
         )
+
+    @classmethod
+    def _init_class_UI(cls):
+        # make UI available in class methods
+        if cls.UI is None:
+            cls.UI = configuration.UserInputFactory(
+                cls.USER_INPUT_TENTACLE_TYPE
+            )
