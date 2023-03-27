@@ -29,7 +29,14 @@ from octobot_commons.tentacles_management.class_inspector cimport (
     get_single_deepest_child_class,
 )
 
+from octobot_commons.tentacles_management cimport abstract_tentacle
+
+from octobot_commons.tentacles_management.abstract_tentacle cimport (
+    AbstractTentacle,
+)
+
 __all__ = [
+    "AbstractTentacle",
     "default_parent_inspection",
     "default_parents_inspection",
     "evaluator_parent_inspection",

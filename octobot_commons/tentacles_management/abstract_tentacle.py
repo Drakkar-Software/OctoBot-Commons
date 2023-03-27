@@ -20,7 +20,6 @@ import copy
 
 import octobot_commons.enums as commons_enums
 import octobot_commons.configuration as configuration
-import octobot_commons.databases as databases
 
 
 class AbstractTentacle:
@@ -29,14 +28,21 @@ class AbstractTentacle:
     """
 
     __metaclass__ = abc.ABCMeta
-    ALLOW_SUPER_CLASS_CONFIG = False
-    USER_INPUT_TENTACLE_TYPE = commons_enums.UserInputTentacleTypes.UNDEFINED
-    HISTORIZE_USER_INPUT_CONFIG = False
-    UI = None
+
+    ALLOW_SUPER_CLASS_CONFIG = (
+        False  # when True, the given tentacle can read its parent class configuration
+    )
+    USER_INPUT_TENTACLE_TYPE = (
+        commons_enums.UserInputTentacleTypes.UNDEFINED
+    )  # tentacle type, saved in user inputs
+    HISTORIZE_USER_INPUT_CONFIG = (
+        False  # when True, user input values can be saved and read from the run data db
+    )
+    CLASS_UI = None  # class-level user input factory. Used when initializing user inputs with classmethods
 
     def __init__(self):
         self.logger = None
-        self.__class__._init_class_UI()
+        self.__class__._init_class_user_input_factory()
         self.UI: configuration.UserInputFactory = configuration.UserInputFactory(
             self.USER_INPUT_TENTACLE_TYPE
         )
@@ -99,44 +105,40 @@ class AbstractTentacle:
 
     def init_user_inputs(self, inputs: dict) -> None:
         """
-        instance method API for user inputs
+        instance method API for user inputs. Used by load_and_save_user_inputs
+        Override if this tentacle has user inputs that should be initialized on a specific instance
         Called right before starting the tentacle, should define all the tentacle's user inputs unless
         those are defined somewhere else.
         """
 
-    async def load_and_save_user_inputs(self, bot_id: str):
-        """
-        instance method API for user inputs
-        Initialize and save the user inputs of the tentacle
-        """
-        try:
-            inputs = {}
-            self.init_user_inputs(inputs)
-            if databases.RunDatabasesProvider.instance().is_storage_enabled(bot_id):
-                run_db = databases.RunDatabasesProvider.instance().get_run_db(bot_id)
-                await configuration.clear_user_inputs(run_db, self.get_name())
-                for user_input in inputs.values():
-                    await configuration.save_user_input(user_input, run_db)
-                await run_db.flush()
-        except Exception as err:
-            self.logger.exception(
-                err, True, f"Error when initializing user inputs: {err}"
-            )
-
     @classmethod
     def init_user_inputs_from_class(cls, inputs: dict) -> None:
         """
-        classmethod API for user inputs
+        classmethod API for user inputs. Used by init_user_inputs_from_class
+        Override if this tentacle has user inputs that can be initialized on a class level
         Called by load_user_inputs_from_class, should define all the tentacle user inputs.
         """
 
+    async def load_and_save_user_inputs(self, bot_id: str) -> dict:
+        """
+        instance method API for user inputs
+        Initialize and save the tentacle user inputs in run data
+        :return: the filled user input configuration
+        """
+        return await configuration.load_and_save_user_inputs(self, bot_id)
+
     @classmethod
-    def load_user_inputs_from_class(cls, tentacles_setup_config, tentacle_config):
+    def load_user_inputs_from_class(
+        cls, tentacles_setup_config, tentacle_config
+    ) -> dict:
         """
         classmethod API for user inputs
+        Initialize the tentacle user inputs
         Called by get_raw_config_and_user_inputs
         """
-        return configuration.load_user_inputs_from_class(cls, tentacles_setup_config, tentacle_config)
+        return configuration.load_user_inputs_from_class(
+            cls, tentacles_setup_config, tentacle_config
+        )
 
     @classmethod
     async def get_raw_config_and_user_inputs(
@@ -145,36 +147,17 @@ class AbstractTentacle:
         """
         :return: the tentacle configuration and its list of user inputs
         """
-        cls._init_class_UI()
+        cls._init_class_user_input_factory()
         if not cls.HISTORIZE_USER_INPUT_CONFIG:
-            return configuration.get_raw_config_and_user_inputs_from_class(cls, tentacles_setup_config)
-        try:
-            import octobot_tentacles_manager.api as api
-
-            specific_config = api.get_tentacle_config(tentacles_setup_config, cls)
-        except ImportError as err:
-            raise ImportError("octobot_tentacles_manager is required") from err
-        if saved_user_inputs := await configuration.get_user_inputs(
-            databases.RunDatabasesProvider.instance().get_run_db(bot_id),
-            cls.get_name(),
-        ):
-            # user inputs have been saved in run database, use those as they might contain additional
-            # (nested) user inputs
-            return specific_config, saved_user_inputs
-        # use user inputs from init_user_inputs
-        tentacle_instance = cls.create_local_instance(
-            config, tentacles_setup_config, specific_config
-        )
-        user_inputs = {}
-        tentacle_instance.init_user_inputs(user_inputs)
-        return specific_config, list(
-            user_input.to_dict() for user_input in user_inputs.values()
+            return configuration.get_raw_config_and_user_inputs_from_class(
+                cls, tentacles_setup_config
+            )
+        return await configuration.get_raw_config_and_user_inputs(
+            cls, config, tentacles_setup_config, bot_id
         )
 
     @classmethod
-    def _init_class_UI(cls):
+    def _init_class_user_input_factory(cls):
         # make UI available in class methods
-        if cls.UI is None:
-            cls.UI = configuration.UserInputFactory(
-                cls.USER_INPUT_TENTACLE_TYPE
-            )
+        if cls.CLASS_UI is None:
+            cls.CLASS_UI = configuration.UserInputFactory(cls.USER_INPUT_TENTACLE_TYPE)
