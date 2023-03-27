@@ -19,6 +19,7 @@ import copy
 
 
 import octobot_commons.enums as commons_enums
+import octobot_commons.configuration.user_inputs as user_inputs
 import octobot_commons.configuration as configuration
 
 
@@ -38,12 +39,13 @@ class AbstractTentacle:
     HISTORIZE_USER_INPUT_CONFIG = (
         False  # when True, user input values can be saved and read from the run data db
     )
-    CLASS_UI = None  # class-level user input factory. Used when initializing user inputs with classmethods
+    CLASS_UI = user_inputs.UserInputFactory(
+        commons_enums.UserInputTentacleTypes.UNDEFINED
+    )  # class-level user input factory. Used when initializing user inputs with classmethods
 
     def __init__(self):
         self.logger = None
-        self.__class__._init_class_user_input_factory()
-        self.UI: configuration.UserInputFactory = configuration.UserInputFactory(
+        self.UI: user_inputs.UserInputFactory = user_inputs.UserInputFactory(
             self.USER_INPUT_TENTACLE_TYPE
         )
         self.UI.set_tentacle_class(self.__class__).set_tentacle_config_proxy(
@@ -147,7 +149,6 @@ class AbstractTentacle:
         """
         :return: the tentacle configuration and its list of user inputs
         """
-        cls._init_class_user_input_factory()
         if not cls.HISTORIZE_USER_INPUT_CONFIG:
             return configuration.get_raw_config_and_user_inputs_from_class(
                 cls, tentacles_setup_config
@@ -155,9 +156,3 @@ class AbstractTentacle:
         return await configuration.get_raw_config_and_user_inputs(
             cls, config, tentacles_setup_config, bot_id
         )
-
-    @classmethod
-    def _init_class_user_input_factory(cls):
-        # make UI available in class methods
-        if cls.CLASS_UI is None:
-            cls.CLASS_UI = configuration.UserInputFactory(cls.USER_INPUT_TENTACLE_TYPE)
