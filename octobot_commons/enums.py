@@ -281,6 +281,7 @@ class DBTables(enum.Enum):
     INPUTS = "inputs"
     PORTFOLIO = "portfolio"
     ORDERS = "all_orders"
+    HISTORICAL_ORDERS_UPDATES = "order_updates"
     TRADES = "all_trades"
     TRANSACTIONS = "all_transactions"
     CANDLES = "candles"
