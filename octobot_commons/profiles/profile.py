@@ -72,6 +72,7 @@ class Profile:
         self.imported: bool = False
         self.complexity: enums.ProfileComplexity = enums.ProfileComplexity.MEDIUM
         self.risk: enums.ProfileRisk = enums.ProfileRisk.MODERATE
+        self.profile_type: enums.ProfileType = enums.ProfileType.LIVE
 
         self.config: dict = {}
 
@@ -96,6 +97,9 @@ class Profile:
         )
         self.risk = enums.ProfileRisk(
             profile_config.get(constants.CONFIG_RISK, enums.ProfileRisk.MODERATE.value)
+        )
+        self.profile_type = enums.ProfileType(
+            profile_config.get(constants.CONFIG_TYPE, enums.ProfileType.LIVE.value)
         )
         self.config = parsed_profile[constants.PROFILE_CONFIG]
         if self.avatar:
@@ -237,6 +241,7 @@ class Profile:
                 constants.CONFIG_IMPORTED: self.imported,
                 constants.CONFIG_COMPLEXITY: self.complexity.value,
                 constants.CONFIG_RISK: self.risk.value,
+                constants.CONFIG_TYPE: self.profile_type.value,
             },
             constants.PROFILE_CONFIG: self.config,
         }
