@@ -169,6 +169,7 @@ def test_as_dict(profile):
             constants.CONFIG_IMPORTED: False,
             constants.CONFIG_COMPLEXITY: enums.ProfileComplexity.MEDIUM.value,
             constants.CONFIG_RISK: enums.ProfileRisk.MODERATE.value,
+            constants.CONFIG_TYPE: enums.ProfileType.LIVE.value,
         },
         constants.PROFILE_CONFIG: {},
     }
@@ -178,6 +179,7 @@ def test_as_dict(profile):
     profile.imported = True
     profile.complexity = enums.ProfileComplexity.DIFFICULT
     profile.risk = enums.ProfileRisk.LOW
+    profile.profile_type = enums.ProfileType.BACKTESTING
     assert profile.as_dict() == {
         constants.CONFIG_PROFILE: {
             constants.CONFIG_ID: "default",
@@ -189,6 +191,7 @@ def test_as_dict(profile):
             constants.CONFIG_IMPORTED: True,
             constants.CONFIG_COMPLEXITY: enums.ProfileComplexity.DIFFICULT.value,
             constants.CONFIG_RISK: enums.ProfileRisk.LOW.value,
+            constants.CONFIG_TYPE: enums.ProfileType.BACKTESTING.value,
         },
         constants.PROFILE_CONFIG: {
             "a": 1

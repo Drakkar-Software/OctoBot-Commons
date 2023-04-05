@@ -493,3 +493,8 @@ class ProfileRisk(enum.Enum):
     LOW = 1
     MODERATE = 2
     HIGH = 3
+
+
+class ProfileType(enum.Enum):
+    LIVE = "live"
+    BACKTESTING = "backtesting"
