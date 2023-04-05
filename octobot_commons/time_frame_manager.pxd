@@ -24,3 +24,4 @@ cpdef object get_display_time_frame(dict config, object default_display_time_fra
 cpdef object get_previous_time_frame(list config_time_frames, object time_frame, object origin_time_frame)
 cpdef object find_min_time_frame(list time_frames, object min_time_frame=*)
 cpdef list parse_time_frames(list time_frames_string_list)
+cpdef bint is_time_frame(str value)

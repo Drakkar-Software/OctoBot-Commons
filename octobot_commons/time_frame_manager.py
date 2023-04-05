@@ -148,3 +148,14 @@ def parse_time_frames(time_frames_string_list):
                 )
             )
     return result_list
+
+
+def is_time_frame(value):
+    """
+    :return: True if the value represents a TimeFrame
+    """
+    try:
+        enums.TimeFrames(value)
+        return True
+    except ValueError:
+        return False
