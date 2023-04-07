@@ -93,11 +93,12 @@ class DisplayTranslator:
         self.nested_elements[name] = element
         yield element
 
-    def add_user_inputs(self, inputs, part=None):
+    def add_user_inputs(self, inputs, part=None, config_by_tentacles=None):
         """
         add user inputs to the given part or self
         """
-        config_by_tentacles = {}
+        has_forced_config = config_by_tentacles is not None
+        config_by_tentacles = config_by_tentacles or {}
         config_schema_by_tentacles = {}
         tentacle_type_by_tentacles = {}
         shown_tentacles = {}
@@ -120,10 +121,12 @@ class DisplayTranslator:
                 ]
                 if tentacle not in config_schema_by_tentacles:
                     config_schema_by_tentacles[tentacle] = self._base_schema(tentacle)
-                    config_by_tentacles[tentacle] = {}
-                config_by_tentacles[tentacle][
-                    user_input_element["name"].replace(" ", "_")
-                ] = user_input_element["value"]
+                    if not has_forced_config:
+                        config_by_tentacles[tentacle] = {}
+                if tentacle not in config_by_tentacles:
+                    config_by_tentacles[tentacle][
+                        user_input_element["name"].replace(" ", "_")
+                    ] = user_input_element["value"]
                 if user_input_element["parent_input_name"] is None:
                     # user input with parent_input_name are added alongside their parents, only add top
                     # level user inputs in schema
