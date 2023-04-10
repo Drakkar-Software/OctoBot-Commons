@@ -13,8 +13,12 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import json
+
 import octobot_commons.databases.run_databases.run_databases_provider as run_databases_provider
 import octobot_commons.configuration as configuration
+import octobot_commons.enums as enums
+import octobot_commons.logging as logging
 
 
 async def init_bot_storage(bot_id, run_database_identifier, clear_user_inputs):
@@ -26,12 +30,13 @@ async def init_bot_storage(bot_id, run_database_identifier, clear_user_inputs):
         await run_databases_provider.RunDatabasesProvider.instance().add_bot_id(
             bot_id, run_database_identifier
         )
+        # always ensure database is valid
+        run_db = run_databases_provider.RunDatabasesProvider.instance().get_run_db(
+            bot_id
+        )
+        await _repair_database_if_necessary(run_db)
         if clear_user_inputs:
-            await configuration.clear_user_inputs(
-                run_databases_provider.RunDatabasesProvider.instance().get_run_db(
-                    bot_id
-                )
-            )
+            await configuration.clear_user_inputs(run_db)
 
 
 async def close_bot_storage(bot_id):
@@ -40,3 +45,15 @@ async def close_bot_storage(bot_id):
     """
     if run_databases_provider.RunDatabasesProvider.instance().has_bot_id(bot_id):
         await run_databases_provider.RunDatabasesProvider.instance().close(bot_id)
+
+
+async def _repair_database_if_necessary(database):
+    try:
+        # will raise if the db has an issue
+        await database.all(enums.DBTables.METADATA.value)
+    except json.JSONDecodeError:
+        logging.get_logger(__name__).warning(
+            f"Invalid database at {database}, resetting content."
+        )
+        # error in database, reset it
+        await database.hard_reset()
