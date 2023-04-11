@@ -153,7 +153,9 @@ def _get_markdown_pretty_portfolio_row(
     str_ref_market_value = "{:<12}".format("")
     if ref_market:
         str_ref_market_value = "{:<12}".format(
-            get_min_string_from_number(ref_market_value, max_digits=2) if ref_market_value else ""
+            get_min_string_from_number(ref_market_value, max_digits=2)
++            if ref_market_value
++            else ""
         )
     return f"{str_currency} {str_holdings} {str_ref_market_value}"
 
