@@ -149,7 +149,10 @@ def _get_markdown_pretty_portfolio_row(
     :return: the portfolio row adapted for a markdown format
     """
     str_currency = "{:<4}".format(currency)
-    str_holdings = "{:<12}".format(get_min_string_from_number(holdings, max_digits=4))
+    if holdings > 1: 
+        str_holdings = "{:<12}".format(get_min_string_from_number(holdings, max_digits=4))
+    else: 
+        str_holdings = "{:<12}".format(get_min_string_from_number(holdings, max_digits=6))
     str_ref_market_value = "{:<12}".format("")
     if ref_market:
         str_ref_market_value = "{:<12}".format(
