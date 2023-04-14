@@ -176,7 +176,7 @@ def _get_markdown_pretty_portfolio_row(
                 get_min_string_from_number(ref_market_value, max_digits=6)
             )
         else:
-            ""
+            """"""
     return f"{str_currency} {str_holdings} {str_ref_market_value}"
 
 
