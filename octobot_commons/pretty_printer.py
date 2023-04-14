@@ -149,21 +149,34 @@ def _get_markdown_pretty_portfolio_row(
     :return: the portfolio row adapted for a markdown format
     """
     str_currency = "{:<4}".format(currency)
-    if holdings >= 10: 
-        str_holdings = "{:<12}".format(get_min_string_from_number(holdings, max_digits=2))
-    elif holdings >= 1: 
-        str_holdings = "{:<12}".format(get_min_string_from_number(holdings, max_digits=4))
-    else: 
-        str_holdings = "{:<12}".format(get_min_string_from_number(holdings, max_digits=6))
+    if holdings >= 10:
+        str_holdings = "{:<12}".format(
+            get_min_string_from_number(holdings, max_digits=2)
+        )
+    elif holdings >= 1:
+        str_holdings = "{:<12}".format(
+            get_min_string_from_number(holdings, max_digits=4)
+        )
+    else:
+        str_holdings = "{:<12}".format(
+            get_min_string_from_number(holdings, max_digits=6)
+        )
     str_ref_market_value = "{:<12}".format("")
     if ref_market:
         if ref_market_value >= 10:
-            str_ref_market_value = "{:<12}".format(get_min_string_from_number(ref_market_value, max_digits=2))
+            str_ref_market_value = "{:<12}".format(
+                get_min_string_from_number(ref_market_value, max_digits=2)
+            )
         elif ref_market_value >= 1:
-            str_ref_market_value = "{:<12}".format(get_min_string_from_number(ref_market_value, max_digits=4))
+            str_ref_market_value = "{:<12}".format(
+                get_min_string_from_number(ref_market_value, max_digits=4)
+            )
         elif ref_market_value < 1:
-            str_ref_market_value = "{:<12}".format(get_min_string_from_number(ref_market_value, max_digits=6))
-        else: ""
+            str_ref_market_value = "{:<12}".format(
+                get_min_string_from_number(ref_market_value, max_digits=6)
+            )
+        else:
+            ""
     return f"{str_currency} {str_holdings} {str_ref_market_value}"
 
 
