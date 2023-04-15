@@ -142,6 +142,19 @@ def _get_row_pretty_portfolio_row(holdings, currency, ref_market, ref_market_val
     return f"{str_holdings} {currency}"
 
 
+def _get_max_digits(number):
+    abs_number = abs(number)
+    if abs_number < 0.0001:
+        return 8
+    if abs_number < 0.01:
+        return 6
+    if abs_number < 1:
+        return 4
+    if abs_number < 100:
+        return 2
+    return 0
+
+
 def _get_markdown_pretty_portfolio_row(
     holdings, currency, ref_market, ref_market_value
 ):
@@ -149,32 +162,12 @@ def _get_markdown_pretty_portfolio_row(
     :return: the portfolio row adapted for a markdown format
     """
     str_currency = "{:<4}".format(currency)
-    if holdings >= 10:
-        str_holdings = "{:<12}".format(
-            get_min_string_from_number(holdings, max_digits=2)
-        )
-    elif holdings >= 1:
-        str_holdings = "{:<12}".format(
-            get_min_string_from_number(holdings, max_digits=4)
-        )
-    else:
-        str_holdings = "{:<12}".format(
-            get_min_string_from_number(holdings, max_digits=6)
-        )
+    str_holdings = "{:<12}".format(get_min_string_from_number(holdings))
     str_ref_market_value = "{:<12}".format("")
     if ref_market:
-        if ref_market_value >= 10:
-            str_ref_market_value = "{:<12}".format(
-                get_min_string_from_number(ref_market_value, max_digits=2)
-            )
-        elif ref_market_value >= 1:
-            str_ref_market_value = "{:<12}".format(
-                get_min_string_from_number(ref_market_value, max_digits=4)
-            )
-        elif ref_market_value < 1:
-            str_ref_market_value = "{:<12}".format(
-                get_min_string_from_number(ref_market_value, max_digits=6)
-            )
+        str_ref_market_value = "{:<12}".format(
+            get_min_string_from_number(ref_market_value)
+        )
     return f"{str_currency} {str_holdings} {str_ref_market_value}"
 
 
@@ -298,13 +291,14 @@ def round_with_decimal_count(number, max_digits=8) -> float:
     return float(get_min_string_from_number(number, max_digits))
 
 
-def get_min_string_from_number(number, max_digits=8) -> str:
+def get_min_string_from_number(number, max_digits=None) -> str:
     """
     Get a min string from number
     :param number: the number
     :param max_digits: the mex digits
     :return: the string from number
     """
+    max_digits = _get_max_digits(number) if max_digits is None else max_digits
     if number is None or round(number, max_digits) == 0.0:
         return "0"
     if number % 1 != 0:
