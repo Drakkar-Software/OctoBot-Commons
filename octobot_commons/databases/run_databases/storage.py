@@ -34,9 +34,10 @@ async def init_bot_storage(bot_id, run_database_identifier, clear_user_inputs):
         run_db = run_databases_provider.RunDatabasesProvider.instance().get_run_db(
             bot_id
         )
-        await _repair_database_if_necessary(run_db)
-        if clear_user_inputs:
-            await configuration.clear_user_inputs(run_db)
+        if run_database_identifier.enable_storage:
+            await _repair_database_if_necessary(run_db)
+            if clear_user_inputs:
+                await configuration.clear_user_inputs(run_db)
 
 
 async def close_bot_storage(bot_id):
