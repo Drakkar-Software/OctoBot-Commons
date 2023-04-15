@@ -38,6 +38,17 @@ def test_get_min_string_from_number():
     assert pretty_printer.get_min_string_from_number(101.04, max_digits=1) == "101"
     assert pretty_printer.get_min_string_from_number(100.00000000, max_digits=8) == "100"
     assert pretty_printer.get_min_string_from_number(-100.00000000, max_digits=8) == "-100"
+    # with computed max_digits
+    assert pretty_printer.get_min_string_from_number(-100.00000001) == "-100"
+    assert pretty_printer.get_min_string_from_number(100.00000001) == "100"
+    assert pretty_printer.get_min_string_from_number(-1.12345678) == "-1.12"
+    assert pretty_printer.get_min_string_from_number(1.12345678) == "1.12"
+    assert pretty_printer.get_min_string_from_number(0.12345678) == "0.1235"
+    assert pretty_printer.get_min_string_from_number(-0.12345678) == "-0.1235"
+    assert pretty_printer.get_min_string_from_number(0.0045678) == "0.004568"
+    assert pretty_printer.get_min_string_from_number(-0.0045678) == "-0.004568"
+    assert pretty_printer.get_min_string_from_number(0.0000456789) == "0.00004568"
+    assert pretty_printer.get_min_string_from_number(-0.0000456789) == "-0.00004568"
 
 
 def test_round_with_decimal_count():
