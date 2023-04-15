@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.26] - 2023-04-15
+### Updated
+- [PrettyPrinter] Adapt decimals to number
+### Fixed
+- [Databases] Auto-repair error
+
 ## [1.8.25] - 2023-04-15
 ### Added
 - [DisplayTranslator] config_by_tentacles
