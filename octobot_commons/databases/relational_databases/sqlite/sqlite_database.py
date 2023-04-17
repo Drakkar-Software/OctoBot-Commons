@@ -208,6 +208,12 @@ class SQLiteDatabase:
             size=size,
         )
 
+    async def delete(self, table, **kwargs):
+        return await self.__execute_delete(
+            table,
+            self.__where_clauses_from_kwargs(**kwargs),
+        )
+
     def __where_clauses_from_kwargs(self, should_quote_value=True, **kwargs) -> str:
         return self.__where_clauses_from_operations(
             list(kwargs.keys()),
@@ -288,6 +294,11 @@ class SQLiteDatabase:
                 raise errors.DatabaseNotFoundError(err)
             self.logger.error(f"An error occurred when executing select : {err}")
         return []
+
+    async def __execute_delete(self, table, where_clauses):
+        async with self.aio_cursor() as cursor:
+            await cursor.execute(f"DELETE FROM {table.value} WHERE {where_clauses} ")
+            # nothing to return, will raise on error
 
     async def check_table_exists(self, table) -> bool:
         async with self.aio_cursor() as cursor:
