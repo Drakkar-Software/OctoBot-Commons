@@ -241,6 +241,33 @@ async def test_insert_all():
         assert await temp_empty_database.select(OHLCV, date="05") == [(2, 'abc', '10', '05')]
 
 
+async def test_delete():
+    async with get_temp_empty_database() as temp_empty_database:
+        await temp_empty_database.insert_all(OHLCV,
+                                             symbol=["xyz", "abc"],
+                                             timestamp=[1, 2],
+                                             price=[1, 10],
+                                             date=["01", "05"])
+        assert await temp_empty_database.select(OHLCV) == [(2, 'abc', '10', '05'), (1, 'xyz', '1', '01')]
+        # no matching row to delete
+        await temp_empty_database.delete(OHLCV, symbol="plop")
+        assert await temp_empty_database.select(OHLCV) == [(2, 'abc', '10', '05'), (1, 'xyz', '1', '01')]
+        await temp_empty_database.delete(OHLCV, symbol="xyz")
+        assert await temp_empty_database.select(OHLCV) == [(2, 'abc', '10', '05')]
+        await temp_empty_database.insert_all(OHLCV,
+                                             symbol=["hoho", "dd"],
+                                             timestamp=[11, 11],
+                                             price=[1, 10],
+                                             date=["01", "05"])
+        assert await temp_empty_database.select(OHLCV) == [
+            (11, 'dd', '10', '05'), (11, 'hoho', '1', '01'), (2, 'abc', '10', '05')
+        ]
+        await temp_empty_database.delete(OHLCV, timestamp="11")
+        assert await temp_empty_database.select(OHLCV) == [(2, 'abc', '10', '05')]
+        await temp_empty_database.delete(OHLCV, date="05")
+        assert await temp_empty_database.select(OHLCV) == []
+
+
 async def test_create_index():
     async with get_temp_empty_database() as temp_empty_database:
         await temp_empty_database.insert(OHLCV, 1, symbol="xyz", price="1", date="01")
