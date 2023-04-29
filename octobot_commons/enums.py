@@ -218,6 +218,7 @@ class BacktestingMetadata(enum.Enum):
     ID = "id"
     GAINS = "gains"
     PERCENT_GAINS = "% gains"
+    MARKETS_PROFITABILITY = "markets profitability"
     END_PORTFOLIO = "end portfolio"
     START_PORTFOLIO = "start portfolio"
     WIN_RATE = "% win rate"
