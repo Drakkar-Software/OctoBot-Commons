@@ -203,6 +203,11 @@ class DisplayTranslator:
             properties["maximum"] = max_val
         if editor_options := user_input_element.get("editor_options"):
             properties["options"].update(editor_options)
+            if "dependencies" in editor_options:
+                other_values = user_input_element.get("other_schema_values", {}) or {}
+                # when using dependencies, set field as not required as it might not be set
+                other_values["required"] = other_values.get("required", False)
+                user_input_element["other_schema_values"] = other_values
         if other_schema_values := user_input_element.get("other_schema_values"):
             properties.update(other_schema_values)
         return properties
