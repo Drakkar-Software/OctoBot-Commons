@@ -63,7 +63,9 @@ def export_profile(profile, export_path: str) -> str:
     try:
         _filter_profile_export(temp_path)
         # export the edited profile
-        shutil.make_archive(export_path, constants.PROFILE_EXPORT_FORMAT, temp_path)
+        shutil.make_archive(
+            os.path.abspath(export_path), constants.PROFILE_EXPORT_FORMAT, temp_path
+        )
     finally:
         shutil.rmtree(temp_path)
     return export_path_with_ext
