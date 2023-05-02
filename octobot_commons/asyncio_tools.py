@@ -78,7 +78,7 @@ class ErrorContainer:
             error = context.get("exception")
             if error:
                 traceback.print_exception(
-                    etype=type(error), value=error, tb=error.__traceback__
+                    type(error), value=error, tb=error.__traceback__
                 )
 
     async def check(self) -> None:
