@@ -33,7 +33,6 @@ with open('README.md', encoding='utf-8') as f:
 
 REQUIRED = open('requirements.txt').readlines()
 REQUIRES_PYTHON = '>=3.8'
-CYTHON_DEBUG = False if not os.getenv('CYTHON_DEBUG') else os.getenv('CYTHON_DEBUG')
 
 setup(
     name=PROJECT_NAME,
@@ -51,7 +50,7 @@ setup(
     test_suite="tests",
     zip_safe=False,
     data_files=[],
-    setup_requires=REQUIRED if not CYTHON_DEBUG else [],
+    setup_requires=REQUIRED,
     install_requires=REQUIRED,
     python_requires=REQUIRES_PYTHON,
     classifiers=[
