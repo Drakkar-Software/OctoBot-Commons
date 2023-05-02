@@ -14,14 +14,10 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 # from distutils.extension import Extension
-import os
-
-from setuptools import dist
-
 import numpy as np
 
 from setuptools import find_packages
-from setuptools import setup, Extension
+from setuptools import setup
 
 from octobot_commons import PROJECT_NAME, VERSION
 
@@ -50,7 +46,6 @@ setup(
     test_suite="tests",
     zip_safe=False,
     data_files=[],
-    setup_requires=REQUIRED,
     install_requires=REQUIRED,
     python_requires=REQUIRES_PYTHON,
     classifiers=[
