@@ -14,8 +14,6 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 # from distutils.extension import Extension
-import numpy as np
-
 from setuptools import find_packages
 from setuptools import setup
 
@@ -41,7 +39,6 @@ setup(
     packages=PACKAGES,
     include_package_data=True,
     long_description=DESCRIPTION,
-    include_dirs=[np.get_include()],
     tests_require=["pytest"],
     test_suite="tests",
     zip_safe=False,
