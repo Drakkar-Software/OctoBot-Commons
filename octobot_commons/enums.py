@@ -413,6 +413,7 @@ class UserInputTentacleTypes(enum.Enum):
     EVALUATOR = "evaluator"
     EXCHANGE = "exchange"
     WEB_PLUGIN = "web_plugin"
+    USER_INTERFACE = "user_interface"
     AUTOMATION = "automation"
     UNDEFINED = "undefined"
 
