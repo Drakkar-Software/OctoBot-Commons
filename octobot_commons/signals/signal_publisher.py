@@ -1,4 +1,4 @@
-# pylint: disable=R0913
+# pylint: disable=R0913, W0718
 # Drakkar-Software OctoBot-Trading
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -116,6 +116,10 @@ class SignalPublisher(singleton.Singleton):
                 signal_builder_wrap.is_being_emitted = True
                 await signals_emitter.emit_signal_bundle(
                     signal_builder_wrap.signal_bundle_builder.build()
+                )
+            except Exception as err:
+                logging.get_logger(self.__class__.__name__).exception(
+                    err, True, f"Unexpected error when emitting signal: {err}"
                 )
             finally:
                 # always reset builder after emitting to avoid emitting the same signal twice

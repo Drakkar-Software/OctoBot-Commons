@@ -15,6 +15,7 @@
 #  License along with this library.
 import octobot_commons.signals.signal_bundle as signal_bundle
 import octobot_commons.signals.signal as signal
+import octobot_commons.logging as logging
 
 
 class SignalBundleBuilder:
@@ -25,6 +26,7 @@ class SignalBundleBuilder:
         self.identifier: str = identifier
         self.version: str = None
         self.signal_class = self.__class__.DEFAULT_SIGNAL_CLASS
+        self.logger = logging.get_logger(self.__class__.__name__)
         self.reset()
 
     def register_signal(self, topic: str, content: dict, **kwargs):
