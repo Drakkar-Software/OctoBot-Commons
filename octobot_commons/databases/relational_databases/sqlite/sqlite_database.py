@@ -50,7 +50,7 @@ class SQLiteDatabase:
             self._cursor_pool = cursor_pool.CursorPool(self.connection)
             await self.__init_tables_list()
         except (sqlite3.OperationalError, sqlite3.DatabaseError) as err:
-            raise errors.DatabaseNotFoundError(err)
+            raise errors.DatabaseNotFoundError(f"{err} (file: {self.file_name})")
 
     async def create_index(self, table, columns):
         await self.__execute_index_creation(
@@ -345,7 +345,8 @@ class SQLiteDatabase:
 
     async def stop(self):
         try:
-            await self._cursor_pool.close()
+            if self._cursor_pool is not None:
+                await self._cursor_pool.close()
         finally:
             if self.connection is not None:
                 conn = self.connection
