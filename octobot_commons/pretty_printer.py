@@ -193,7 +193,6 @@ def global_portfolio_pretty_print(
     value = "value"
     for asset, asset_dict in global_portfolio.items():
         if asset_dict[constants.PORTFOLIO_TOTAL] > 0:
-            # fill lines with empty spaces if necessary
             holdings_value = 0
             if currency_values and ref_market_name:
                 if ref_market_name == asset:
@@ -214,9 +213,9 @@ def global_portfolio_pretty_print(
                     value: holdings_value,
                 }
             )
-    # force "value" str for cythonization
-    results.sort(key=lambda r: r["value"], reverse=True)
+    results.sort(key=lambda r: r[value], reverse=True)
     if markdown:
+        # fill lines with empty spaces if necessary
         header = (
             f"{'{:<4}'.format('')} "
             f"{'  {:<9}'.format('Holdings')}  "
