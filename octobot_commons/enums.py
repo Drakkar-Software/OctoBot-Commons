@@ -482,6 +482,7 @@ class UserInputEditorOptionsTypes(enum.Enum):
 
 class UserInputOtherSchemaValuesTypes(enum.Enum):
     DESCRIPTION = "description"
+    DEPENDENCIES = "dependencies"
 
 
 class ProfileComplexity(enum.Enum):
