@@ -23,11 +23,6 @@ from tests.profiles import get_profile_path, profile
 
 
 @pytest.fixture
-def profile_dict():
-    return json.loads(get_profile_path())
-
-
-@pytest.fixture
 def profile_data_dict():
     return {
         'profile_details': {
@@ -68,7 +63,24 @@ def profile_data_dict():
         }, 'trading': {
             'reference_market': 'BTC',
             'risk': 0.5
-        }
+        }, 'tentacles': [
+            {
+                'name': 'plopEvaluator',
+                'config': {},
+                'enabled': False,
+            },
+            {
+                'name': 'plopEvaluator',
+                'enabled': True,
+                'config': {
+                    'a': True,
+                    'other': {
+                        'l': [1, 2],
+                        'n': None,
+                    }
+                },
+            },
+        ]
     }
 
 
@@ -82,6 +94,7 @@ def test_from_profile(profile):
     assert profile_data.trader_simulator.enabled is True
     assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
     assert profile_data.trading.risk == 0.5
+    assert profile_data.tentacles == []
 
 
 def test_to_profile(profile):
@@ -108,6 +121,8 @@ def test_from_dict(profile_data_dict):
     assert profile_data.trader_simulator.enabled is True
     assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
     assert profile_data.trading.risk == 0.5
+    assert profile_data.tentacles[0].name == "plopEvaluator"
+    assert profile_data.tentacles[1].config["other"]["l"] == [1, 2]
 
 
 def test_to_dict(profile_data_dict):
