@@ -70,6 +70,13 @@ class TradingData:
 
 
 @dataclasses.dataclass
+class TentaclesData:
+    name: str
+    config: dict = None
+    enabled: bool = True
+
+
+@dataclasses.dataclass
 class ProfileData(minimizable_dataclass.MinimizableDataclass):
     profile_details: ProfileDetailsData
     crypto_currencies: list[CryptoCurrencyData]
@@ -77,6 +84,7 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
     trader: TraderData
     trader_simulator: TraderSimulatorData
     trading: TradingData
+    tentacles: list[TentaclesData] = None
 
     def __post_init__(self):
         self.profile_details = ProfileDetailsData(**self.profile_details)
@@ -85,6 +93,7 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
         self.trader = TraderData(**self.trader)
         self.trader_simulator = TraderSimulatorData(**self.trader_simulator)
         self.trading = TradingData(**self.trading)
+        self.tentacles = [TentaclesData(**tentacle) for tentacle in self.tentacles] if self.tentacles else []
 
     @classmethod
     def from_profile(cls, profile: profiles.Profile):
@@ -127,12 +136,19 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
                 "reference_market": content[constants.CONFIG_TRADING][constants.CONFIG_TRADER_REFERENCE_MARKET],
                 "risk": content[constants.CONFIG_TRADING][constants.CONFIG_TRADER_RISK],
             },
+            "tentacles": []
         })
 
     def to_profile(self, to_create_profile_path: str) -> profiles.Profile:
         profile = profiles.Profile(to_create_profile_path)
         profile.from_dict(self._to_profile_dict())
         return profile
+
+    def set_tentacles_config(self, config_by_tentacle: dict):
+        self.tentacles = [
+            TentaclesData(name=tentacle, config=config)
+            for tentacle, config in config_by_tentacle.items()
+        ]
 
     def _to_profile_dict(self) -> dict:
         return {
