@@ -35,7 +35,11 @@ class Authenticator(singleton.Singleton):
         self.supports: None
         self.feed_callbacks = {}
         # also register this instance for the base Authenticator class in singleton
+        self.use_as_singleton_instance()
+
+    def use_as_singleton_instance(self):
         singleton.Singleton._instances[Authenticator] = self
+        singleton.Singleton._instances[self.__class__] = self
 
     @abc.abstractmethod
     async def login(self, username, password, password_token=None):
@@ -123,7 +127,7 @@ class Authenticator(singleton.Singleton):
         """
         await asyncio.wait_for(self.initialized_event.wait(), timeout)
 
-    async def update_trades(self, trades: list, reset: bool):
+    async def update_trades(self, trades: list, exchange_name: str, reset: bool):
         """
         Updates authenticated account trades
         """
