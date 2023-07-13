@@ -30,6 +30,12 @@ from octobot_commons.profiles.profile_sharing import (
     download_and_install_profile,
 )
 
+from octobot_commons.profiles import profile_data
+
+from octobot_commons.profiles.profile_data import (
+    ProfileData,
+)
+
 
 __all__ = [
     "Profile",
@@ -38,4 +44,5 @@ __all__ = [
     "import_profile",
     "download_profile",
     "download_and_install_profile",
+    "ProfileData",
 ]

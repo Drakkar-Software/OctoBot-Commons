@@ -81,8 +81,14 @@ class Profile:
         Reads a profile from self.path
         :return: self
         """
-        parsed_profile = json_util.read_file(self.config_file())
-        profile_config = parsed_profile.get(constants.CONFIG_PROFILE, {})
+        return self.from_dict(json_util.read_file(self.config_file()))
+
+    def from_dict(self, profile_dict: dict):
+        """
+        Reads a profile from the given dict
+        :return: self
+        """
+        profile_config = profile_dict.get(constants.CONFIG_PROFILE, {})
         self.profile_id = profile_config.get(constants.CONFIG_ID, str(uuid.uuid4()))
         self.name = profile_config.get(constants.CONFIG_NAME, "")
         self.description = profile_config.get(constants.CONFIG_DESCRIPTION, "")
@@ -101,7 +107,7 @@ class Profile:
         self.profile_type = enums.ProfileType(
             profile_config.get(constants.CONFIG_TYPE, enums.ProfileType.LIVE.value)
         )
-        self.config = parsed_profile[constants.PROFILE_CONFIG]
+        self.config = profile_dict[constants.PROFILE_CONFIG]
         if self.avatar:
             avatar_path = os.path.join(self.path, self.avatar)
             if os.path.isfile(avatar_path):
