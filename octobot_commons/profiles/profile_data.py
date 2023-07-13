@@ -16,6 +16,7 @@
 import dataclasses
 
 import octobot_commons.profiles as profiles
+import octobot_commons.minimizable_dataclass as minimizable_dataclass
 import octobot_commons.enums as enums
 import octobot_commons.constants as constants
 
@@ -69,7 +70,7 @@ class TradingData:
 
 
 @dataclasses.dataclass
-class ProfileData:
+class ProfileData(minimizable_dataclass.MinimizableDataclass):
     profile_details: ProfileDetailsData
     crypto_currencies: list[CryptoCurrencyData]
     exchanges: list[ExchangeData]
@@ -84,24 +85,6 @@ class ProfileData:
         self.trader = TraderData(**self.trader)
         self.trader_simulator = TraderSimulatorData(**self.trader_simulator)
         self.trading = TradingData(**self.trading)
-
-    @classmethod
-    def from_dict(cls, dict_value: dict):
-        return cls(**dict_value)
-
-    def to_dict(self, include_default_values=True) -> dict:
-        if include_default_values:
-            # use default factory
-            return dataclasses.asdict(self)
-        factory = asdict_without_default_factory(
-            [self.__class__] + [
-                getattr(self, attr.name)[0].__class__
-                if isinstance(getattr(self, attr.name), list) and getattr(self, attr.name)
-                else getattr(self, attr.name).__class__
-                for attr in dataclasses.fields(self)
-            ]
-        )
-        return dataclasses.asdict(self, dict_factory=factory)
 
     @classmethod
     def from_profile(cls, profile: profiles.Profile):
@@ -187,25 +170,3 @@ class ProfileData:
             },
             constants.CONFIG_PROFILE: dataclasses.asdict(self.profile_details),
         }
-
-
-def asdict_without_default_factory(possible_classes):
-    def factory(obj) -> dict:
-        formatted_dict = {}
-        found_class = None
-        for possible_class in possible_classes:
-            if all(
-                key in possible_class.__dataclass_fields__
-                for key, _ in obj
-            ):
-                found_class = possible_class
-        if found_class is None:
-            raise KeyError(f"class not found for asdict of {obj}")
-        for key, val in obj:
-                field_value = found_class.__dataclass_fields__[key].default
-                if field_value is dataclasses.MISSING or field_value != val:
-                    formatted_dict[key] = val
-
-        return formatted_dict
-
-    return factory
