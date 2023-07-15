@@ -87,13 +87,20 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
     tentacles: list[TentaclesData] = None
 
     def __post_init__(self):
-        self.profile_details = ProfileDetailsData(**self.profile_details)
-        self.crypto_currencies = [CryptoCurrencyData(**crypto_currency) for crypto_currency in self.crypto_currencies]
-        self.exchanges = [ExchangeData(**exchange) for exchange in self.exchanges]
-        self.trader = TraderData(**self.trader)
-        self.trader_simulator = TraderSimulatorData(**self.trader_simulator)
-        self.trading = TradingData(**self.trading)
-        self.tentacles = [TentaclesData(**tentacle) for tentacle in self.tentacles] if self.tentacles else []
+        if isinstance(self.profile_details, dict):
+            self.profile_details = ProfileDetailsData(**self.profile_details)
+        if self.crypto_currencies and isinstance(self.crypto_currencies[0], dict):
+            self.crypto_currencies = [CryptoCurrencyData(**crypto_currency) for crypto_currency in self.crypto_currencies]
+        if self.exchanges and isinstance(self.exchanges[0], dict):
+            self.exchanges = [ExchangeData(**exchange) for exchange in self.exchanges]
+        if isinstance(self.trader, dict):
+            self.trader = TraderData(**self.trader)
+        if isinstance(self.trader_simulator, dict):
+            self.trader_simulator = TraderSimulatorData(**self.trader_simulator)
+        if isinstance(self.trading, dict):
+            self.trading = TradingData(**self.trading)
+        if self.tentacles and isinstance(self.tentacles[0], dict):
+            self.tentacles = [TentaclesData(**tentacle) for tentacle in self.tentacles] if self.tentacles else []
 
     @classmethod
     def from_profile(cls, profile: profiles.Profile):
