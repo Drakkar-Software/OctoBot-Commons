@@ -108,7 +108,7 @@ class Profile:
             profile_config.get(constants.CONFIG_TYPE, enums.ProfileType.LIVE.value)
         )
         self.config = profile_dict[constants.PROFILE_CONFIG]
-        if self.avatar:
+        if self.avatar and self.path:
             avatar_path = os.path.join(self.path, self.avatar)
             if os.path.isfile(avatar_path):
                 self.avatar_path = avatar_path
