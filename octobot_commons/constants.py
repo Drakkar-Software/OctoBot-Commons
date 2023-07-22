@@ -152,6 +152,7 @@ CONFIG_ACTIVATION_TOPICS = "activation method"
 CONFIG_TRIGGER_TIMEFRAMES = "Trigger_timeframes"
 CONFIG_EMIT_TRADING_SIGNALS = "emit_trading_signals"
 CONFIG_TRADING_SIGNALS_STRATEGY = "trading_strategy"
+ALLOW_DEFAULT_CONFIG = "allow_default_config"
 
 # terms of service
 CONFIG_ACCEPTED_TERMS = "accepted_terms"
