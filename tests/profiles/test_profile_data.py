@@ -34,6 +34,7 @@ def profile_data_dict():
             'complexity': 2,
             'risk': 2,
             'type': 'live',
+            'bot_id': 'bot_1',
             'imported': False,
             'read_only': False
         },
@@ -113,6 +114,29 @@ def test_to_profile(profile):
 
 def test_from_dict(profile_data_dict):
     profile_data = profiles.ProfileData.from_dict(profile_data_dict)
+    # check one element per attribute to be sure it's all parsed
+    assert profile_data.profile_details.origin_url == "https://default.url"
+    assert profile_data.crypto_currencies[0].trading_pairs == ['BTC/USDT']
+    assert profile_data.exchanges[0].name == "binance"
+    assert profile_data.trader.enabled is False
+    assert profile_data.trader_simulator.enabled is True
+    assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
+    assert profile_data.trading.risk == 0.5
+    assert profile_data.tentacles[0].name == "plopEvaluator"
+    assert profile_data.tentacles[1].config["other"]["l"] == [1, 2]
+
+
+def test_from_dict_objects(profile_data_dict):
+    profile_data_objects = profiles.ProfileData.from_dict(profile_data_dict)
+    profile_data = profiles.ProfileData.from_dict({
+        "profile_details": profile_data_objects.profile_details,
+        "crypto_currencies": profile_data_objects.crypto_currencies,
+        "exchanges": profile_data_objects.exchanges,
+        "trader": profile_data_objects.trader,
+        "trader_simulator": profile_data_objects.trader_simulator,
+        "trading": profile_data_objects.trading,
+        "tentacles": profile_data_objects.tentacles,
+    })
     # check one element per attribute to be sure it's all parsed
     assert profile_data.profile_details.origin_url == "https://default.url"
     assert profile_data.crypto_currencies[0].trading_pairs == ['BTC/USDT']

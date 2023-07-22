@@ -33,6 +33,7 @@ class ProfileDetailsData:
     type: str = enums.ProfileType.LIVE.value
     imported: bool = False
     read_only: bool = False
+    bot_id: str = None
 
 
 @dataclasses.dataclass
