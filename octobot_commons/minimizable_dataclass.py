@@ -17,7 +17,6 @@ import dataclasses
 
 
 class MinimizableDataclass:
-
     @classmethod
     def from_dict(cls, dict_value: dict):
         return cls(**dict_value)
@@ -27,9 +26,11 @@ class MinimizableDataclass:
             # use default factory
             return dataclasses.asdict(self)
         factory = _asdict_without_default_factory(
-            (self.__class__, ) + tuple(
+            (self.__class__,)
+            + tuple(
                 getattr(self, attr.name)[0].__class__
-                if isinstance(getattr(self, attr.name), list) and getattr(self, attr.name)
+                if isinstance(getattr(self, attr.name), list)
+                and getattr(self, attr.name)
                 else getattr(self, attr.name).__class__
                 for attr in dataclasses.fields(self)
             )
@@ -42,17 +43,14 @@ def _asdict_without_default_factory(possible_classes):
         formatted_dict = {}
         found_class = None
         for possible_class in possible_classes:
-            if all(
-                key in possible_class.__dataclass_fields__
-                for key, _ in obj
-            ):
+            if all(key in possible_class.__dataclass_fields__ for key, _ in obj):
                 found_class = possible_class
         if found_class is None:
             raise KeyError(f"class not found for asdict of {obj}")
         for key, val in obj:
-                field_value = found_class.__dataclass_fields__[key].default
-                if field_value is dataclasses.MISSING or field_value != val:
-                    formatted_dict[key] = val
+            field_value = found_class.__dataclass_fields__[key].default
+            if field_value is dataclasses.MISSING or field_value != val:
+                formatted_dict[key] = val
 
         return formatted_dict
 

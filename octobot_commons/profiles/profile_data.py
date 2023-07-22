@@ -91,7 +91,10 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
         if isinstance(self.profile_details, dict):
             self.profile_details = ProfileDetailsData(**self.profile_details)
         if self.crypto_currencies and isinstance(self.crypto_currencies[0], dict):
-            self.crypto_currencies = [CryptoCurrencyData(**crypto_currency) for crypto_currency in self.crypto_currencies]
+            self.crypto_currencies = [
+                CryptoCurrencyData(**crypto_currency)
+                for crypto_currency in self.crypto_currencies
+            ]
         if self.exchanges and isinstance(self.exchanges[0], dict):
             self.exchanges = [ExchangeData(**exchange) for exchange in self.exchanges]
         if isinstance(self.trader, dict):
@@ -101,51 +104,73 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
         if isinstance(self.trading, dict):
             self.trading = TradingData(**self.trading)
         if self.tentacles and isinstance(self.tentacles[0], dict):
-            self.tentacles = [TentaclesData(**tentacle) for tentacle in self.tentacles] if self.tentacles else []
+            self.tentacles = (
+                [TentaclesData(**tentacle) for tentacle in self.tentacles]
+                if self.tentacles
+                else []
+            )
 
     @classmethod
     def from_profile(cls, profile: profiles.Profile):
         profile_dict = profile.as_dict()
         content = profile_dict[constants.PROFILE_CONFIG]
-        return cls.from_dict({
-            "profile_details": profile_dict[constants.CONFIG_PROFILE],
-            "crypto_currencies": [
-                {
-                    "trading_pairs": details.get(constants.CONFIG_CRYPTO_PAIRS, []),
-                    "name": currency,
-                    "enabled": details.get(constants.CONFIG_ENABLED_OPTION, True),
-                }
-                for currency, details in content[constants.CONFIG_CRYPTO_CURRENCIES].items()
-            ],
-            "exchanges": [
-                {
-                    "name": exchange,
-                    "type": details.get(constants.CONFIG_EXCHANGE_TYPE, constants.DEFAULT_EXCHANGE_TYPE),
-                    "enabled": details.get(constants.CONFIG_ENABLED_OPTION, True),
-                }
-                for exchange, details in content[constants.CONFIG_EXCHANGES].items()
-            ],
-            "trader": {
-                "enabled": content[constants.CONFIG_TRADER][constants.CONFIG_ENABLED_OPTION],
-                "load_trade_history": content[constants.CONFIG_TRADER].get(constants.CONFIG_LOAD_TRADE_HISTORY, True),
-            },
-            "trader_simulator": {
-
-                "enabled": content[constants.CONFIG_SIMULATOR][constants.CONFIG_ENABLED_OPTION],
-                "starting_portfolio": content[constants.CONFIG_SIMULATOR][constants.CONFIG_STARTING_PORTFOLIO],
-                "maker_fees": content[constants.CONFIG_SIMULATOR][constants.CONFIG_SIMULATOR_FEES].get(
-                    constants.CONFIG_SIMULATOR_FEES_MAKER, 0.0
-                ),
-                "taker_fees": content[constants.CONFIG_SIMULATOR][constants.CONFIG_SIMULATOR_FEES].get(
-                    constants.CONFIG_SIMULATOR_FEES_TAKER, 0.0
-                ),
-            },
-            "trading": {
-                "reference_market": content[constants.CONFIG_TRADING][constants.CONFIG_TRADER_REFERENCE_MARKET],
-                "risk": content[constants.CONFIG_TRADING][constants.CONFIG_TRADER_RISK],
-            },
-            "tentacles": []
-        })
+        return cls.from_dict(
+            {
+                "profile_details": profile_dict[constants.CONFIG_PROFILE],
+                "crypto_currencies": [
+                    {
+                        "trading_pairs": details.get(constants.CONFIG_CRYPTO_PAIRS, []),
+                        "name": currency,
+                        "enabled": details.get(constants.CONFIG_ENABLED_OPTION, True),
+                    }
+                    for currency, details in content[
+                        constants.CONFIG_CRYPTO_CURRENCIES
+                    ].items()
+                ],
+                "exchanges": [
+                    {
+                        "name": exchange,
+                        "type": details.get(
+                            constants.CONFIG_EXCHANGE_TYPE,
+                            constants.DEFAULT_EXCHANGE_TYPE,
+                        ),
+                        "enabled": details.get(constants.CONFIG_ENABLED_OPTION, True),
+                    }
+                    for exchange, details in content[constants.CONFIG_EXCHANGES].items()
+                ],
+                "trader": {
+                    "enabled": content[constants.CONFIG_TRADER][
+                        constants.CONFIG_ENABLED_OPTION
+                    ],
+                    "load_trade_history": content[constants.CONFIG_TRADER].get(
+                        constants.CONFIG_LOAD_TRADE_HISTORY, True
+                    ),
+                },
+                "trader_simulator": {
+                    "enabled": content[constants.CONFIG_SIMULATOR][
+                        constants.CONFIG_ENABLED_OPTION
+                    ],
+                    "starting_portfolio": content[constants.CONFIG_SIMULATOR][
+                        constants.CONFIG_STARTING_PORTFOLIO
+                    ],
+                    "maker_fees": content[constants.CONFIG_SIMULATOR][
+                        constants.CONFIG_SIMULATOR_FEES
+                    ].get(constants.CONFIG_SIMULATOR_FEES_MAKER, 0.0),
+                    "taker_fees": content[constants.CONFIG_SIMULATOR][
+                        constants.CONFIG_SIMULATOR_FEES
+                    ].get(constants.CONFIG_SIMULATOR_FEES_TAKER, 0.0),
+                },
+                "trading": {
+                    "reference_market": content[constants.CONFIG_TRADING][
+                        constants.CONFIG_TRADER_REFERENCE_MARKET
+                    ],
+                    "risk": content[constants.CONFIG_TRADING][
+                        constants.CONFIG_TRADER_RISK
+                    ],
+                },
+                "tentacles": [],
+            }
+        )
 
     def to_profile(self, to_create_profile_path: str) -> profiles.Profile:
         profile = profiles.Profile(to_create_profile_path)
@@ -185,7 +210,7 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
                     constants.CONFIG_SIMULATOR_FEES: {
                         constants.CONFIG_SIMULATOR_FEES_MAKER: self.trader_simulator.maker_fees,
                         constants.CONFIG_SIMULATOR_FEES_TAKER: self.trader_simulator.taker_fees,
-                    }
+                    },
                 },
                 constants.CONFIG_TRADING: {
                     constants.CONFIG_TRADER_REFERENCE_MARKET: self.trading.reference_market,
