@@ -1,3 +1,4 @@
+# pylint: disable=C0103,R0902
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -15,7 +16,7 @@
 #  License along with this library.
 import dataclasses
 
-import octobot_commons.profiles as profiles
+import octobot_commons.profiles.profile as profile_import
 import octobot_commons.minimizable_dataclass as minimizable_dataclass
 import octobot_commons.enums as enums
 import octobot_commons.constants as constants
@@ -87,6 +88,7 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
     trading: TradingData
     tentacles: list[TentaclesData] = None
 
+    # pylint: disable=E1134
     def __post_init__(self):
         if isinstance(self.profile_details, dict):
             self.profile_details = ProfileDetailsData(**self.profile_details)
@@ -111,7 +113,10 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
             )
 
     @classmethod
-    def from_profile(cls, profile: profiles.Profile):
+    def from_profile(cls, profile: profile_import.Profile):
+        """
+        Creates a cls instance from the given profile
+        """
         profile_dict = profile.as_dict()
         content = profile_dict[constants.PROFILE_CONFIG]
         return cls.from_dict(
@@ -172,12 +177,18 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
             }
         )
 
-    def to_profile(self, to_create_profile_path: str) -> profiles.Profile:
-        profile = profiles.Profile(to_create_profile_path)
+    def to_profile(self, to_create_profile_path: str) -> profile_import.Profile:
+        """
+        Returns a new Profile from self
+        """
+        profile = profile_import.Profile(to_create_profile_path)
         profile.from_dict(self._to_profile_dict())
         return profile
 
     def set_tentacles_config(self, config_by_tentacle: dict):
+        """
+        Update self.tentacles from the given config_by_tentacle
+        """
         self.tentacles = [
             TentaclesData(name=tentacle, config=config)
             for tentacle, config in config_by_tentacle.items()
