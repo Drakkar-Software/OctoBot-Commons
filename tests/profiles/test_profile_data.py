@@ -48,7 +48,8 @@ def profile_data_dict():
             {
                 'name': 'binance',
                 'type': 'spot',
-                'enabled': True
+                'enabled': True,
+                'config_name': 'binance_1'
             }
         ], 'trader': {
             'enabled': False,

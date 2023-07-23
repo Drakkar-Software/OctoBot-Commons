@@ -49,6 +49,7 @@ class ExchangeData:
     name: str
     type: str = constants.DEFAULT_EXCHANGE_TYPE
     enabled: bool = True
+    config_name: str = None
 
 
 @dataclasses.dataclass
