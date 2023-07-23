@@ -37,7 +37,11 @@ class Authenticator(singleton.Singleton):
         # also register this instance for the base Authenticator class in singleton
         self.use_as_singleton_instance()
 
+    # pylint: disable=W0212
     def use_as_singleton_instance(self):
+        """
+        Update the Authenticator Singleton to use self
+        """
         singleton.Singleton._instances[Authenticator] = self
         singleton.Singleton._instances[self.__class__] = self
 

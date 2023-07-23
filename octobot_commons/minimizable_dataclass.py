@@ -19,9 +19,15 @@ import dataclasses
 class MinimizableDataclass:
     @classmethod
     def from_dict(cls, dict_value: dict):
+        """
+        Creates a new instance of cls from the given dict
+        """
         return cls(**dict_value)
 
     def to_dict(self, include_default_values=True) -> dict:
+        """
+        Creates a new dict from self. Recursively processes any MinimizableDataclass instance attribute
+        """
         if include_default_values:
             # use default factory
             return dataclasses.asdict(self)
