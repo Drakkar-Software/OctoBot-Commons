@@ -15,6 +15,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import dataclasses
+import typing
 
 import octobot_commons.profiles.profile as profile_import
 import octobot_commons.minimizable_dataclass as minimizable_dataclass
@@ -25,22 +26,22 @@ import octobot_commons.constants as constants
 @dataclasses.dataclass
 class ProfileDetailsData:
     name: str
-    description: str
-    id: str = None
-    origin_url: str = None
-    avatar: str = None
+    description: str = ""
+    id: typing.Union[str, None] = None
+    origin_url: typing.Union[str, None] = None
+    avatar: typing.Union[str, None] = None
     complexity: int = enums.ProfileComplexity.MEDIUM.value
     risk: int = enums.ProfileRisk.MODERATE.value
     type: str = enums.ProfileType.LIVE.value
     imported: bool = False
     read_only: bool = False
-    bot_id: str = None
+    bot_id: typing.Union[str, None] = None
 
 
 @dataclasses.dataclass
 class CryptoCurrencyData:
     trading_pairs: list[str]
-    name: str = None
+    name: typing.Union[str, None] = None
     enabled: bool = True
 
 
@@ -49,21 +50,26 @@ class ExchangeData:
     name: str
     type: str = constants.DEFAULT_EXCHANGE_TYPE
     enabled: bool = True
-    config_name: str = None
+    config_name: typing.Union[str, None] = None
 
 
 @dataclasses.dataclass
 class TraderData:
-    enabled: bool
+    enabled: bool = True
     load_trade_history: bool = True
 
 
 @dataclasses.dataclass
 class TraderSimulatorData:
-    enabled: bool
-    starting_portfolio: dict[str, float]
-    maker_fees: float = 0.0
-    taker_fees: float = 0.0
+    enabled: bool = False
+    starting_portfolio: dict[str, float] = None
+    maker_fees: float = 0.1
+    taker_fees: float = 0.1
+
+    # pylint: disable=E1134
+    def __post_init__(self):
+        if self.starting_portfolio is None:
+            self.starting_portfolio = {}
 
 
 @dataclasses.dataclass
@@ -84,9 +90,9 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
     profile_details: ProfileDetailsData
     crypto_currencies: list[CryptoCurrencyData]
     exchanges: list[ExchangeData]
-    trader: TraderData
-    trader_simulator: TraderSimulatorData
     trading: TradingData
+    trader: TraderData = TraderData()
+    trader_simulator: TraderSimulatorData = TraderSimulatorData()
     tentacles: list[TentaclesData] = None
 
     # pylint: disable=E1134
