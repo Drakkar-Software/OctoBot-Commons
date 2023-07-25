@@ -85,6 +85,42 @@ def profile_data_dict():
         ]
     }
 
+@pytest.fixture
+def min_profile_data_dict():
+    return {
+        'profile_details': {
+            'name': 'min_profile',
+        },
+        'crypto_currencies': [
+            {
+                'trading_pairs': ['BTC/USDT'],
+            }
+        ], 'exchanges': [
+            {
+                'name': 'binance',
+            }
+        ], 'trading': {
+            'reference_market': 'BTC',
+        }, 'tentacles': [
+            {
+                'name': 'plopEvaluator',
+                'config': {},
+                'enabled': False,
+            },
+            {
+                'name': 'plopEvaluator',
+                'enabled': True,
+                'config': {
+                    'a': True,
+                    'other': {
+                        'l': [1, 2],
+                        'n': None,
+                    }
+                },
+            },
+        ]
+    }
+
 
 def test_from_profile(profile):
     profile_data = profiles.ProfileData.from_profile(profile.read_config())
@@ -123,6 +159,23 @@ def test_from_dict(profile_data_dict):
     assert profile_data.trader_simulator.enabled is True
     assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
     assert profile_data.trading.risk == 0.5
+    assert profile_data.tentacles[0].name == "plopEvaluator"
+    assert profile_data.tentacles[1].config["other"]["l"] == [1, 2]
+
+
+def test_from_min_dict(min_profile_data_dict):
+    profile_data = profiles.ProfileData.from_dict(min_profile_data_dict)
+    # check one element per attribute to be sure it's all parsed
+    assert profile_data.profile_details.name == "min_profile"
+    assert profile_data.profile_details.origin_url is None
+    assert profile_data.crypto_currencies[0].trading_pairs == ['BTC/USDT']
+    assert profile_data.crypto_currencies[0].name is None
+    assert profile_data.crypto_currencies[0].enabled is True
+    assert profile_data.exchanges[0].name == "binance"
+    assert profile_data.trader.enabled is True
+    assert profile_data.trader_simulator.enabled is False
+    assert profile_data.trader_simulator.starting_portfolio == {}
+    assert profile_data.trading.risk == 1
     assert profile_data.tentacles[0].name == "plopEvaluator"
     assert profile_data.tentacles[1].config["other"]["l"] == [1, 2]
 
