@@ -62,14 +62,9 @@ class TraderData:
 @dataclasses.dataclass
 class TraderSimulatorData:
     enabled: bool = False
-    starting_portfolio: dict[str, float] = None
+    starting_portfolio: dict[str, float] = dataclasses.field(default_factory=dict)
     maker_fees: float = 0.1
     taker_fees: float = 0.1
-
-    # pylint: disable=E1134
-    def __post_init__(self):
-        if self.starting_portfolio is None:
-            self.starting_portfolio = {}
 
 
 @dataclasses.dataclass
