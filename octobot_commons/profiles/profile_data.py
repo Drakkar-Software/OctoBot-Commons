@@ -25,7 +25,7 @@ import octobot_commons.constants as constants
 
 @dataclasses.dataclass
 class ProfileDetailsData:
-    name: str
+    name: str = ""
     description: str = ""
     id: typing.Union[str, None] = None
     origin_url: typing.Union[str, None] = None
@@ -36,6 +36,7 @@ class ProfileDetailsData:
     imported: bool = False
     read_only: bool = False
     bot_id: typing.Union[str, None] = None
+    version: typing.Union[str, None] = None
 
 
 @dataclasses.dataclass
@@ -47,10 +48,9 @@ class CryptoCurrencyData:
 
 @dataclasses.dataclass
 class ExchangeData:
-    name: str
+    exchange_credential_id: typing.Union[str, None] = None
+    name: str = ""
     type: str = constants.DEFAULT_EXCHANGE_TYPE
-    enabled: bool = True
-    config_name: typing.Union[str, None] = None
 
 
 @dataclasses.dataclass
@@ -76,19 +76,25 @@ class TradingData:
 @dataclasses.dataclass
 class TentaclesData:
     name: str
-    config: dict = None
+    config: dict = dataclasses.field(default_factory=dict)
     enabled: bool = True
+
+
+@dataclasses.dataclass
+class OptionsData:
+    values: dict = dataclasses.field(default_factory=dict)
 
 
 @dataclasses.dataclass
 class ProfileData(minimizable_dataclass.MinimizableDataclass):
     profile_details: ProfileDetailsData
     crypto_currencies: list[CryptoCurrencyData]
-    exchanges: list[ExchangeData]
     trading: TradingData
+    exchanges: list[ExchangeData] = dataclasses.field(default_factory=list)
     trader: TraderData = TraderData()
     trader_simulator: TraderSimulatorData = TraderSimulatorData()
-    tentacles: list[TentaclesData] = None
+    tentacles: list[TentaclesData] = dataclasses.field(default_factory=list)
+    options: OptionsData = OptionsData()
 
     # pylint: disable=E1134
     def __post_init__(self):
@@ -113,6 +119,8 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
                 if self.tentacles
                 else []
             )
+        if isinstance(self.options, dict):
+            self.options = OptionsData(**self.options)
 
     @classmethod
     def from_profile(cls, profile: profile_import.Profile):
@@ -141,7 +149,6 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
                             constants.CONFIG_EXCHANGE_TYPE,
                             constants.DEFAULT_EXCHANGE_TYPE,
                         ),
-                        "enabled": details.get(constants.CONFIG_ENABLED_OPTION, True),
                     }
                     for exchange, details in content[constants.CONFIG_EXCHANGES].items()
                 ],
@@ -209,7 +216,7 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
                 constants.CONFIG_EXCHANGES: {
                     exchange.name: {
                         constants.CONFIG_EXCHANGE_TYPE: exchange.type,
-                        constants.CONFIG_ENABLED_OPTION: exchange.enabled,
+                        constants.CONFIG_ENABLED_OPTION: True,
                     }
                     for exchange in self.exchanges
                 },

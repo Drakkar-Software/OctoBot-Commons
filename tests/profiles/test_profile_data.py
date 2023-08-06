@@ -36,7 +36,8 @@ def profile_data_dict():
             'type': 'live',
             'bot_id': 'bot_1',
             'imported': False,
-            'read_only': False
+            'read_only': False,
+            'version': "42.42.1b"
         },
         'crypto_currencies': [
             {
@@ -48,8 +49,7 @@ def profile_data_dict():
             {
                 'name': 'binance',
                 'type': 'spot',
-                'enabled': True,
-                'config_name': 'binance_1'
+                'exchange_credential_id': 'binance_1'
             }
         ], 'trader': {
             'enabled': False,
@@ -82,7 +82,11 @@ def profile_data_dict():
                     }
                 },
             },
-        ]
+        ], 'options': {
+            'values': {
+                'plop_key': 'hola senior'
+            }
+        }
     }
 
 @pytest.fixture
