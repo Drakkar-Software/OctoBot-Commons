@@ -141,6 +141,7 @@ class Authenticator(singleton.Singleton):
         self,
         current_value: dict,
         initial_value: dict,
+        profitability: float,
         unit: str,
         content: dict,
         history: dict,
