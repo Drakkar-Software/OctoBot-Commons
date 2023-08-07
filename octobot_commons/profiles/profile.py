@@ -245,9 +245,13 @@ class Profile:
                 constants.CONFIG_ORIGIN_URL: self.origin_url,
                 constants.CONFIG_READ_ONLY: self.read_only,
                 constants.CONFIG_IMPORTED: self.imported,
-                constants.CONFIG_COMPLEXITY: self.complexity.value,
-                constants.CONFIG_RISK: self.risk.value,
-                constants.CONFIG_TYPE: self.profile_type.value,
+                constants.CONFIG_COMPLEXITY: self.complexity.value
+                if self.complexity
+                else None,
+                constants.CONFIG_RISK: self.risk.value if self.risk else None,
+                constants.CONFIG_TYPE: self.profile_type.value
+                if self.profile_type
+                else None,
             },
             constants.PROFILE_CONFIG: self.config,
         }

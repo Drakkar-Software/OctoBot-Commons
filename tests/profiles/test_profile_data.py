@@ -18,6 +18,7 @@ import pytest
 
 import octobot_commons.profiles as profiles
 import octobot_commons.constants as constants
+import octobot_commons.enums as enums
 
 from tests.profiles import get_profile_path, profile
 
@@ -26,36 +27,25 @@ from tests.profiles import get_profile_path, profile
 def profile_data_dict():
     return {
         'profile_details': {
-            'name': 'default',
-            'description': 'OctoBot default profile.',
+            'name': 'profile_name 42',
             'id': 'default',
-            'origin_url': 'https://default.url',
-            'avatar': 'default_profile.png',
-            'complexity': 2,
-            'risk': 2,
-            'type': 'live',
-            'bot_id': 'bot_1',
-            'imported': False,
-            'read_only': False,
-            'version': "42.42.1b"
+            'version': "42.42.1b",
+            'bot_id': "1234-1224-0000"
         },
         'crypto_currencies': [
             {
                 'trading_pairs': ['BTC/USDT'],
-                'name': 'Bitcoin',
-                'enabled': True
+                'name': 'Bitcoin'
             }
         ], 'exchanges': [
             {
-                'name': 'binance',
-                'type': 'spot',
-                'exchange_credential_id': 'binance_1'
+                'exchange_credential_id': '123-plop',
+                'internal_name': 'cryptocom'
             }
         ], 'trader': {
-            'enabled': False,
-            'load_trade_history': True
+            'enabled': True
         }, 'trader_simulator': {
-            'enabled': True,
+            'enabled': False,
             'starting_portfolio': {
                 'BTC': 10,
                 'USDT': 1000
@@ -69,11 +59,9 @@ def profile_data_dict():
             {
                 'name': 'plopEvaluator',
                 'config': {},
-                'enabled': False,
             },
             {
                 'name': 'plopEvaluator',
-                'enabled': True,
                 'config': {
                     'a': True,
                     'other': {
@@ -99,21 +87,15 @@ def min_profile_data_dict():
             {
                 'trading_pairs': ['BTC/USDT'],
             }
-        ], 'exchanges': [
-            {
-                'name': 'binance',
-            }
         ], 'trading': {
             'reference_market': 'BTC',
         }, 'tentacles': [
             {
                 'name': 'plopEvaluator',
                 'config': {},
-                'enabled': False,
             },
             {
                 'name': 'plopEvaluator',
-                'enabled': True,
                 'config': {
                     'a': True,
                     'other': {
@@ -122,16 +104,21 @@ def min_profile_data_dict():
                     }
                 },
             },
-        ]
+        ], 'options': {
+            'values': {
+                'plop_key': 'hola !!!',
+                'jour': 'nuit',
+            }
+        }
     }
 
 
 def test_from_profile(profile):
     profile_data = profiles.ProfileData.from_profile(profile.read_config())
     # check one element per attribute to be sure it's all parsed
-    assert profile_data.profile_details.origin_url == "https://default.url"
+    assert profile_data.profile_details.name == "default"
     assert profile_data.crypto_currencies[0].trading_pairs == ['BTC/USDT']
-    assert profile_data.exchanges[0].name == "binance"
+    assert profile_data.exchanges == []
     assert profile_data.trader.enabled is False
     assert profile_data.trader_simulator.enabled is True
     assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
@@ -145,22 +132,27 @@ def test_to_profile(profile):
     # force missing values
     for crypto_data in profile.config[constants.CONFIG_CRYPTO_CURRENCIES].values():
         crypto_data[constants.CONFIG_ENABLED_OPTION] = crypto_data.get(constants.CONFIG_ENABLED_OPTION, True)
-    for exchange_data in profile.config[constants.CONFIG_EXCHANGES].values():
-        exchange_data[constants.CONFIG_ENABLED_OPTION] = exchange_data.get(constants.CONFIG_ENABLED_OPTION, True)
-        exchange_data[constants.CONFIG_EXCHANGE_TYPE] = exchange_data.get(constants.CONFIG_EXCHANGE_TYPE,
-                                                                          constants.DEFAULT_EXCHANGE_TYPE)
+    # remove not stored values
+    profile.config[constants.CONFIG_EXCHANGES] = {}
+    profile.avatar = profile.description = ""
+    profile.complexity = enums.ProfileComplexity.MEDIUM
+    profile.risk = enums.ProfileRisk.MODERATE
+    profile.profile_type = enums.ProfileType.LIVE
+    profile.origin_url = None
     # if both parsing and transforming return the same profile as original one, the whole chain works
-    assert profile.as_dict() == created_profile.as_dict()
+    profile_dict = profile.as_dict()
+    assert profile_dict == created_profile.as_dict()
 
 
 def test_from_dict(profile_data_dict):
     profile_data = profiles.ProfileData.from_dict(profile_data_dict)
     # check one element per attribute to be sure it's all parsed
-    assert profile_data.profile_details.origin_url == "https://default.url"
+    assert profile_data.profile_details.name == "profile_name 42"
     assert profile_data.crypto_currencies[0].trading_pairs == ['BTC/USDT']
-    assert profile_data.exchanges[0].name == "binance"
-    assert profile_data.trader.enabled is False
-    assert profile_data.trader_simulator.enabled is True
+    assert profile_data.exchanges[0].exchange_credential_id == "123-plop"
+    assert profile_data.exchanges[0].internal_name == "cryptocom"
+    assert profile_data.trader.enabled is True
+    assert profile_data.trader_simulator.enabled is False
     assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
     assert profile_data.trading.risk == 0.5
     assert profile_data.tentacles[0].name == "plopEvaluator"
@@ -171,17 +163,22 @@ def test_from_min_dict(min_profile_data_dict):
     profile_data = profiles.ProfileData.from_dict(min_profile_data_dict)
     # check one element per attribute to be sure it's all parsed
     assert profile_data.profile_details.name == "min_profile"
-    assert profile_data.profile_details.origin_url is None
     assert profile_data.crypto_currencies[0].trading_pairs == ['BTC/USDT']
     assert profile_data.crypto_currencies[0].name is None
-    assert profile_data.crypto_currencies[0].enabled is True
-    assert profile_data.exchanges[0].name == "binance"
+    assert profile_data.exchanges == []
     assert profile_data.trader.enabled is True
     assert profile_data.trader_simulator.enabled is False
     assert profile_data.trader_simulator.starting_portfolio == {}
     assert profile_data.trading.risk == 1
     assert profile_data.tentacles[0].name == "plopEvaluator"
     assert profile_data.tentacles[1].config["other"]["l"] == [1, 2]
+    assert profile_data.options.values["jour"] == "nuit"
+    assert profile_data.options.values["plop_key"] == "hola !!!"
+    full_profile_data_dict = profile_data.to_dict(include_default_values=True)
+    assert len(full_profile_data_dict) > len(min_profile_data_dict)
+    profile_data_dict = profile_data.to_dict(include_default_values=False)
+    # default values in values but all keys are present
+    assert len(profile_data_dict) == len(full_profile_data_dict)
 
 
 def test_from_dict_objects(profile_data_dict):
@@ -194,17 +191,19 @@ def test_from_dict_objects(profile_data_dict):
         "trader_simulator": profile_data_objects.trader_simulator,
         "trading": profile_data_objects.trading,
         "tentacles": profile_data_objects.tentacles,
+        "options": profile_data_objects.options,
     })
     # check one element per attribute to be sure it's all parsed
-    assert profile_data.profile_details.origin_url == "https://default.url"
+    assert profile_data.profile_details.version == "42.42.1b"
     assert profile_data.crypto_currencies[0].trading_pairs == ['BTC/USDT']
-    assert profile_data.exchanges[0].name == "binance"
-    assert profile_data.trader.enabled is False
-    assert profile_data.trader_simulator.enabled is True
+    assert profile_data.exchanges[0].exchange_credential_id == "123-plop"
+    assert profile_data.trader.enabled is True
+    assert profile_data.trader_simulator.enabled is False
     assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
     assert profile_data.trading.risk == 0.5
     assert profile_data.tentacles[0].name == "plopEvaluator"
     assert profile_data.tentacles[1].config["other"]["l"] == [1, 2]
+    assert profile_data.options.values['plop_key'] == 'hola senior'
 
 
 def test_to_dict(profile_data_dict):
