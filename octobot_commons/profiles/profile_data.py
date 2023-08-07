@@ -19,22 +19,13 @@ import typing
 
 import octobot_commons.profiles.profile as profile_import
 import octobot_commons.minimizable_dataclass as minimizable_dataclass
-import octobot_commons.enums as enums
 import octobot_commons.constants as constants
 
 
 @dataclasses.dataclass
 class ProfileDetailsData:
     name: str = ""
-    description: str = ""
     id: typing.Union[str, None] = None
-    origin_url: typing.Union[str, None] = None
-    avatar: typing.Union[str, None] = None
-    complexity: int = enums.ProfileComplexity.MEDIUM.value
-    risk: int = enums.ProfileRisk.MODERATE.value
-    type: str = enums.ProfileType.LIVE.value
-    imported: bool = False
-    read_only: bool = False
     bot_id: typing.Union[str, None] = None
     version: typing.Union[str, None] = None
 
@@ -43,20 +34,17 @@ class ProfileDetailsData:
 class CryptoCurrencyData:
     trading_pairs: list[str]
     name: typing.Union[str, None] = None
-    enabled: bool = True
 
 
 @dataclasses.dataclass
 class ExchangeData:
     exchange_credential_id: typing.Union[str, None] = None
-    name: str = ""
-    type: str = constants.DEFAULT_EXCHANGE_TYPE
+    internal_name: typing.Union[str, None] = None
 
 
 @dataclasses.dataclass
 class TraderData:
     enabled: bool = True
-    load_trade_history: bool = True
 
 
 @dataclasses.dataclass
@@ -77,7 +65,6 @@ class TradingData:
 class TentaclesData:
     name: str
     config: dict = dataclasses.field(default_factory=dict)
-    enabled: bool = True
 
 
 @dataclasses.dataclass
@@ -131,34 +118,26 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
         content = profile_dict[constants.PROFILE_CONFIG]
         return cls.from_dict(
             {
-                "profile_details": profile_dict[constants.CONFIG_PROFILE],
+                "profile_details": {
+                    "id": profile_dict[constants.CONFIG_PROFILE][constants.CONFIG_ID],
+                    "name": profile_dict[constants.CONFIG_PROFILE][
+                        constants.CONFIG_NAME
+                    ],
+                },
                 "crypto_currencies": [
                     {
                         "trading_pairs": details.get(constants.CONFIG_CRYPTO_PAIRS, []),
                         "name": currency,
-                        "enabled": details.get(constants.CONFIG_ENABLED_OPTION, True),
                     }
                     for currency, details in content[
                         constants.CONFIG_CRYPTO_CURRENCIES
                     ].items()
-                ],
-                "exchanges": [
-                    {
-                        "name": exchange,
-                        "type": details.get(
-                            constants.CONFIG_EXCHANGE_TYPE,
-                            constants.DEFAULT_EXCHANGE_TYPE,
-                        ),
-                    }
-                    for exchange, details in content[constants.CONFIG_EXCHANGES].items()
+                    if details.get(constants.CONFIG_ENABLED_OPTION, True)
                 ],
                 "trader": {
                     "enabled": content[constants.CONFIG_TRADER][
                         constants.CONFIG_ENABLED_OPTION
                     ],
-                    "load_trade_history": content[constants.CONFIG_TRADER].get(
-                        constants.CONFIG_LOAD_TRADE_HISTORY, True
-                    ),
                 },
                 "trader_simulator": {
                     "enabled": content[constants.CONFIG_SIMULATOR][
@@ -209,20 +188,14 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
                 constants.CONFIG_CRYPTO_CURRENCIES: {
                     crypto_currency.name: {
                         constants.CONFIG_CRYPTO_PAIRS: crypto_currency.trading_pairs,
-                        constants.CONFIG_ENABLED_OPTION: crypto_currency.enabled,
+                        constants.CONFIG_ENABLED_OPTION: True,
                     }
                     for crypto_currency in self.crypto_currencies
                 },
-                constants.CONFIG_EXCHANGES: {
-                    exchange.name: {
-                        constants.CONFIG_EXCHANGE_TYPE: exchange.type,
-                        constants.CONFIG_ENABLED_OPTION: True,
-                    }
-                    for exchange in self.exchanges
-                },
+                constants.CONFIG_EXCHANGES: {},
                 constants.CONFIG_TRADER: {
                     constants.CONFIG_ENABLED_OPTION: self.trader.enabled,
-                    constants.CONFIG_LOAD_TRADE_HISTORY: self.trader.load_trade_history,
+                    constants.CONFIG_LOAD_TRADE_HISTORY: True,
                 },
                 constants.CONFIG_SIMULATOR: {
                     constants.CONFIG_ENABLED_OPTION: self.trader_simulator.enabled,

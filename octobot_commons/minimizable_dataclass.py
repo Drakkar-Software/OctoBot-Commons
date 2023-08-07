@@ -49,6 +49,8 @@ def _asdict_without_default_factory(possible_classes):
         formatted_dict = {}
         found_class = None
         for possible_class in possible_classes:
+            if possible_class in (list, dict):
+                continue
             if all(key in possible_class.__dataclass_fields__ for key, _ in obj):
                 found_class = possible_class
         if found_class is None:
