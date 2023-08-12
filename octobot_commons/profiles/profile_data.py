@@ -68,6 +68,13 @@ class TentaclesData:
 
 
 @dataclasses.dataclass
+class BacktestingContext:
+    start_time_delta: float = 0
+    starting_portfolio: dict = dataclasses.field(default_factory=dict)
+    exchanges: list[str] = dataclasses.field(default_factory=list)
+
+
+@dataclasses.dataclass
 class OptionsData:
     values: dict = dataclasses.field(default_factory=dict)
 
@@ -81,6 +88,7 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
     trader: TraderData = TraderData()
     trader_simulator: TraderSimulatorData = TraderSimulatorData()
     tentacles: list[TentaclesData] = dataclasses.field(default_factory=list)
+    backtesting_context: BacktestingContext = BacktestingContext()
     options: OptionsData = OptionsData()
 
     # pylint: disable=E1134
@@ -106,6 +114,8 @@ class ProfileData(minimizable_dataclass.MinimizableDataclass):
                 if self.tentacles
                 else []
             )
+        if isinstance(self.backtesting_context, dict):
+            self.backtesting_context = BacktestingContext(**self.backtesting_context)
         if isinstance(self.options, dict):
             self.options = OptionsData(**self.options)
 

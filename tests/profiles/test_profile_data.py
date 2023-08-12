@@ -17,6 +17,7 @@ import json
 import pytest
 
 import octobot_commons.profiles as profiles
+import octobot_commons.profiles.profile_data as profile_data_import
 import octobot_commons.constants as constants
 import octobot_commons.enums as enums
 
@@ -74,6 +75,14 @@ def profile_data_dict():
             'values': {
                 'plop_key': 'hola senior'
             }
+        }, 'backtesting_context': {
+            'start_time_delta': 11313.22,
+            'starting_portfolio': {
+                'plop_key': 'hola senior'
+            },
+            'exchanges': [
+                'binance', 'kucoin'
+            ]
         }
     }
 
@@ -104,7 +113,10 @@ def min_profile_data_dict():
                     }
                 },
             },
-        ], 'options': {
+        ],
+        'backtesting_context': {
+            'start_time_delta': 11313.22
+        }, 'options': {
             'values': {
                 'plop_key': 'hola !!!',
                 'jour': 'nuit',
@@ -177,8 +189,10 @@ def test_from_min_dict(min_profile_data_dict):
     full_profile_data_dict = profile_data.to_dict(include_default_values=True)
     assert len(full_profile_data_dict) > len(min_profile_data_dict)
     profile_data_dict = profile_data.to_dict(include_default_values=False)
-    # default values in values but all keys are present
-    assert len(profile_data_dict) == len(full_profile_data_dict)
+    # default values in values but: keys are present except for exchanges, which content is empty (default)
+    full_profile_data_dict_keys_without_exchange = list(full_profile_data_dict.keys())
+    full_profile_data_dict_keys_without_exchange.remove("exchanges")
+    assert sorted(list(profile_data_dict.keys())) == sorted(full_profile_data_dict_keys_without_exchange)
 
 
 def test_from_dict_objects(profile_data_dict):
@@ -204,6 +218,7 @@ def test_from_dict_objects(profile_data_dict):
     assert profile_data.tentacles[0].name == "plopEvaluator"
     assert profile_data.tentacles[1].config["other"]["l"] == [1, 2]
     assert profile_data.options.values['plop_key'] == 'hola senior'
+    assert profile_data.backtesting_context == profile_data_import.BacktestingContext()
 
 
 def test_to_dict(profile_data_dict):
