@@ -14,7 +14,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-
+import contextlib
 import logging
 
 import octobot_commons.timestamp_util as timestamp_util
@@ -64,6 +64,19 @@ def get_global_logger_level() -> object:
     :return: the global logger level
     """
     return logging.getLogger().getEffectiveLevel()
+
+
+@contextlib.contextmanager
+def temporary_log_level(level):
+    """
+    Sets the log level to the given level inside this context
+    """
+    previous_level = get_global_logger_level()
+    try:
+        set_global_logger_level(level)
+        yield
+    finally:
+        set_global_logger_level(previous_level)
 
 
 def get_logger_level_per_handler() -> list:
