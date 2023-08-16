@@ -36,6 +36,7 @@ from octobot_commons.logging.logging_util import (
     get_errors_count,
     reset_errors_count,
     register_error_notifier,
+    set_enable_web_interface_logs,
 )
 
 __all__ = [
@@ -59,4 +60,5 @@ __all__ = [
     "get_errors_count",
     "reset_errors_count",
     "register_error_notifier",
+    "set_enable_web_interface_logs",
 ]
