@@ -35,6 +35,7 @@ error_notifier_callbacks = []
 LOGS_MAX_COUNT = 1000
 
 STORED_LOG_MIN_LEVEL = logging.WARNING
+ENABLE_WEB_INTERFACE_LOGS = True
 ERROR_PUBLICATION_ENABLED = True
 SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED = False
 
@@ -261,7 +262,11 @@ class BotLogger:
         :param message: the log message
         :param level: the log level
         """
-        if STORED_LOG_MIN_LEVEL <= level and get_global_logger_level() <= level:
+        if (
+            ENABLE_WEB_INTERFACE_LOGS
+            and STORED_LOG_MIN_LEVEL <= level
+            and get_global_logger_level() <= level
+        ):
             self._web_interface_publish_log(message, level)
             if not ERROR_PUBLICATION_ENABLED and logging.ERROR <= level:
                 global SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED
@@ -322,3 +327,11 @@ def set_error_publication_enabled(enabled) -> None:
         add_log(logging.ERROR, None, None, keep_log=False, call_notifiers=True)
     else:
         SHOULD_PUBLISH_LOGS_WHEN_RE_ENABLED = False
+
+
+def set_enable_web_interface_logs(enabled):
+    """
+    Disable or enable errors storage in web interface
+    """
+    global ENABLE_WEB_INTERFACE_LOGS
+    ENABLE_WEB_INTERFACE_LOGS = enabled
