@@ -17,6 +17,7 @@
 import contextlib
 import logging
 
+import octobot_commons.constants as constants
 import octobot_commons.timestamp_util as timestamp_util
 
 LOG_DATABASE = "log_db"
@@ -221,7 +222,9 @@ class BotLogger:
         :param include_exception_name: when True adds the __class__.__name__ of the exception at the end of the message
         :param skip_post_callback: when True, the error callback wont be called
         """
-        self.logger.exception(exception, **kwargs)
+        extra = kwargs.get("extra", {})
+        extra[constants.EXCEPTION_DESC] = error_message
+        self.logger.exception(exception, extra=extra, **kwargs)
         if publish_error_if_necessary:
             message = error_message
             if message is None:
@@ -230,7 +233,11 @@ class BotLogger:
                 )
             elif include_exception_name:
                 message = f"{message} (error: {exception.__class__.__name__})"
-            self.error(message, skip_post_callback=True)
+            self.error(
+                message,
+                skip_post_callback=True,
+                extra={constants.IS_EXCEPTION_DESC: True},
+            )
         self._post_callback_if_necessary(exception, error_message, skip_post_callback)
 
     def critical(self, message, *args, **kwargs) -> None:
