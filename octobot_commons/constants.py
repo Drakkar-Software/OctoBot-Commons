@@ -213,3 +213,7 @@ DB_SEPARATOR = "_"
 TINYDB_EXT = ".json"
 MAX_BACKTESTING_RUNS = 500000
 MAX_OPTIMIZER_RUNS = 50000
+
+# Logging
+EXCEPTION_DESC = "exception_desc"
+IS_EXCEPTION_DESC = "is_exception_desc"
