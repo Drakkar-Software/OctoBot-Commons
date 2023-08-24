@@ -16,18 +16,18 @@
 import copy
 import dataclasses
 
-import octobot_commons.updatable_dataclass as updatable_dataclass
+import octobot_commons.dataclasses
 
 
 @dataclasses.dataclass
-class TestPersonClass(updatable_dataclass.UpdatableDataclass):
+class TestPersonClass(octobot_commons.dataclasses.UpdatableDataclass):
     name: str = ""
     age: int = 0
     likes: list = dataclasses.field(default_factory=list)
 
 
 @dataclasses.dataclass
-class TestPersonGroupClass(updatable_dataclass.UpdatableDataclass):
+class TestPersonGroupClass(octobot_commons.dataclasses.UpdatableDataclass):
     identifier: str = ""
     present_people: list[TestPersonClass] = dataclasses.field(default_factory=list)
     absent_people: list[TestPersonClass] = dataclasses.field(default_factory=list)
