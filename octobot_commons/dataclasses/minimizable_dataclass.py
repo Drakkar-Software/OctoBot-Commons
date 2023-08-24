@@ -14,16 +14,10 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import dataclasses
+import octobot_commons.dataclasses.flexible_dataclass as flexible_dataclass
 
 
-class MinimizableDataclass:
-    @classmethod
-    def from_dict(cls, dict_value: dict):
-        """
-        Creates a new instance of cls from the given dict
-        """
-        return cls(**dict_value)
-
+class MinimizableDataclass(flexible_dataclass.FlexibleDataclass):
     def to_dict(self, include_default_values=True) -> dict:
         """
         Creates a new dict from self. Recursively processes any MinimizableDataclass instance attribute

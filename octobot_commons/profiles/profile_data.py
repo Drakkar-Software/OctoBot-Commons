@@ -18,12 +18,12 @@ import dataclasses
 import typing
 
 import octobot_commons.profiles.profile as profile_import
-import octobot_commons.minimizable_dataclass as minimizable_dataclass
+import octobot_commons.dataclasses
 import octobot_commons.constants as constants
 
 
 @dataclasses.dataclass
-class ProfileDetailsData:
+class ProfileDetailsData(octobot_commons.dataclasses.FlexibleDataclass):
     name: str = ""
     id: typing.Union[str, None] = None
     bot_id: typing.Union[str, None] = None
@@ -31,24 +31,24 @@ class ProfileDetailsData:
 
 
 @dataclasses.dataclass
-class CryptoCurrencyData:
+class CryptoCurrencyData(octobot_commons.dataclasses.FlexibleDataclass):
     trading_pairs: list[str]
     name: typing.Union[str, None] = None
 
 
 @dataclasses.dataclass
-class ExchangeData:
+class ExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
     exchange_credential_id: typing.Union[str, None] = None
     internal_name: typing.Union[str, None] = None
 
 
 @dataclasses.dataclass
-class TraderData:
+class TraderData(octobot_commons.dataclasses.FlexibleDataclass):
     enabled: bool = True
 
 
 @dataclasses.dataclass
-class TraderSimulatorData:
+class TraderSimulatorData(octobot_commons.dataclasses.FlexibleDataclass):
     enabled: bool = False
     starting_portfolio: dict[str, float] = dataclasses.field(default_factory=dict)
     maker_fees: float = 0.1
@@ -56,68 +56,62 @@ class TraderSimulatorData:
 
 
 @dataclasses.dataclass
-class TradingData:
+class TradingData(octobot_commons.dataclasses.FlexibleDataclass):
     reference_market: str
     risk: float = 1.0
 
 
 @dataclasses.dataclass
-class TentaclesData:
+class TentaclesData(octobot_commons.dataclasses.FlexibleDataclass):
     name: str
     config: dict = dataclasses.field(default_factory=dict)
 
 
 @dataclasses.dataclass
-class BacktestingContext:
+class BacktestingContext(octobot_commons.dataclasses.FlexibleDataclass):
     start_time_delta: float = 0
     starting_portfolio: dict = dataclasses.field(default_factory=dict)
     exchanges: list[str] = dataclasses.field(default_factory=list)
 
 
 @dataclasses.dataclass
-class OptionsData:
+class OptionsData(octobot_commons.dataclasses.FlexibleDataclass):
     values: dict = dataclasses.field(default_factory=dict)
 
 
 @dataclasses.dataclass
-class ProfileData(minimizable_dataclass.MinimizableDataclass):
+class ProfileData(octobot_commons.dataclasses.MinimizableDataclass):
     profile_details: ProfileDetailsData
     crypto_currencies: list[CryptoCurrencyData]
     trading: TradingData
     exchanges: list[ExchangeData] = dataclasses.field(default_factory=list)
     trader: TraderData = TraderData()
-    trader_simulator: TraderSimulatorData = TraderSimulatorData()
+    trader_simulator: TraderSimulatorData = dataclasses.field(
+        default_factory=TraderSimulatorData
+    )
     tentacles: list[TentaclesData] = dataclasses.field(default_factory=list)
-    backtesting_context: BacktestingContext = BacktestingContext()
-    options: OptionsData = OptionsData()
+    backtesting_context: BacktestingContext = dataclasses.field(
+        default_factory=BacktestingContext
+    )
+    options: OptionsData = dataclasses.field(default_factory=OptionsData)
 
     # pylint: disable=E1134
     def __post_init__(self):
-        if isinstance(self.profile_details, dict):
-            self.profile_details = ProfileDetailsData(**self.profile_details)
         if self.crypto_currencies and isinstance(self.crypto_currencies[0], dict):
             self.crypto_currencies = [
-                CryptoCurrencyData(**crypto_currency)
+                CryptoCurrencyData.from_dict(crypto_currency)
                 for crypto_currency in self.crypto_currencies
             ]
         if self.exchanges and isinstance(self.exchanges[0], dict):
-            self.exchanges = [ExchangeData(**exchange) for exchange in self.exchanges]
-        if isinstance(self.trader, dict):
-            self.trader = TraderData(**self.trader)
-        if isinstance(self.trader_simulator, dict):
-            self.trader_simulator = TraderSimulatorData(**self.trader_simulator)
-        if isinstance(self.trading, dict):
-            self.trading = TradingData(**self.trading)
+            self.exchanges = [
+                ExchangeData.from_dict(exchange) for exchange in self.exchanges
+            ]
         if self.tentacles and isinstance(self.tentacles[0], dict):
             self.tentacles = (
-                [TentaclesData(**tentacle) for tentacle in self.tentacles]
+                [TentaclesData.from_dict(tentacle) for tentacle in self.tentacles]
                 if self.tentacles
                 else []
             )
-        if isinstance(self.backtesting_context, dict):
-            self.backtesting_context = BacktestingContext(**self.backtesting_context)
-        if isinstance(self.options, dict):
-            self.options = OptionsData(**self.options)
 
     @classmethod
     def from_profile(cls, profile: profile_import.Profile):
