@@ -76,6 +76,7 @@ def profile_data_dict():
             }
         }, 'backtesting_context': {
             'start_time_delta': 11313.22,
+            'update_interval': 444,
             'starting_portfolio': {
                 'plop_key': 'hola senior'
             },

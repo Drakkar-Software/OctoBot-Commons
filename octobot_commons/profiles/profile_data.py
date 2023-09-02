@@ -70,6 +70,7 @@ class TentaclesData(octobot_commons.dataclasses.FlexibleDataclass):
 @dataclasses.dataclass
 class BacktestingContext(octobot_commons.dataclasses.FlexibleDataclass):
     start_time_delta: float = 0
+    update_interval: float = 7 * constants.DAYS_TO_SECONDS
     starting_portfolio: dict = dataclasses.field(default_factory=dict)
     exchanges: list[str] = dataclasses.field(default_factory=list)
 
