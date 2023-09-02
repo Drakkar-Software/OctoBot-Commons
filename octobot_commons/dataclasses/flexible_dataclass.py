@@ -19,7 +19,7 @@ import typing
 
 @dataclasses.dataclass
 class FlexibleDataclass:
-    class_field_cache: typing.ClassVar[dict] = {}
+    _class_field_cache: typing.ClassVar[dict] = {}
     """
     Implements from_dict which can be called to instantiate a new instance of this class from a dict. Using from_dict 
     ignores any additional key from the given dict that is not defined as a dataclass field.
@@ -32,15 +32,15 @@ class FlexibleDataclass:
         Creates a new instance of cls from the given dict, ignoring additional dict values
         """
         if isinstance(dict_value, dict):
-            if not cls.class_field_cache:
-                cls.class_field_cache = {
+            if not cls._class_field_cache:
+                cls._class_field_cache = {
                     f.name: f.type for f in dataclasses.fields(cls) if f.init
                 }
 
             fields_values = {
-                k: _get_nested_class(v, cls.class_field_cache[k])
+                k: _get_nested_class(v, cls._class_field_cache[k])
                 for k, v in dict_value.items()
-                if k in cls.class_field_cache
+                if k in cls._class_field_cache
             }
             return cls(**fields_values)
         return dict_value
