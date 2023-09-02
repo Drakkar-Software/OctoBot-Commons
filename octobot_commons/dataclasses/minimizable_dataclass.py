@@ -48,7 +48,8 @@ def _asdict_without_default_factory(possible_classes):
             if all(key in possible_class.__dataclass_fields__ for key, _ in obj):
                 found_class = possible_class
         if found_class is None:
-            raise KeyError(f"class not found for asdict of {obj}")
+            # class not found, include all values
+            return dict(obj)
         for key, val in obj:
             default_field_value = found_class.__dataclass_fields__[key].default
             if default_field_value is dataclasses.MISSING and (
