@@ -57,7 +57,8 @@ class UpdatableDataclass:
         (unset values in other are ignored)
         """
         update_content = self.__class__()
-        for field_name in self.__dataclass_fields__:  # pylint: disable=no-member
+        for field in dataclasses.fields(self):
+            field_name = field.name
             self_val = getattr(self, field_name)
             other_val = getattr(other, field_name)
             if isinstance(self_val, UpdatableDataclass) and other_val:
