@@ -40,9 +40,10 @@ class TestPersonGroupClass(octobot_commons.dataclasses.FlexibleDataclass):
 
 
 def test_from_dict():
-    person_1 = TestPersonClass(name="rombur", age=33)
+    person_1 = TestPersonClass(name="rhombur", age=33)
     dict_1 = dataclasses.asdict(person_1)
     person_1_1 = TestPersonClass.from_dict(dict_1)
+    assert list(person_1_1.get_field_names()) == list(person_1.get_field_names()) == ['name', 'age', 'likes']
     assert person_1 == person_1_1
     person_1_1.name = "leto"
 
@@ -68,3 +69,14 @@ def test_default_values():
     assert group_0.leader is not group_0_1.leader
     group_0.leader.name = "erasme"
     assert group_0.leader.name != group_0_1.leader.name
+
+
+def test_get_field_names():
+    person_1 = TestPersonClass()
+    person_2 = TestPersonClass()
+    group_1 = TestPersonGroupClass()
+    group_2 = TestPersonGroupClass()
+
+    assert list(person_1.get_field_names()) == list(person_2.get_field_names()) == ['name', 'age', 'likes']
+    assert list(group_1.get_field_names()) == list(group_2.get_field_names()) == \
+       ['identifier', 'present_people', 'absent_people', 'leader']

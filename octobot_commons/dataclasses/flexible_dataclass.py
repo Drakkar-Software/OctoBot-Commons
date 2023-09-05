@@ -32,18 +32,24 @@ class FlexibleDataclass:
         Creates a new instance of cls from the given dict, ignoring additional dict values
         """
         if isinstance(dict_value, dict):
-            if not cls._class_field_cache:
-                cls._class_field_cache = {
-                    f.name: f.type for f in dataclasses.fields(cls) if f.init
-                }
-
             fields_values = {
                 k: _get_nested_class(v, cls._class_field_cache[k])
                 for k, v in dict_value.items()
-                if k in cls._class_field_cache
+                if k in cls.get_field_names()
             }
             return cls(**fields_values)
         return dict_value
+
+    @classmethod
+    def get_field_names(cls):
+        """
+        :return a generator over the given FlexibleDataclass field names
+        """
+        if not cls._class_field_cache:
+            cls._class_field_cache = {
+                f.name: f.type for f in dataclasses.fields(cls) if f.init
+            }
+        return cls._class_field_cache.keys()
 
 
 def _get_nested_class(value, target_type):
