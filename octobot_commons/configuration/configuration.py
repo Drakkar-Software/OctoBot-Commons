@@ -285,6 +285,8 @@ class Configuration:
                 config_operations.merge_dictionaries_by_appending_keys,
                 [self.config] + updated_configs,
             )
+        # ensure encrypted fields
+        config_file_manager.encrypt_values_if_necessary(self.config)
 
         # save config
         self.save(
