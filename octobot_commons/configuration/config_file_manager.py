@@ -131,6 +131,16 @@ def jsonify_config(config) -> str:
     :param config: the config
     :return: the jsonified config
     """
+    encrypt_values_if_necessary(config)
+    return dump_formatted_json(config)
+
+
+def encrypt_values_if_necessary(config) -> None:
+    """
+    check exchange keys encryption
+    """
+    if commons_constants.CONFIG_EXCHANGES not in config:
+        return
     # check exchange keys encryption
     for exchange, exchange_config in config[commons_constants.CONFIG_EXCHANGES].items():
         try:
@@ -140,8 +150,6 @@ def jsonify_config(config) -> str:
             config[commons_constants.CONFIG_EXCHANGES][exchange] = {
                 key: "" for key in commons_constants.CONFIG_EXCHANGE_ENCRYPTED_VALUES
             }
-
-    return dump_formatted_json(config)
 
 
 def handle_encrypted_value(value_key, config_element, verbose=False) -> bool:
