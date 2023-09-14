@@ -14,7 +14,6 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
-import json
 import copy
 import os
 import shutil
@@ -173,8 +172,7 @@ class Profile:
         Saves the current profile configuration file
         :return: None
         """
-        with open(self.config_file(), "w") as profile_file:
-            json.dump(self.as_dict(), profile_file, indent=4, sort_keys=True)
+        json_util.safe_dump(self.as_dict(), self.config_file())
 
     def rename_folder(self, new_name, should_raise) -> str:
         """
