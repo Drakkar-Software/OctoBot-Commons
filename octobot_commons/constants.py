@@ -218,3 +218,25 @@ MAX_OPTIMIZER_RUNS = 50000
 # Logging
 EXCEPTION_DESC = "exception_desc"
 IS_EXCEPTION_DESC = "is_exception_desc"
+
+# from https://www.coingecko.com/en/categories/stablecoins
+USD_LIKE_COINS = [
+    "USDT",
+    "USDC",
+    "TUSD",
+    "BUSD",
+    "DAI",
+    "USD",
+    "FRAX",
+    "USDD",
+    "USDP",
+    "GUSD",
+    "LUSD",
+    "FDUSD",
+    "ALUSD",
+    "USDTC",
+    "MIM",
+    "DOLA",
+    "BOB",
+    "MIMATIC",
+]
