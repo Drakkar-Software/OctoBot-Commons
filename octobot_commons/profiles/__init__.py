@@ -35,6 +35,7 @@ from octobot_commons.profiles import profile_data
 from octobot_commons.profiles.profile_data import (
     ProfileData,
     ExchangeData,
+    MinimalFund,
     OptionsData,
 )
 
@@ -48,5 +49,6 @@ __all__ = [
     "download_and_install_profile",
     "ProfileData",
     "ExchangeData",
+    "MinimalFund",
     "OptionsData",
 ]

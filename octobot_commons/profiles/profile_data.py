@@ -56,9 +56,24 @@ class TraderSimulatorData(octobot_commons.dataclasses.FlexibleDataclass):
 
 
 @dataclasses.dataclass
+class MinimalFund(octobot_commons.dataclasses.FlexibleDataclass):
+    asset: str
+    value: float
+
+
+@dataclasses.dataclass
 class TradingData(octobot_commons.dataclasses.FlexibleDataclass):
     reference_market: str
+    minimal_funds: list[MinimalFund] = dataclasses.field(default_factory=list)
     risk: float = 1.0
+
+    # pylint: disable=E1134
+    def __post_init__(self):
+        if self.minimal_funds and isinstance(self.minimal_funds[0], dict):
+            self.minimal_funds = [
+                MinimalFund.from_dict(minimal_fund)
+                for minimal_fund in self.minimal_funds
+            ]
 
 
 @dataclasses.dataclass

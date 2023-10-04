@@ -54,6 +54,16 @@ def profile_data_dict():
             'taker_fees': 0.1
         }, 'trading': {
             'reference_market': 'BTC',
+            'minimal_funds': [
+                {
+                    "asset": "BTC",
+                    "value": 12,
+                },
+                {
+                    "asset": "PLOP",
+                    "value": 0.1111,
+                }
+            ],
             'risk': 0.5
         }, 'tentacles': [
             {
