@@ -138,6 +138,7 @@ class UserCommands(enum.Enum):
     """
 
     MANUAL_TRIGGER = "manual_trigger"
+    OPTIMIZE_INITIAL_PORTFOLIO = "optimize_initial_portfolio"
     RELOAD_CONFIG = "reload_config"
     RELOAD_SCRIPT = "reload_script"
     CLEAR_PLOTTING_CACHE = "clear_plotting_cache"
