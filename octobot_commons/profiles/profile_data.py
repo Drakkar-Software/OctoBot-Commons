@@ -58,7 +58,8 @@ class TraderSimulatorData(octobot_commons.dataclasses.FlexibleDataclass):
 @dataclasses.dataclass
 class MinimalFund(octobot_commons.dataclasses.FlexibleDataclass):
     asset: str
-    value: float
+    available: float
+    total: float
 
 
 @dataclasses.dataclass

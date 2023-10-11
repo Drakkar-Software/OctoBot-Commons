@@ -57,11 +57,13 @@ def profile_data_dict():
             'minimal_funds': [
                 {
                     "asset": "BTC",
-                    "value": 12,
+                    "available": 12,
+                    "total": 12,
                 },
                 {
                     "asset": "PLOP",
-                    "value": 0.1111,
+                    "available": 0.1111,
+                    "total": 0.1111,
                 }
             ],
             'risk': 0.5
