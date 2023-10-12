@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.*
+import copy
+
 import pytest
 
 import octobot_commons.profiles as profiles
@@ -63,7 +65,7 @@ def profile_data_dict():
                 {
                     "asset": "PLOP",
                     "available": 0.1111,
-                    "total": 0.1111,
+                    "total": 0.2222,
                 }
             ],
             'risk': 0.5
@@ -169,6 +171,14 @@ def test_to_profile(profile):
 
 
 def test_from_dict(profile_data_dict):
+    # use second MinimalFund syntax
+    profile_data_dict = copy.deepcopy(profile_data_dict)
+    profile_data_dict["trading"]['minimal_funds'].append(
+        {
+            "asset": "ETH",
+            "value": 111.2,
+        }
+    )
     profile_data = profiles.ProfileData.from_dict(profile_data_dict)
     # check one element per attribute to be sure it's all parsed
     assert profile_data.profile_details.name == "profile_name 42"
@@ -179,6 +189,11 @@ def test_from_dict(profile_data_dict):
     assert profile_data.trader_simulator.enabled is False
     assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
     assert profile_data.trading.risk == 0.5
+    assert profile_data.trading.minimal_funds == [
+        profiles.MinimalFund("BTC", 12, 12),
+        profiles.MinimalFund("PLOP", 0.1111, 0.2222),
+        profiles.MinimalFund("ETH", 111.2, 111.2),
+    ]
     assert profile_data.tentacles[0].name == "plopEvaluator"
     assert profile_data.tentacles[1].config["other"]["l"] == [1, 2]
 
