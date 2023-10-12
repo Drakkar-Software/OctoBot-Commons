@@ -14,6 +14,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import copy
 import dataclasses
 import typing
 
@@ -60,6 +61,16 @@ class MinimalFund(octobot_commons.dataclasses.FlexibleDataclass):
     asset: str
     available: float
     total: float
+
+    @classmethod
+    def from_dict(cls, dict_value: dict):
+        to_use_dict = copy.copy(dict_value)
+        if "value" in dict_value:
+            if "available" not in dict_value:
+                to_use_dict["available"] = dict_value["value"]
+            if "total" not in dict_value:
+                to_use_dict["total"] = dict_value["value"]
+        return super().from_dict(to_use_dict)
 
 
 @dataclasses.dataclass
