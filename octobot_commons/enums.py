@@ -501,3 +501,7 @@ class ProfileRisk(enum.Enum):
 class ProfileType(enum.Enum):
     LIVE = "live"
     BACKTESTING = "backtesting"
+
+
+class SignalHistoryTypes(enum.Enum):
+    GPT = "gpt"
