@@ -13,6 +13,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+
+import typing
 import octobot_commons.databases.implementations.cache_database as cache_database
 import octobot_commons.enums as commons_enums
 import octobot_commons.errors as errors
@@ -174,6 +176,27 @@ class CacheTimestampDatabase(cache_database.CacheDatabase):
                 f"Data to set are required to have the same length as the timestamps list. "
                 f"Error on the {key} values"
             )
+
+    async def reset_values(self, value_keys: typing.List[str]) -> None:
+        """
+        Reset value_keys on the current cache
+        :param value_keys: identifiers of the values
+        :return: None
+        """
+        await self._ensure_metadata()
+        await self._ensure_local_cache(
+            commons_enums.CacheDatabaseColumns.TIMESTAMP.value
+        )
+        try:
+            for row in self._local_cache.values():
+                for value_key in value_keys:
+                    if value_key in row:
+                        del row[value_key]
+            await self._update_full_database()
+        except Exception as error:
+            raise RuntimeError(
+                f"Failed to clear cache for value keys: {value_keys}"
+            ) from error
 
     async def _update_full_database(self):
         # to be called to avoid multiple upsert / update which can be very slow: take full advantage of multiple inserts
