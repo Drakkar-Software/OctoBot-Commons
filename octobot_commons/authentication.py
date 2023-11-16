@@ -27,15 +27,16 @@ class Authenticator(singleton.Singleton):
     Abstract class to be implemented when using authenticated requests
     """
 
-    def __init__(self):
+    def __init__(self, use_as_singleton=True):
         self.logger: bot_logging.BotLogger = bot_logging.get_logger(
             self.__class__.__name__
         )
         self.initialized_event: asyncio.Event = None
         self.supports: None
         self.feed_callbacks = {}
-        # also register this instance for the base Authenticator class in singleton
-        self.use_as_singleton_instance()
+        if use_as_singleton:
+            # also register this instance for the base Authenticator class in singleton
+            self.use_as_singleton_instance()
 
     # pylint: disable=W0212
     def use_as_singleton_instance(self):
