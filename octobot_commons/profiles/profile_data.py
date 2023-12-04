@@ -224,14 +224,23 @@ class ProfileData(octobot_commons.dataclasses.MinimizableDataclass):
                     }
                     for crypto_currency in self.crypto_currencies
                 },
-                constants.CONFIG_EXCHANGES: {},
+                constants.CONFIG_EXCHANGES: {
+                    exchange_details.internal_name: {
+                        constants.CONFIG_ENABLED_OPTION: True,
+                        constants.CONFIG_EXCHANGE_TYPE: constants.DEFAULT_EXCHANGE_TYPE,
+                    }
+                    for exchange_details in self.exchanges
+                },
                 constants.CONFIG_TRADER: {
                     constants.CONFIG_ENABLED_OPTION: self.trader.enabled,
                     constants.CONFIG_LOAD_TRADE_HISTORY: True,
                 },
                 constants.CONFIG_SIMULATOR: {
                     constants.CONFIG_ENABLED_OPTION: self.trader_simulator.enabled,
-                    constants.CONFIG_STARTING_PORTFOLIO: self.trader_simulator.starting_portfolio,
+                    constants.CONFIG_STARTING_PORTFOLIO: self.trader_simulator.starting_portfolio
+                    or self.backtesting_context.starting_portfolio
+                    if self.backtesting_context
+                    else {},
                     constants.CONFIG_SIMULATOR_FEES: {
                         constants.CONFIG_SIMULATOR_FEES_MAKER: self.trader_simulator.maker_fees,
                         constants.CONFIG_SIMULATOR_FEES_TAKER: self.trader_simulator.taker_fees,
