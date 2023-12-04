@@ -26,6 +26,7 @@ from octobot_commons.profiles.profile_sharing import (
     export_profile,
     install_profile,
     import_profile,
+    import_profile_data_as_profile,
     download_profile,
     download_and_install_profile,
 )
@@ -45,6 +46,7 @@ __all__ = [
     "export_profile",
     "install_profile",
     "import_profile",
+    "import_profile_data_as_profile",
     "download_profile",
     "download_and_install_profile",
     "ProfileData",

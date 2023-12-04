@@ -106,7 +106,7 @@ class Configuration:
         :return: None
         """
         profile = self.profile_by_id[profile_id]
-        if profile.read_only:
+        if profile.read_only and not profile.imported:
             raise errors.ProfileRemovalError(f"{profile.name} profile can't be removed")
         try:
             shutil.rmtree(profile.path)
