@@ -1,3 +1,4 @@
+# pylint: disable=R0913,W0718,W0706,C0415
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -34,6 +35,15 @@ async def convert_profile_data_to_profile_directory(
     output_path: str,
     aiohttp_session,
 ):
+    """
+    Creates a profile folder from the given ProfileData
+    :param profile_data: path to the profile zipped archive
+    :param description: profile description
+    :param risk: profile risk
+    :param avatar_url: profile avatar_url
+    :param output_path: profile folder path
+    :param aiohttp_session: session to use
+    """
     logger = bot_logging.get_logger(__name__)
     if os.path.exists(output_path):
         raise OSError(f"{output_path} already exists")
