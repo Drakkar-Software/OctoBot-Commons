@@ -72,6 +72,7 @@ class Profile:
         self.complexity: enums.ProfileComplexity = enums.ProfileComplexity.MEDIUM
         self.risk: enums.ProfileRisk = enums.ProfileRisk.MODERATE
         self.profile_type: enums.ProfileType = enums.ProfileType.LIVE
+        self.extra_backtesting_time_frames = []
 
         self.config: dict = {}
 
@@ -105,6 +106,9 @@ class Profile:
         )
         self.profile_type = enums.ProfileType(
             profile_config.get(constants.CONFIG_TYPE, enums.ProfileType.LIVE.value)
+        )
+        self.extra_backtesting_time_frames = profile_config.get(
+            constants.CONFIG_EXTRA_BACKTESTING_TIME_FRAMES, []
         )
         self.config = profile_dict[constants.PROFILE_CONFIG]
         if self.avatar and self.path:
@@ -250,6 +254,7 @@ class Profile:
                 constants.CONFIG_TYPE: self.profile_type.value
                 if self.profile_type
                 else None,
+                constants.CONFIG_EXTRA_BACKTESTING_TIME_FRAMES: self.extra_backtesting_time_frames,
             },
             constants.PROFILE_CONFIG: self.config,
         }

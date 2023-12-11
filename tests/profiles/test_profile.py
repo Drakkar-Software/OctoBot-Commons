@@ -170,6 +170,7 @@ def test_as_dict(profile):
             constants.CONFIG_COMPLEXITY: enums.ProfileComplexity.MEDIUM.value,
             constants.CONFIG_RISK: enums.ProfileRisk.MODERATE.value,
             constants.CONFIG_TYPE: enums.ProfileType.LIVE.value,
+            constants.CONFIG_EXTRA_BACKTESTING_TIME_FRAMES: [],
         },
         constants.PROFILE_CONFIG: {},
     }
@@ -180,6 +181,7 @@ def test_as_dict(profile):
     profile.complexity = enums.ProfileComplexity.DIFFICULT
     profile.risk = enums.ProfileRisk.LOW
     profile.profile_type = enums.ProfileType.BACKTESTING
+    profile.extra_backtesting_time_frames = [enums.TimeFrames.ONE_DAY.value]
     assert profile.as_dict() == {
         constants.CONFIG_PROFILE: {
             constants.CONFIG_ID: "default",
@@ -192,6 +194,7 @@ def test_as_dict(profile):
             constants.CONFIG_COMPLEXITY: enums.ProfileComplexity.DIFFICULT.value,
             constants.CONFIG_RISK: enums.ProfileRisk.LOW.value,
             constants.CONFIG_TYPE: enums.ProfileType.BACKTESTING.value,
+            constants.CONFIG_EXTRA_BACKTESTING_TIME_FRAMES: [enums.TimeFrames.ONE_DAY.value],
         },
         constants.PROFILE_CONFIG: {
             "a": 1
