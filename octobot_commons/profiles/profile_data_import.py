@@ -25,6 +25,9 @@ import octobot_commons.aiohttp_util as aiohttp_util
 import octobot_commons.enums as enums
 
 IMPORTED_AVATAR = "avatar"
+IMPORTED_PROFILES_DEFAULT_EXTRA_BACKTESTING_TIMEFRAME = (
+    enums.TimeFrames.FIFTEEN_MINUTES.value
+)
 
 
 async def convert_profile_data_to_profile_directory(
@@ -79,6 +82,9 @@ def _get_profile(
     profile.risk = risk
     profile.profile_id = str(uuid.uuid4().hex)
     profile.read_only = True
+    profile.extra_backtesting_time_frames = [
+        IMPORTED_PROFILES_DEFAULT_EXTRA_BACKTESTING_TIMEFRAME
+    ]
     return profile
 
 
