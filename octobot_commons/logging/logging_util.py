@@ -229,6 +229,7 @@ class BotLogger:
         :param skip_post_callback: when True, the error callback wont be called
         """
         extra = kwargs.get("extra", {})
+        origin_error_message = error_message
         error_message = (
             self._process_log_callback(error_message)
             if error_message
@@ -237,7 +238,7 @@ class BotLogger:
         extra[constants.EXCEPTION_DESC] = error_message
         self.logger.exception(exception, extra=extra, **kwargs)
         if publish_error_if_necessary:
-            message = error_message
+            message = origin_error_message
             if message is None:
                 message = (
                     str(exception) if str(exception) else exception.__class__.__name__
