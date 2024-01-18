@@ -34,7 +34,7 @@ async def download_stream_file(
     """
     last_modified = None
     async with aiohttp_session.get(file_url) as resp:
-        if resp.status == 200:
+        if resp.status != 200:
             try:
                 text = await resp.text()
             except BaseException as err:
