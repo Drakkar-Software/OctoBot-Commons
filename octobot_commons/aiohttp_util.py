@@ -1,3 +1,4 @@
+# pylint: disable=W0718
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -33,9 +34,13 @@ async def download_stream_file(
     """
     last_modified = None
     async with aiohttp_session.get(file_url) as resp:
-        if resp.status != 200:
+        if resp.status == 200:
+            try:
+                text = await resp.text()
+            except BaseException as err:
+                text = f"error when reading resp text: {err}"
             raise RuntimeError(
-                f"Failed to download file at url : {file_url} (status: {resp.status})"
+                f"Failed to download file at url : {file_url} (status: {resp.status}, text: {text})"
             )
         while True:
             last_modified = resp.headers.get("Last-Modified", "unknown")
