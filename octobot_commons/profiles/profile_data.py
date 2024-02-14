@@ -238,9 +238,11 @@ class ProfileData(octobot_commons.dataclasses.MinimizableDataclass):
                 constants.CONFIG_SIMULATOR: {
                     constants.CONFIG_ENABLED_OPTION: self.trader_simulator.enabled,
                     constants.CONFIG_STARTING_PORTFOLIO: self.trader_simulator.starting_portfolio
-                    or self.backtesting_context.starting_portfolio
-                    if self.backtesting_context
-                    else {},
+                    or (
+                        self.backtesting_context.starting_portfolio
+                        if self.backtesting_context
+                        else {}
+                    ),
                     constants.CONFIG_SIMULATOR_FEES: {
                         constants.CONFIG_SIMULATOR_FEES_MAKER: self.trader_simulator.maker_fees,
                         constants.CONFIG_SIMULATOR_FEES_TAKER: self.trader_simulator.taker_fees,
