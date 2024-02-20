@@ -61,13 +61,11 @@ def profile_data_dict():
                     "asset": "BTC",
                     "available": 12,
                     "total": 12,
-                    "usd_like_value": 1,
                 },
                 {
                     "asset": "PLOP",
                     "available": 0.1111,
                     "total": 0.2222,
-                    "usd_like_value": 0,
                 }
             ],
             'risk': 0.5
@@ -192,8 +190,8 @@ def test_from_dict(profile_data_dict):
     assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
     assert profile_data.trading.risk == 0.5
     assert profile_data.trading.minimal_funds == [
-        profiles.MinimalFund("BTC", 12, 12, usd_like_value=1),
-        profiles.MinimalFund("PLOP", 0.1111, 0.2222, usd_like_value=0),
+        profiles.MinimalFund("BTC", 12, 12),
+        profiles.MinimalFund("PLOP", 0.1111, 0.2222),
         profiles.MinimalFund("ETH", 111.2, 111.2),
     ]
     assert profile_data.tentacles[0].name == "plopEvaluator"
