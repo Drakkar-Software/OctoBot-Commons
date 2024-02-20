@@ -61,6 +61,7 @@ class MinimalFund(octobot_commons.dataclasses.FlexibleDataclass):
     asset: str
     available: float
     total: float
+    usd_like_value: float = 0
 
     @classmethod
     def from_dict(cls, dict_value: dict):
