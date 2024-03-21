@@ -401,6 +401,7 @@ class SignalsAttrs(enum.Enum):
 class InitializationEventExchangeTopics(enum.Enum):
     POSITIONS = "positions"
     BALANCE = "balance"
+    PROFITABILITY = "profitability"
     ORDERS = "orders"
     TRADES = "trades"
     CONTRACTS = "contracts"
