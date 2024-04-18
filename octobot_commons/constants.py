@@ -242,3 +242,7 @@ USD_LIKE_COINS = [
     "BOB",
     "MIMATIC",
 ]
+
+ENABLE_CERTIFI_SSL_CERTIFICATES = bool(
+    os.getenv("ENABLE_CERTIFI_SSL_CERTIFICATES", "true").lower() == "true"
+)
