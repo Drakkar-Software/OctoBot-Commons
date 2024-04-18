@@ -20,6 +20,7 @@ import aiohttp
 import certifi
 
 import octobot_commons.aiohttp_util as aiohttp_util
+import octobot_commons.constants as commons_constants
 
 pytestmark = pytest.mark.asyncio
 
@@ -45,7 +46,7 @@ async def test_get_ssl_fallback_aiohttp_client_session():
         # no need for certifi
         with mock.patch.object(aiohttp.ClientSession, "get", _ok_get_mock):
             session = await aiohttp_util.get_ssl_fallback_aiohttp_client_session(
-                aiohttp_util.DEFAULT_TEST_URL
+                commons_constants.KNOWN_POTENTIALLY_SSL_FAILED_REQUIRED_URL
             )
             assert isinstance(session, aiohttp.ClientSession)
             assert len(ok_get_mock_calls) == 1
@@ -56,7 +57,9 @@ async def test_get_ssl_fallback_aiohttp_client_session():
 
         # need for certifi
         with mock.patch.object(aiohttp.ClientSession, "get", _ko_get_mock):
-            async with aiohttp_util.ssl_fallback_aiohttp_client_session(aiohttp_util.DEFAULT_TEST_URL):
+            async with aiohttp_util.ssl_fallback_aiohttp_client_session(
+                commons_constants.KNOWN_POTENTIALLY_SSL_FAILED_REQUIRED_URL
+            ):
                 assert isinstance(session, aiohttp.ClientSession)
                 assert len(ok_get_mock_calls) == 0
                 assert len(ko_get_mock) == 1
@@ -67,11 +70,11 @@ async def test_fetch_test_url_with_and_without_certify():
     base_session = aiohttp.ClientSession()
     certify_session = aiohttp_util._get_certify_aiohttp_client_session()
     try:
-        async with base_session.get(aiohttp_util.DEFAULT_TEST_URL) as resp:
+        async with base_session.get(commons_constants.KNOWN_POTENTIALLY_SSL_FAILED_REQUIRED_URL) as resp:
             assert resp.status < 400
             base_text = await resp.text()
             assert "DrakkarSoftware" in base_text
-        async with certify_session.get(aiohttp_util.DEFAULT_TEST_URL) as resp:
+        async with certify_session.get(commons_constants.KNOWN_POTENTIALLY_SSL_FAILED_REQUIRED_URL) as resp:
             assert resp.status < 400
             certifi_text = await resp.text()
             assert base_text == certifi_text
