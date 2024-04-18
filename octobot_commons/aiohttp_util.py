@@ -23,10 +23,6 @@ import certifi
 import octobot_commons.logging
 import octobot_commons.constants
 
-DEFAULT_TEST_URL = (
-    "https://tentacles.octobot.online/officials/packages/full/base/1.0.9/metadata.yaml"
-)
-
 
 async def download_stream_file(
     output_file,
