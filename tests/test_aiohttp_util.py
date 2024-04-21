@@ -83,3 +83,12 @@ async def test_fetch_test_url_with_and_without_certify():
             await base_session.close()
         if certify_session:
             await certify_session.close()
+
+
+async def test_certify_aiohttp_client_session():
+    origin_where = certifi.where
+
+    with mock.patch.object(certifi, "where", mock.Mock(side_effect=origin_where)) as where_mock:
+        async with aiohttp_util.certify_aiohttp_client_session() as session:
+            assert isinstance(session, aiohttp.ClientSession)
+            where_mock.assert_called_once()
