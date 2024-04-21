@@ -111,7 +111,7 @@ async def get_ssl_fallback_aiohttp_client_session(
     # use custom SSL certificates session
     fallback_session = _get_certify_aiohttp_client_session()
     octobot_commons.logging.get_logger(__name__).info(
-        "Using certifi configured aiohttp connector."
+        "Falling back to certifi configured aiohttp connector."
     )
     return fallback_session
 
@@ -124,6 +124,23 @@ async def ssl_fallback_aiohttp_client_session(test_url: str):
     session = None
     try:
         session = await get_ssl_fallback_aiohttp_client_session(test_url)
+        yield session
+    finally:
+        if session is not None:
+            await session.close()
+
+
+@contextlib.asynccontextmanager
+async def certify_aiohttp_client_session():
+    """
+    yields an aiohttp.ClientSession always using certifi ssl certificates
+    """
+    session = None
+    try:
+        octobot_commons.logging.get_logger(__name__).debug(
+            "Using certifi configured aiohttp connector."
+        )
+        session = _get_certify_aiohttp_client_session()
         yield session
     finally:
         if session is not None:
