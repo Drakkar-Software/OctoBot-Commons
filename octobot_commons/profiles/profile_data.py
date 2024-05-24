@@ -137,7 +137,7 @@ class ProfileData(octobot_commons.dataclasses.MinimizableDataclass):
     crypto_currencies: list[CryptoCurrencyData]
     trading: TradingData
     exchanges: list[ExchangeData] = dataclasses.field(default_factory=list)
-    future_exchange_data: FutureExchangeData = FutureExchangeData()
+    future_exchange_data: FutureExchangeData = dataclasses.field(default_factory=FutureExchangeData)
     trader: TraderData = dataclasses.field(default_factory=TraderData)
     trader_simulator: TraderSimulatorData = dataclasses.field(
         default_factory=TraderSimulatorData
