@@ -383,7 +383,8 @@ class CommunityFeedAttrs(enum.Enum):
 
 
 class CommunityChannelTypes(enum.Enum):
-    SIGNAL = "t"  # to check
+    SIGNAL = "t"
+    TRADINGVIEW = "tv"
     ALERT = "alert"
 
 
