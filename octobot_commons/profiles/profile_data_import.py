@@ -75,8 +75,12 @@ async def convert_profile_data_to_profile_directory(
             profile_data, description, risk, output_path, auto_update, slug
         )
     )
+    # when updating profile, keep existing registered tentacles
+    import_registered_tentacles = profile_to_update is not None
     # tentacles_config.json
-    tentacles_setup_config = _get_tentacles_setup_config(profile_data, output_path)
+    tentacles_setup_config = _get_tentacles_setup_config(
+        profile_data, output_path, import_registered_tentacles
+    )
     if tentacles_setup_config.save_config(is_config_update=True):
         changed = True
     # specific_config
@@ -165,7 +169,9 @@ def get_updated_profile(
 
 
 def _get_tentacles_setup_config(
-    profile_data: profile_data_import.ProfileData, output_path: str
+    profile_data: profile_data_import.ProfileData,
+    output_path: str,
+    import_registered_tentacles: bool,
 ):
     try:
         import octobot_tentacles_manager.api
@@ -183,7 +189,8 @@ def _get_tentacles_setup_config(
             )
         )
         octobot_tentacles_manager.api.fill_with_installed_tentacles(
-            tentacles_setup_config
+            tentacles_setup_config,
+            import_registered_tentacles=import_registered_tentacles,
         )
         return tentacles_setup_config
     except ImportError:
