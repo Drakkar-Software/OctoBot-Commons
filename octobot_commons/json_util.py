@@ -98,7 +98,7 @@ def safe_dump(content: dict, save_path: str, restore_file: str = None) -> None:
     except Exception as err:
         # when failing to create restore file
         error_details = (
-            f"Failed to create the {restore_file} backup file. Is the associated folder  "
+            f"Failed to create the {restore_file} backup file. Is the associated "
             f"folder accessible ? : {err} ({err.__class__.__name__})"
         )
         octobot_commons.logging.get_logger(LOGGER_NAME).exception(
