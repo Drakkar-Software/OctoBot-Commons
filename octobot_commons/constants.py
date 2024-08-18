@@ -252,3 +252,4 @@ ENABLE_CERTIFI_SSL_CERTIFICATES = bool(
 KNOWN_POTENTIALLY_SSL_FAILED_REQUIRED_URL = (
     "https://tentacles.octobot.online/officials/packages/full/base/1.0.9/metadata.yaml"
 )
+IS_DEV_MODE_ENABLED = bool(os.getenv(CONFIG_DEBUG_OPTION, "False").lower() == "true")

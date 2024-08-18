@@ -162,7 +162,7 @@ async def import_profile_data_as_profile(
     aiohttp_session,
     name: str = None,
     description: str = None,
-    risk: enums.ProfileRisk = None,
+    risk: enums.ProfileRisk = enums.ProfileRisk.MODERATE,
     bot_install_path: str = ".",
     origin_url: str = None,
     logo_url: str = None,
@@ -171,8 +171,11 @@ async def import_profile_data_as_profile(
     """
     Imports the given ProfileData into the user's profile directory with the "imported_" prefix
     :param profile_data: path to the profile zipped archive
+    :param aiohttp_session: aiohttp session to use to download the profile logo
     :param profile_schema: the schema to validate profile against
     :param name: name of the profile folder
+    :param description: description of the profile
+    :param risk: risk of the profile
     :param bot_install_path: path to the octobot installation
     :param origin_url: url the profile is coming from
     :param logo_url: url the profile avatar

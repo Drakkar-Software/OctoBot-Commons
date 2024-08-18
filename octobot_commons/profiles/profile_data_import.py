@@ -47,7 +47,7 @@ async def convert_profile_data_to_profile_directory(
     profile_data: profile_data_import.ProfileData,
     output_path: str,
     description: str = None,
-    risk: enums.ProfileRisk = None,
+    risk: enums.ProfileRisk = enums.ProfileRisk.MODERATE,
     auto_update: bool = False,
     slug: str = None,
     avatar_url: str = None,
