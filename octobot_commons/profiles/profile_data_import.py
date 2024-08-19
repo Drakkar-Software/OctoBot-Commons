@@ -188,9 +188,13 @@ def _get_tentacles_setup_config(
                 *classes, config_path=config_path
             )
         )
+        use_reference_registered_tentacles = (
+            not tentacles_setup_config.registered_tentacles
+        )
         octobot_tentacles_manager.api.fill_with_installed_tentacles(
             tentacles_setup_config,
             import_registered_tentacles=import_registered_tentacles,
+            use_reference_registered_tentacles=use_reference_registered_tentacles,
         )
         return tentacles_setup_config
     except ImportError:
