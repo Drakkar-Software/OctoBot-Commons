@@ -138,7 +138,7 @@ class Authenticator(singleton.Singleton):
         """
         raise NotImplementedError
 
-    async def update_orders(self, orders: list, exchange_name: str):
+    async def update_orders(self, orders_by_exchange: dict[str, list]):
         """
         Updates authenticated account orders
         """
