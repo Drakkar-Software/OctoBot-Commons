@@ -127,7 +127,6 @@ class Configuration:
 
     def save(
         self,
-        temp_restore_config_file=commons_constants.TEMP_RESTORE_CONFIG_FILE,
         schema_file=None,
         sync_all_profiles=False,
     ) -> None:
@@ -140,7 +139,6 @@ class Configuration:
         config_file_manager.dump(
             self.config_path,
             config_to_save,
-            temp_restore_config_file=temp_restore_config_file,
             schema_file=schema_file,
         )
         if self.profile is not None:
