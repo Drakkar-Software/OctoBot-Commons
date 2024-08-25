@@ -4,10 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.55] - 2023-08-25
+### Updated
+[Config] remove custom restore file
+[Config] allow restore file copy failure
+
 ## [1.9.54] - 2023-08-21
 ### Updated
 [Authenticator] update update_orders args 
-
 ## [1.9.53] - 2023-08-19
 ### Added
 [Constants] CONFIG_EXCHANGE_UID
