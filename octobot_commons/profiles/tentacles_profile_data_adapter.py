@@ -13,7 +13,10 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import typing
+
 import octobot_commons.profiles.profile_data as profile_data_import
+import octobot_commons.profiles.exchange_auth_data as exchange_auth_data_import
 
 
 class TentaclesProfileDataAdapter:
@@ -25,11 +28,19 @@ class TentaclesProfileDataAdapter:
         self,
         tentacles_data: list[profile_data_import.TentaclesData],
         additional_data: dict,
+        authenticator,
+        auth_key: typing.Optional[str],
     ):
         self.tentacles_data: list[profile_data_import.TentaclesData] = tentacles_data
         self.additional_data: dict = additional_data
+        self.authenticator = authenticator
+        self.auth_key = auth_key
 
-    def adapt(self, profile_data: profile_data_import.ProfileData) -> None:
+    async def adapt(
+        self,
+        profile_data: profile_data_import.ProfileData,
+        auth_data: list[exchange_auth_data_import.ExchangeAuthData],
+    ) -> None:
         """
         Use self.tentacles_data to adapt the given profile_data
         """
