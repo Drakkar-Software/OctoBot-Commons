@@ -23,9 +23,12 @@ import octobot_commons.constants
 @dataclasses.dataclass
 class ExchangeAuthData(octobot_commons.dataclasses.FlexibleDataclass):
     internal_name: str
+    exchange_credential_id: str = ""
     api_key: str = ""
     api_secret: str = ""
     api_password: str = ""
+    exchange_type: str = octobot_commons.constants.DEFAULT_EXCHANGE_TYPE
+    sandboxed: bool = False
 
     def apply_to_exchange_config(self, config) -> bool:
         """
@@ -46,5 +49,11 @@ class ExchangeAuthData(octobot_commons.dataclasses.FlexibleDataclass):
                 exchange_config[
                     octobot_commons.constants.CONFIG_EXCHANGE_PASSWORD
                 ] = self.api_password
+                exchange_config[
+                    octobot_commons.constants.CONFIG_EXCHANGE_SANDBOXED
+                ] = self.sandboxed
+                exchange_config[
+                    octobot_commons.constants.CONFIG_EXCHANGE_TYPE
+                ] = self.exchange_type
                 return True
         return False
