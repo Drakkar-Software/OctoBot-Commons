@@ -167,6 +167,7 @@ async def import_profile_data_as_profile(
     origin_url: str = None,
     logo_url: str = None,
     auto_update: bool = False,
+    force_simulator: bool = False,
 ) -> Profile:
     """
     Imports the given ProfileData into the user's profile directory with the "imported_" prefix
@@ -180,6 +181,7 @@ async def import_profile_data_as_profile(
     :param origin_url: url the profile is coming from
     :param logo_url: url the profile avatar
     :param auto_update: True if the profile should automatically be kept up-to-date
+    :param force_simulator: True if trader simulator should be forced in config
     :return: The created profile
     """
     logger = bot_logging.get_logger("ProfileSharing")
@@ -196,6 +198,7 @@ async def import_profile_data_as_profile(
             auto_update=auto_update,
             slug=slug,
             avatar_url=logo_url,
+            force_simulator=force_simulator,
             aiohttp_session=aiohttp_session,
         )
         return import_profile(
