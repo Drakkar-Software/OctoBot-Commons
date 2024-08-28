@@ -30,30 +30,38 @@ class ExchangeAuthData(octobot_commons.dataclasses.FlexibleDataclass):
     exchange_type: str = octobot_commons.constants.DEFAULT_EXCHANGE_TYPE
     sandboxed: bool = False
 
-    def apply_to_exchange_config(self, config) -> bool:
+    def apply_to_exchange_config(self, config):
         """
         Updates the given Configuration object to use the local authentication data
         :param config: Configuration object to update
-        :return: True when an exchange auth has been updated, False if no exchange config matched self.internal_name
         """
+        applied = False
         for exchange, exchange_config in config.config[
             octobot_commons.constants.CONFIG_EXCHANGES
         ].items():
             if exchange == self.internal_name:
-                exchange_config[
-                    octobot_commons.constants.CONFIG_EXCHANGE_KEY
-                ] = self.api_key
-                exchange_config[
-                    octobot_commons.constants.CONFIG_EXCHANGE_SECRET
-                ] = self.api_secret
-                exchange_config[
-                    octobot_commons.constants.CONFIG_EXCHANGE_PASSWORD
-                ] = self.api_password
-                exchange_config[
-                    octobot_commons.constants.CONFIG_EXCHANGE_SANDBOXED
-                ] = self.sandboxed
-                exchange_config[
-                    octobot_commons.constants.CONFIG_EXCHANGE_TYPE
-                ] = self.exchange_type
-                return True
-        return False
+                self._apply_config(exchange_config)
+                applied = True
+                break
+        if not applied:
+            # exchange doesn't already exist: add it
+            exchange_config = {octobot_commons.constants.CONFIG_ENABLED_OPTION: True}
+            self._apply_config(exchange_config)
+            config.config[octobot_commons.constants.CONFIG_EXCHANGES][
+                self.internal_name
+            ] = exchange_config
+
+    def _apply_config(self, exchange_config: dict):
+        exchange_config[octobot_commons.constants.CONFIG_EXCHANGE_KEY] = self.api_key
+        exchange_config[
+            octobot_commons.constants.CONFIG_EXCHANGE_SECRET
+        ] = self.api_secret
+        exchange_config[
+            octobot_commons.constants.CONFIG_EXCHANGE_PASSWORD
+        ] = self.api_password
+        exchange_config[
+            octobot_commons.constants.CONFIG_EXCHANGE_SANDBOXED
+        ] = self.sandboxed
+        exchange_config[
+            octobot_commons.constants.CONFIG_EXCHANGE_TYPE
+        ] = self.exchange_type
