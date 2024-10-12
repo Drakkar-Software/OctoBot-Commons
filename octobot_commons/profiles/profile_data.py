@@ -42,6 +42,7 @@ class CryptoCurrencyData(octobot_commons.dataclasses.FlexibleDataclass):
 class ExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
     exchange_credential_id: typing.Union[str, None] = None
     internal_name: typing.Union[str, None] = None
+    exchange_id: typing.Union[str, None] = None
 
 
 @dataclasses.dataclass
