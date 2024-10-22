@@ -49,6 +49,7 @@ def profile_data_dict():
             {
                 'exchange_credential_id': '123-plop',
                 'exchange_id': '123-exchange',
+                'proxy_id': '123-proxy',
                 'internal_name': 'cryptocom'
             }
         ], 'trader': {
