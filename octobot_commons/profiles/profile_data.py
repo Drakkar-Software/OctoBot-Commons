@@ -42,6 +42,7 @@ class CryptoCurrencyData(octobot_commons.dataclasses.FlexibleDataclass):
 class ExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
     exchange_credential_id: typing.Union[str, None] = None
     internal_name: typing.Union[str, None] = None
+    exchange_type: str = constants.DEFAULT_EXCHANGE_TYPE
     exchange_id: typing.Union[str, None] = None
     proxy_id: typing.Union[str, None] = None
 
@@ -230,7 +231,7 @@ class ProfileData(octobot_commons.dataclasses.MinimizableDataclass):
                 constants.CONFIG_EXCHANGES: {
                     exchange_details.internal_name: {
                         constants.CONFIG_ENABLED_OPTION: True,
-                        constants.CONFIG_EXCHANGE_TYPE: constants.DEFAULT_EXCHANGE_TYPE,
+                        constants.CONFIG_EXCHANGE_TYPE: exchange_details.exchange_type,
                     }
                     for exchange_details in self.exchanges
                 },
