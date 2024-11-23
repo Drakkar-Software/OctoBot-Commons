@@ -154,6 +154,7 @@ CONFIG_TENTACLES_FILE = "tentacles_config.json"
 EVALUATOR_PRIORITY = "priority"
 DEFAULT_EVALUATOR_PRIORITY = 0
 CONFIG_TENTACLES_REQUIRED_CANDLES_COUNT = "required_candles_count"
+CONFIG_HISTORICAL_CONFIGURATION = "_historical_configuration"
 NESTED_TENTACLE_CONFIG = "nested_tentacle_configuration"
 CONFIG_ACTIVATION_TOPICS = "activation method"
 CONFIG_TRIGGER_TIMEFRAMES = "Trigger_timeframes"
