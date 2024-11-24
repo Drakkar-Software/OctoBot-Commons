@@ -59,7 +59,9 @@ def get_oldest_historical_tentacle_config_time(master_config: dict) -> float:
     try:
         return min(
             historical_config[0]
-            for historical_config in master_config.get(constants.CONFIG_HISTORICAL_CONFIGURATION, [])
+            for historical_config in master_config.get(
+                constants.CONFIG_HISTORICAL_CONFIGURATION, []
+            )
         )
     except ValueError:
         raise ValueError("No historical configuration found")
