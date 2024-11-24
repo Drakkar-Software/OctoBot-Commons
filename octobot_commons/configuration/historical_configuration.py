@@ -50,3 +50,16 @@ def get_historical_tentacle_config(master_config: dict, current_time: float) -> 
         raise KeyError(
             f"{constants.CONFIG_HISTORICAL_CONFIGURATION} not found in master_config."
         )
+
+
+def get_oldest_historical_tentacle_config_time(master_config: dict) -> float:
+    """
+    :return: the oldest historical configuration timestamp
+    """
+    try:
+        return min(
+            historical_config[0]
+            for historical_config in master_config.get(constants.CONFIG_HISTORICAL_CONFIGURATION, [])
+        )
+    except ValueError:
+        raise ValueError("No historical configuration found")
