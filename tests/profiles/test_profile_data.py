@@ -38,11 +38,13 @@ def profile_data_dict():
             {
                 'trading_pairs': ['BTC/USDT'],
                 'name': 'Bitcoin',
+                'leverage': None,
                 'enabled': True
             },
             {
                 'trading_pairs': ['ETH/USDT'],
                 'name': 'ETH',
+                'leverage': 5,
                 'enabled': False
             }
         ], 'exchanges': [
@@ -50,7 +52,9 @@ def profile_data_dict():
                 'exchange_credential_id': '123-plop',
                 'exchange_id': '123-exchange',
                 'proxy_id': '123-proxy',
-                'internal_name': 'cryptocom'
+                'exchange_type': 'spot',
+                'internal_name': 'cryptocom',
+                'default_leverage': 10,
             }
         ], 'trader': {
             'enabled': True
@@ -196,8 +200,12 @@ def test_from_dict(profile_data_dict):
     # check one element per attribute to be sure it's all parsed
     assert profile_data.profile_details.name == "profile_name 42"
     assert profile_data.crypto_currencies[0].trading_pairs == ['BTC/USDT']
+    assert profile_data.crypto_currencies[0].leverage is None
+    assert profile_data.crypto_currencies[1].leverage == 5
     assert profile_data.exchanges[0].exchange_credential_id == "123-plop"
     assert profile_data.exchanges[0].internal_name == "cryptocom"
+    assert profile_data.exchanges[0].exchange_type == "spot"
+    assert profile_data.exchanges[0].default_leverage == 10
     assert profile_data.trader.enabled is True
     assert profile_data.trader_simulator.enabled is False
     assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
@@ -218,9 +226,11 @@ def test_from_min_dict(min_profile_data_dict):
     assert profile_data.crypto_currencies[0].trading_pairs == ['BTC/USDT']
     assert profile_data.crypto_currencies[0].name is None
     assert profile_data.crypto_currencies[0].enabled is True
+    assert profile_data.crypto_currencies[0].leverage is None
     assert profile_data.crypto_currencies[1].trading_pairs == ['ETH/USDT']
     assert profile_data.crypto_currencies[1].name is None
     assert profile_data.crypto_currencies[1].enabled is False
+    assert profile_data.crypto_currencies[1].leverage is None
     assert profile_data.exchanges == []
     assert profile_data.trader.enabled is True
     assert profile_data.trader_simulator.enabled is False
