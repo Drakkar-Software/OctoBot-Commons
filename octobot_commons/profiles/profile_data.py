@@ -35,6 +35,7 @@ class ProfileDetailsData(octobot_commons.dataclasses.FlexibleDataclass):
 class CryptoCurrencyData(octobot_commons.dataclasses.FlexibleDataclass):
     trading_pairs: list[str]
     name: typing.Union[str, None] = None
+    leverage: typing.Union[float, None] = None
     enabled: bool = True
 
 
@@ -45,6 +46,7 @@ class ExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
     exchange_type: str = constants.DEFAULT_EXCHANGE_TYPE
     exchange_id: typing.Union[str, None] = None
     proxy_id: typing.Union[str, None] = None
+    default_leverage: typing.Union[float, None] = None
 
 
 @dataclasses.dataclass
