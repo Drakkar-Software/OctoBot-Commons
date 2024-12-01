@@ -35,7 +35,6 @@ class ProfileDetailsData(octobot_commons.dataclasses.FlexibleDataclass):
 class CryptoCurrencyData(octobot_commons.dataclasses.FlexibleDataclass):
     trading_pairs: list[str]
     name: typing.Union[str, None] = None
-    leverage: typing.Union[float, None] = None
     enabled: bool = True
 
 
@@ -46,7 +45,26 @@ class ExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
     exchange_type: str = constants.DEFAULT_EXCHANGE_TYPE
     exchange_id: typing.Union[str, None] = None
     proxy_id: typing.Union[str, None] = None
+
+
+@dataclasses.dataclass
+class FutureSymbolData(octobot_commons.dataclasses.FlexibleDataclass):
+    symbol: str
+    leverage: typing.Union[float, None] = None
+
+
+@dataclasses.dataclass
+class FutureExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
     default_leverage: typing.Union[float, None] = None
+    symbol_data: list[FutureSymbolData] = dataclasses.field(default_factory=list)
+
+    # pylint: disable=E1134
+    def __post_init__(self):
+        if self.symbol_data and isinstance(self.symbol_data[0], dict):
+            self.symbol_data = [
+                FutureSymbolData.from_dict(symbol_datum)
+                for symbol_datum in self.symbol_data
+            ]
 
 
 @dataclasses.dataclass
@@ -119,6 +137,7 @@ class ProfileData(octobot_commons.dataclasses.MinimizableDataclass):
     crypto_currencies: list[CryptoCurrencyData]
     trading: TradingData
     exchanges: list[ExchangeData] = dataclasses.field(default_factory=list)
+    future_exchange_data: FutureExchangeData = FutureExchangeData()
     trader: TraderData = dataclasses.field(default_factory=TraderData)
     trader_simulator: TraderSimulatorData = dataclasses.field(
         default_factory=TraderSimulatorData
