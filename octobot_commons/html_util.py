@@ -80,15 +80,15 @@ def get_html_summary_if_relevant(
 
 def summarize_exception_html_cause_if_relevant(exception: BaseException, depth=0):
     """
-    Recursively updates the __cause__ attribute of the exception to
-    summarize html content if any
+    Recursively updates args and the __cause__ attribute
+    of the exception to summarize html content if any
     """
     try:
         # Optimistic consideration of attributes being available: should always be the case.
         # However, if this is not the case, just catch the error not forward it
-        if exception.__cause__ is not None:
-            exception.__cause__.args = tuple(
-                get_html_summary_if_relevant(arg) for arg in exception.__cause__.args
+        if exception is not None:
+            exception.args = tuple(
+                get_html_summary_if_relevant(arg) for arg in exception.args
             )
             # condition should not be necessary but still make sure to avoid infinite recursive loops
             if depth < MAX_RECURSIVE_EXCEPTION_CAUSES_DEPTH:
