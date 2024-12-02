@@ -24,6 +24,7 @@ import logging
 
 _IGNORED_ELEMENTS = ["script", "button"]
 DEFAULT_ELEMENT_TEXT_MAX_SIZE = 100
+MAX_RECURSIVE_EXCEPTION_CAUSES_DEPTH = 20
 
 
 def summarize_page_content(
@@ -77,17 +78,24 @@ def get_html_summary_if_relevant(
     return html_content
 
 
-def summarize_exception_html_cause_if_relevant(exception: BaseException):
+def summarize_exception_html_cause_if_relevant(exception: BaseException, depth=0):
     """
-    :return: the updated __cause__ attribute of the exception to
+    Recursively updates the __cause__ attribute of the exception to
     summarize html content if any
     """
     try:
         # Optimistic consideration of attributes being available: should always be the case.
         # However, if this is not the case, just catch the error not forward it
-        exception.__cause__.args = tuple(
-            get_html_summary_if_relevant(arg) for arg in exception.__cause__.args
-        )
+        if exception.__cause__ is not None:
+            exception.__cause__.args = tuple(
+                get_html_summary_if_relevant(arg) for arg in exception.__cause__.args
+            )
+            # condition should not be necessary but still make sure to avoid infinite recursive loops
+            if depth < MAX_RECURSIVE_EXCEPTION_CAUSES_DEPTH:
+                # recursive call to make sure nested causes are also summarized
+                summarize_exception_html_cause_if_relevant(
+                    exception.__cause__, depth=depth + 1
+                )
     except BaseException:
         # Can't format html, nothing to do: just stop processing
         pass
