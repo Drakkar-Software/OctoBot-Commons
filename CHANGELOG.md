@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.67] - 2023-12-02
+### Updated
+[HTML] handle html exception args
+
 ## [1.9.66] - 2023-12-02
 ### Updated
 [HTML] handle nested exception causes
