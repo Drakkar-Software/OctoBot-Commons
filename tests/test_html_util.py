@@ -179,8 +179,13 @@ def test_summarize_exception_html_cause_if_relevant():
                     raise IndexError(RATE_LIMIT_HTML_WITH_MESSAGE)
                 except IndexError as err_4:
                     assert err_4.__cause__ is None
+                    assert "<script>" in str(err_4)
+                    str_traceback = traceback.format_exc()
+                    assert "<script>" in str_traceback
                     # does not crash if __cause__ is None
                     html_util.summarize_exception_html_cause_if_relevant(err_4)
+                    str_traceback = traceback.format_exc()
+                    assert "<script>" not in str_traceback
                     raise KeyError(html_util.get_html_summary_if_relevant(err_4)) from err_4
             except KeyError as err_3:
                 # lvl. 3
@@ -196,7 +201,7 @@ def test_summarize_exception_html_cause_if_relevant():
                     'span<Performance & security by>; a<Cloudflare>',
                 )
                 # cause is not summarized
-                assert err_3.__cause__.args == (RATE_LIMIT_HTML_WITH_MESSAGE, )
+                assert "<script>" not in str(err_3.__cause__.args)
                 html_util.summarize_exception_html_cause_if_relevant(err_3)
                 # cause has been summarized
                 assert err_3.__cause__.args == (
