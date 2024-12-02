@@ -15,6 +15,7 @@
 #  License along with this library.
 import mock
 import pytest
+import traceback
 
 import octobot_commons.html_util as html_util
 
@@ -168,38 +169,100 @@ def test_get_html_summary_if_relevant():
 def test_summarize_exception_html_cause_if_relevant():
     assert html_util.summarize_exception_html_cause_if_relevant(Exception("plop")) is None
     try:
+        # lvl. 1
         try:
-            raise IndexError(RATE_LIMIT_HTML_WITH_MESSAGE)
-        except Exception as inner_err:
-            assert inner_err.__cause__ is None
-            # does not crash if __cause__ is None
-            html_util.summarize_exception_html_cause_if_relevant(inner_err)
-            raise KeyError(html_util.get_html_summary_if_relevant(inner_err)) from inner_err
-    except Exception as err:
-        assert err.args == (
-            'message<hollaex GET https://api.sandbox.hollaex.com/v2/constants 403 '
-            'Forbidden>; title<Access denied | api.hollaex.com used Cloudflare to '
-            'restrict access>; div<Please enable cookies.>; span<Error>; span<1006>; '
-            'span<Ray ID: 8e61e5180c749e8a •>; span<2024-11-21 16:00:49 UTC>; h2<Access '
-            'denied>; h2<What happened?>; p<The owner of this website (api.hollaex.com) '
-            'has banned your IP address (123.123.123.123).>; div<Was this page helpful?>; '
-            'div<Thank you for your feedback!>; span<Cloudflare Ray ID:>; '
-            'strong<8e61e5180c749e8a>; span<Your IP:>; span<123.123.123.123>; '
-            'span<Performance & security by>; a<Cloudflare>',
-        )
-        assert err.__cause__.args == (RATE_LIMIT_HTML_WITH_MESSAGE, )
-        html_util.summarize_exception_html_cause_if_relevant(err)
-        assert err.__cause__.args == (
-            'message<hollaex GET https://api.sandbox.hollaex.com/v2/constants 403 '
-            'Forbidden>; title<Access denied | api.hollaex.com used Cloudflare to '
-            'restrict access>; div<Please enable cookies.>; span<Error>; span<1006>; '
-            'span<Ray ID: 8e61e5180c749e8a •>; span<2024-11-21 16:00:49 UTC>; h2<Access '
-            'denied>; h2<What happened?>; p<The owner of this website (api.hollaex.com) '
-            'has banned your IP address (123.123.123.123).>; div<Was this page helpful?>; '
-            'div<Thank you for your feedback!>; span<Cloudflare Ray ID:>; '
-            'strong<8e61e5180c749e8a>; span<Your IP:>; span<123.123.123.123>; '
-            'span<Performance & security by>; a<Cloudflare>',
-        )
+            # lvl. 2
+            try:
+                # lvl. 3
+                try:
+                    # lvl. 4
+                    raise IndexError(RATE_LIMIT_HTML_WITH_MESSAGE)
+                except IndexError as err_4:
+                    assert err_4.__cause__ is None
+                    # does not crash if __cause__ is None
+                    html_util.summarize_exception_html_cause_if_relevant(err_4)
+                    raise KeyError(html_util.get_html_summary_if_relevant(err_4)) from err_4
+            except KeyError as err_3:
+                # lvl. 3
+                assert err_3.args == (
+                    'message<hollaex GET https://api.sandbox.hollaex.com/v2/constants 403 '
+                    'Forbidden>; title<Access denied | api.hollaex.com used Cloudflare to '
+                    'restrict access>; div<Please enable cookies.>; span<Error>; span<1006>; '
+                    'span<Ray ID: 8e61e5180c749e8a •>; span<2024-11-21 16:00:49 UTC>; h2<Access '
+                    'denied>; h2<What happened?>; p<The owner of this website (api.hollaex.com) '
+                    'has banned your IP address (123.123.123.123).>; div<Was this page helpful?>; '
+                    'div<Thank you for your feedback!>; span<Cloudflare Ray ID:>; '
+                    'strong<8e61e5180c749e8a>; span<Your IP:>; span<123.123.123.123>; '
+                    'span<Performance & security by>; a<Cloudflare>',
+                )
+                # cause is not summarized
+                assert err_3.__cause__.args == (RATE_LIMIT_HTML_WITH_MESSAGE, )
+                html_util.summarize_exception_html_cause_if_relevant(err_3)
+                # cause has been summarized
+                assert err_3.__cause__.args == (
+                    'message<hollaex GET https://api.sandbox.hollaex.com/v2/constants 403 '
+                    'Forbidden>; title<Access denied | api.hollaex.com used Cloudflare to '
+                    'restrict access>; div<Please enable cookies.>; span<Error>; span<1006>; '
+                    'span<Ray ID: 8e61e5180c749e8a •>; span<2024-11-21 16:00:49 UTC>; h2<Access '
+                    'denied>; h2<What happened?>; p<The owner of this website (api.hollaex.com) '
+                    'has banned your IP address (123.123.123.123).>; div<Was this page helpful?>; '
+                    'div<Thank you for your feedback!>; span<Cloudflare Ray ID:>; '
+                    'strong<8e61e5180c749e8a>; span<Your IP:>; span<123.123.123.123>; '
+                    'span<Performance & security by>; a<Cloudflare>',
+                )
+                raise NotImplementedError(err_3) from err_3
+        except NotImplementedError as err_2:
+            # lvl. 2
+            assert err_2.args[0].args == (
+                'message<hollaex GET https://api.sandbox.hollaex.com/v2/constants 403 '
+                'Forbidden>; title<Access denied | api.hollaex.com used Cloudflare to '
+                'restrict access>; div<Please enable cookies.>; span<Error>; span<1006>; '
+                'span<Ray ID: 8e61e5180c749e8a •>; span<2024-11-21 16:00:49 UTC>; h2<Access '
+                'denied>; h2<What happened?>; p<The owner of this website (api.hollaex.com) '
+                'has banned your IP address (123.123.123.123).>; div<Was this page helpful?>; '
+                'div<Thank you for your feedback!>; span<Cloudflare Ray ID:>; '
+                'strong<8e61e5180c749e8a>; span<Your IP:>; span<123.123.123.123>; '
+                'span<Performance & security by>; a<Cloudflare>',
+            )
+            assert err_2.__cause__.__cause__.__class__ == IndexError
+            assert err_2.__cause__.__class__ == KeyError
+            raise ZeroDivisionError from err_2
+    except ZeroDivisionError as err_1:
+        # lvl. 1
+        assert "<script>" not in str(err_1)
+        str_traceback = traceback.format_exc()
+        assert "<script>" not in str_traceback
+
+    # no summary at lower levels
+    try:
+        # lvl. 1
+        try:
+            # lvl. 2
+            try:
+                # lvl. 3
+                try:
+                    # lvl. 4
+                    raise IndexError(RATE_LIMIT_HTML_WITH_MESSAGE)
+                except IndexError as err_4:
+                    raise KeyError(html_util.get_html_summary_if_relevant(err_4)) from err_4
+            except KeyError as err_3:
+                # lvl. 3
+                raise NotImplementedError(err_3) from err_3
+        except NotImplementedError as err_2:
+            # lvl. 2
+            raise ZeroDivisionError from err_2
+    except ZeroDivisionError as err_1:
+        # lvl. 1
+        # summarized in error message
+        assert "<script>" not in str(err_1)
+        # not yet summarized in causes (used by traceback)
+        str_traceback = traceback.format_exc()
+        assert "<script>" in str_traceback
+
+        # summarize
+        html_util.summarize_exception_html_cause_if_relevant(err_1)
+        str_traceback = traceback.format_exc()
+        assert "<script>" not in str_traceback
 
 
 RATE_LIMIT_INVALID_HTMLS = [
