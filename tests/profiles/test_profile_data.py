@@ -52,6 +52,7 @@ def profile_data_dict():
                 'proxy_id': '123-proxy',
                 'exchange_type': 'spot',
                 'internal_name': 'cryptocom',
+                'sandboxed': True,
             }
         ], 'future_exchange_data': {
             'default_leverage': 10,
@@ -216,6 +217,7 @@ def test_from_dict(profile_data_dict):
     assert profile_data.future_exchange_data.symbol_data[1].leverage == 5
     assert profile_data.exchanges[0].exchange_credential_id == "123-plop"
     assert profile_data.exchanges[0].internal_name == "cryptocom"
+    assert profile_data.exchanges[0].sandboxed is True
     assert profile_data.exchanges[0].exchange_type == "spot"
     assert profile_data.trader.enabled is True
     assert profile_data.trader_simulator.enabled is False

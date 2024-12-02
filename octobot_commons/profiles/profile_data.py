@@ -45,6 +45,7 @@ class ExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
     exchange_type: str = constants.DEFAULT_EXCHANGE_TYPE
     exchange_id: typing.Union[str, None] = None
     proxy_id: typing.Union[str, None] = None
+    sandboxed: bool = False
 
 
 @dataclasses.dataclass
