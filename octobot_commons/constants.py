@@ -233,6 +233,8 @@ USD_LIKE_COINS = [
     "USDT",
     "USDC",
     "TUSD",
+    "USDE",
+    "USDS",
     "BUSD",
     "DAI",
     "USD",
@@ -248,6 +250,15 @@ USD_LIKE_COINS = [
     "DOLA",
     "BOB",
     "MIMATIC",
+]
+
+# from coinbase and binance fiat pairs
+FIAT_NON_USD_LIKE_COINS = [
+    "EUR",
+    "GBP",
+    "TRY",
+    "BRL",
+    "ARS",
 ]
 
 ENABLE_CERTIFI_SSL_CERTIFICATES = bool(
