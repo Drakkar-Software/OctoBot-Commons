@@ -85,6 +85,7 @@ CONFIG_CRYPTO_CURRENCY = "crypto-currency"
 CONFIG_CRYPTO_PAIRS = "pairs"
 CONFIG_CRYPTO_QUOTE = "quote"
 CONFIG_CRYPTO_ADD = "add"
+TRADING_SYMBOL_REGEX = "([a-zA-Z]|\\d){1,}\\/([a-zA-Z]|\\d){1,}"
 
 # Exchange
 CONFIG_EXCHANGES = "exchanges"
