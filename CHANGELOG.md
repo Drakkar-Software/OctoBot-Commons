@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.73] - 2024-02-23
+### Updated 
+[DictUtil] add ignore_lists
+
 ## [1.9.72] - 2024-02-16
 ### Fixed
 [ProfileData] fix future_exchange_data default value
