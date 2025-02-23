@@ -65,7 +65,9 @@ def _find_nested_value_in_list(list_value, field, list_indexes):
     return False, field
 
 
-def nested_update_dict(base_dict, updated_dict, list_indexes=None):
+def nested_update_dict(
+    base_dict: dict, updated_dict: dict, list_indexes=None, ignore_lists=False
+):
     """
      Updates a dict with values from another but keeps the 1st dict values when not specified
      in the update dict. Handle nested values unlike the default dict.update().
@@ -73,24 +75,39 @@ def nested_update_dict(base_dict, updated_dict, list_indexes=None):
     :param base_dict: the dict to be updated
     :param updated_dict: the dict to take updated values from
     :param list_indexes: indexes to go to on list elements. If not provided, each element of each list is explored
+    :param ignore_lists: when True, lists are not updated
     """
     if isinstance(base_dict, list):
+        if ignore_lists:
+            return base_dict
         if list_indexes:
             nested_update_dict(
-                base_dict[list_indexes[0]], updated_dict, list_indexes=list_indexes[1:]
+                base_dict[list_indexes[0]],
+                updated_dict,
+                list_indexes=list_indexes[1:],
+                ignore_lists=ignore_lists,
             )
         else:
             for element in base_dict:
                 nested_update_dict(element, updated_dict)
-        return
+        return base_dict
     for key, val in updated_dict.items():
         if isinstance(val, dict):
             if key in base_dict:
-                nested_update_dict(base_dict[key], val, list_indexes=list_indexes)
+                nested_update_dict(
+                    base_dict[key],
+                    val,
+                    list_indexes=list_indexes,
+                    ignore_lists=ignore_lists,
+                )
             else:
                 base_dict[key] = val
+        elif ignore_lists and key in base_dict and isinstance(base_dict[key], list):
+            # list should be ignored
+            pass
         else:
             base_dict[key] = val
+    return base_dict
 
 
 def check_and_merge_values_from_reference(

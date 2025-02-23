@@ -92,3 +92,32 @@ def test_contains_each_element():
         {"1": 2},
         {"1": 1}
     ) is False
+
+
+def test_nested_update_dict():
+    assert dict_util.nested_update_dict({}, {"1": 1, "2": 2}) == {"1": 1, "2": 2}
+    assert dict_util.nested_update_dict({"1": "aa"}, {"1": 1, "2": 2}) == {"1": 1, "2": 2}
+    assert dict_util.nested_update_dict({"1": []}, {"1": 1, "2": 2}) == {"1": 1, "2": 2}
+    assert dict_util.nested_update_dict(
+        {"1": []}, {"1": 1, "2": 2}, ignore_lists=True
+    ) == {"1": [], "2": 2}
+    assert dict_util.nested_update_dict(
+        {"1": [], "plop": {"jerome": 0, "michel": 1, "monique": [1]}},
+        {"1": 1, "2": 2,  "plop": {"jerome": 0.5, "simon": 3, "monique": [2]}},
+        ignore_lists=True
+    ) == {"1": [], "2": 2, "plop": {"jerome": 0.5, "michel": 1, "monique": [1], "simon": 3}}
+    assert dict_util.nested_update_dict(
+        {"1": [], "plop": {"jerome": 0, "michel": 1, "monique": [1]}},
+        {"1": 1, "2": 2,  "plop": {"jerome": 0.5, "simon": 3, "monique": [2]}},
+        ignore_lists=False
+    ) == {"1": 1, "2": 2, "plop": {"jerome": 0.5, "michel": 1, "monique": [2], "simon": 3}}
+    assert dict_util.nested_update_dict(
+        {"1": []},
+        {"1": [{"jerome": 0.5, "monique": [2]}, {"simon": 3, "monique": [23]}]},
+        ignore_lists=True
+    ) == {"1": []}
+    assert dict_util.nested_update_dict(
+        {"1": []},
+        {"1": [{"jerome": 0.5, "monique": [2]}, {"simon": 3, "monique": [23]}]},
+        ignore_lists=False
+    ) == {'1': [{'jerome': 0.5, 'monique': [2]}, {'monique': [23], 'simon': 3}]}
