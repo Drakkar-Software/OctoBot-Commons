@@ -32,7 +32,8 @@ def profile_data_dict():
             'name': 'profile_name 42',
             'id': 'default',
             'version': "42.42.1b",
-            'bot_id': "1234-1224-0000"
+            'bot_id': "1234-1224-0000",
+            'user_id': "plop-id"
         },
         'crypto_currencies': [
             {
@@ -89,6 +90,10 @@ def profile_data_dict():
                     "total": 0.2222,
                 }
             ],
+            'sub_portfolio': {
+                "BTC": 0.1,
+                "USDT": 1000
+            },
             'risk': 0.5
         }, 'tentacles': [
             {

@@ -29,6 +29,7 @@ class ProfileDetailsData(octobot_commons.dataclasses.FlexibleDataclass):
     id: typing.Union[str, None] = None
     bot_id: typing.Union[str, None] = None
     version: typing.Union[str, None] = None
+    user_id: typing.Union[str, None] = None
 
 
 @dataclasses.dataclass
@@ -102,6 +103,7 @@ class TradingData(octobot_commons.dataclasses.FlexibleDataclass):
     reference_market: str
     minimal_funds: list[MinimalFund] = dataclasses.field(default_factory=list)
     risk: float = 1.0
+    sub_portfolio: dict[str, float] = dataclasses.field(default_factory=dict)
 
     # pylint: disable=E1134
     def __post_init__(self):
