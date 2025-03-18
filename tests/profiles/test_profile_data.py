@@ -94,7 +94,8 @@ def profile_data_dict():
                 "BTC": 0.1,
                 "USDT": 1000
             },
-            'risk': 0.5
+            'risk': 0.5,
+            'sellable_assets': ["BTC", "ETH"]
         }, 'tentacles': [
             {
                 'name': 'plopEvaluator',

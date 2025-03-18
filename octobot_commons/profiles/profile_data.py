@@ -104,6 +104,7 @@ class TradingData(octobot_commons.dataclasses.FlexibleDataclass):
     minimal_funds: list[MinimalFund] = dataclasses.field(default_factory=list)
     risk: float = 1.0
     sub_portfolio: dict[str, float] = dataclasses.field(default_factory=dict)
+    sellable_assets: typing.Optional[list[str]] = None
 
     # pylint: disable=E1134
     def __post_init__(self):
