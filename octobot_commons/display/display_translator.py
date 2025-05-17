@@ -152,7 +152,7 @@ class DisplayTranslator:
     def _base_schema(self, tentacle):
         return {
             "type": "object",
-            "title": f"{tentacle} inputs",
+            "title": f"{tentacle} configuration",
             "properties": {},
         }
 
