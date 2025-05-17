@@ -166,6 +166,9 @@ ALLOW_DEFAULT_CONFIG = "allow_default_config"
 # terms of service
 CONFIG_ACCEPTED_TERMS = "accepted_terms"
 
+# distribution
+CONFIG_DISTRIBUTION = "distribution"
+
 # metrics
 CONFIG_METRICS = "metrics"
 CONFIG_METRICS_BOT_ID = "metrics-bot-id"
@@ -186,12 +189,13 @@ DEFAULT_API_KEY = "your-api-key-here"
 DEFAULT_API_SECRET = "your-api-secret-here"
 DEFAULT_API_PASSWORD = "your-api-password-here"
 DEFAULT_EXCHANGE_TYPE = CONFIG_EXCHANGE_SPOT
+NO_KEY_VALUE = "NO KEY"
 DEFAULT_CONFIG_VALUES = {
     DEFAULT_API_KEY,
     DEFAULT_API_SECRET,
     DEFAULT_API_PASSWORD,
     "NOKEY",
-    "NO KEY",
+    NO_KEY_VALUE,
     "Empty",
 }
 
