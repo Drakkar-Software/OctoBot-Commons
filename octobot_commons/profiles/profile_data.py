@@ -30,6 +30,7 @@ class ProfileDetailsData(octobot_commons.dataclasses.FlexibleDataclass):
     bot_id: typing.Union[str, None] = None
     version: typing.Union[str, None] = None
     user_id: typing.Union[str, None] = None
+    nested_strategy_config_id: typing.Union[str, None] = None
 
 
 @dataclasses.dataclass
