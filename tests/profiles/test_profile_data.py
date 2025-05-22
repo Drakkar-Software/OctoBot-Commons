@@ -33,7 +33,8 @@ def profile_data_dict():
             'id': 'default',
             'version': "42.42.1b",
             'bot_id': "1234-1224-0000",
-            'user_id': "plop-id"
+            'user_id': "plop-id",
+            'nested_strategy_config_id': "123-1221"
         },
         'crypto_currencies': [
             {
@@ -281,6 +282,7 @@ def test_from_dict_objects(profile_data_dict):
     })
     # check one element per attribute to be sure it's all parsed
     assert profile_data.profile_details.version == "42.42.1b"
+    assert profile_data.profile_details.nested_strategy_config_id == "123-1221"
     assert profile_data.crypto_currencies[0].trading_pairs == ['BTC/USDT']
     assert profile_data.exchanges[0].exchange_credential_id == "123-plop"
     assert profile_data.trader.enabled is True
