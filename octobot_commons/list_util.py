@@ -25,3 +25,13 @@ def flatten_list(list_to_flatten):
     return functools.reduce(
         lambda first_level, second_level: first_level + second_level, list_to_flatten
     )
+
+
+def deduplicate(elements: list) -> list:
+    """
+    remove duplicated values from a list while preserving order
+    """
+    # from https://stackoverflow.com/questions/480214/how-do-i-remove-duplicates-from-a-list-while-preserving-order
+    seen = set()
+    seen_add = seen.add
+    return [x for x in elements if not (x in seen or seen_add(x))]
