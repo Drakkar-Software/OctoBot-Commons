@@ -211,6 +211,23 @@ class DisplayTranslator:
                 # when using dependencies, set field as not required as it might not be set
                 other_values["required"] = other_values.get("required", False)
                 user_input_element["other_schema_values"] = other_values
+                # waiting for fixes on
+                # - https://github.com/json-editor/json-editor/issues/1559
+                # - https://github.com/json-editor/json-editor/issues/1621
+                to_remove = []
+                for key, val in editor_options[
+                    enums.UserInputOtherSchemaValuesTypes.DEPENDENCIES.value
+                ].items():
+                    if val is False:
+                        # for now remove unsupported dependency
+                        to_remove.append(key)
+                for key in to_remove:
+                    editor_options[
+                        enums.UserInputOtherSchemaValuesTypes.DEPENDENCIES.value
+                    ].pop(key)
+                    self.logger.debug(
+                        f"Removing unsupported 'False' dependency value for {key}"
+                    )
         if other_schema_values := user_input_element.get("other_schema_values"):
             properties.update(other_schema_values)
         return properties
