@@ -160,6 +160,7 @@ class Authenticator(singleton.Singleton):
         history: dict,
         price_by_asset: dict,
         reset: bool,
+        **kwargs
     ):
         """
         Updates authenticated account portfolio
