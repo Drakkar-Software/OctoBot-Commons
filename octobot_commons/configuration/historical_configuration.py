@@ -34,6 +34,13 @@ def add_historical_tentacle_config(
     )
 
 
+def has_any_historical_tentacle_config(master_config: dict) -> bool:
+    """
+    :return: True if there is any historical configuration in the master_config
+    """
+    return constants.CONFIG_HISTORICAL_CONFIGURATION in master_config
+
+
 def get_historical_tentacle_config(master_config: dict, current_time: float) -> dict:
     """
     :return: the historical configuration associated to the given time
@@ -46,6 +53,30 @@ def get_historical_tentacle_config(master_config: dict, current_time: float) -> 
                 return config_start_time_and_config[1]
         # no suitable config found: fallback to the oldest config
         return master_config[constants.CONFIG_HISTORICAL_CONFIGURATION][-1][1]
+    except KeyError:
+        raise KeyError(
+            f"{constants.CONFIG_HISTORICAL_CONFIGURATION} not found in master_config."
+        )
+
+
+def get_historical_tentacle_configs(
+    master_config: dict, from_time: float, to_time: float
+) -> list[dict]:
+    """
+    :return: the historical configurations corresponding to the given time interval,
+    ordered by the most recent config first
+    """
+    try:
+        return [
+            config_start_time_and_config[1]
+            for config_start_time_and_config in master_config[
+                constants.CONFIG_HISTORICAL_CONFIGURATION
+            ]
+            if (
+                config_start_time_and_config[0] >= from_time
+                and config_start_time_and_config[0] <= to_time
+            )
+        ]
     except KeyError:
         raise KeyError(
             f"{constants.CONFIG_HISTORICAL_CONFIGURATION} not found in master_config."
