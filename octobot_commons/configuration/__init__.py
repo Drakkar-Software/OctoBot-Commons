@@ -62,7 +62,9 @@ from octobot_commons.configuration.user_input_configuration import (
 )
 from octobot_commons.configuration.historical_configuration import (
     add_historical_tentacle_config,
+    has_any_historical_tentacle_config,
     get_historical_tentacle_config,
+    get_historical_tentacle_configs,
     get_oldest_historical_tentacle_config_time,
 )
 
@@ -95,6 +97,8 @@ __all__ = [
     "get_raw_config_and_user_inputs",
     "load_and_save_user_inputs",
     "add_historical_tentacle_config",
+    "has_any_historical_tentacle_config",
     "get_historical_tentacle_config",
+    "get_historical_tentacle_configs",
     "get_oldest_historical_tentacle_config_time",
 ]
