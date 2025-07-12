@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.79] - 2024-07-12
+### Added 
+[HistoricalConfig] add checker and multi config selector
+
 ## [1.9.78] - 2024-06-16
 ### Added 
 [Authentication] add kwargs to update_portfolio
