@@ -14,47 +14,48 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 
-import time
-from datetime import datetime
+from datetime import datetime, timezone
 
-_EPOCH = time.time()
-TIMEZONE_DELTA = datetime.fromtimestamp(_EPOCH) - datetime.utcfromtimestamp(_EPOCH)
+
+LOCAL_TIMEZONE = datetime.now().astimezone().tzinfo
 
 
 def convert_timestamp_to_datetime(
-    timestamp, time_format="%d/%m/%y %H:%M", force_timezone=False
-):
+    timestamp: float, time_format: str = "%d/%m/%y %H:%M", local_timezone: bool = False
+) -> str:
     """
-    Convert a timestamp to a datetime object
+    Convert a timestamp to a human readable string
     :param timestamp: the timestamp to convert
     :param time_format: the time format
-    :param force_timezone: if the timezone should be forced
-    :return: the created datetime object
+    :param local_timezone: if the local timezone should be used
+    :return: the created readable string
     """
-    if force_timezone:
-        timestamp += TIMEZONE_DELTA.seconds
-    return datetime.fromtimestamp(timestamp).strftime(time_format)
+    return datetime.fromtimestamp(
+        timestamp, tz=(LOCAL_TIMEZONE if local_timezone else timezone.utc)
+    ).strftime(time_format)
 
 
 def convert_timestamps_to_datetime(
-    timestamps, time_format="%d/%m/%y %H:%M", force_timezone=False
-):
+    timestamps: list[float],
+    time_format: str = "%d/%m/%y %H:%M",
+    local_timezone: bool = False,
+) -> list[str]:
     """
     Convert multiple timestamps to datetime objects
     :param timestamps: the timestamp to convert list
     :param time_format: the time format
-    :param force_timezone: if the timezone should be forced
+    :param local_timezone: if the local timezone should be used
     :return: the created datetime objects
     """
     return [
         convert_timestamp_to_datetime(
-            timestamp, time_format=time_format, force_timezone=force_timezone
+            timestamp, time_format=time_format, local_timezone=local_timezone
         )
         for timestamp in timestamps
     ]
 
 
-def is_valid_timestamp(timestamp):
+def is_valid_timestamp(timestamp: float) -> bool:
     """
     Check if the timestamp is valid
     :param timestamp: the timestamp to check
@@ -63,43 +64,48 @@ def is_valid_timestamp(timestamp):
     if timestamp:
         try:
             datetime.fromtimestamp(timestamp)
-        except OSError:
-            return False
-        except ValueError:
-            return False
-        except OverflowError:
-            return False
-        except TypeError:
+        except (OSError, ValueError, OverflowError, TypeError):
             return False
     return True
 
 
-def get_now_time(time_format="%Y-%m-%d %H:%M:%S"):
+def get_now_time(
+    time_format: str = "%Y-%m-%d %H:%M:%S", local_timezone: bool = True
+) -> str:
     """
     Get the current time
     :param time_format: the time format
     :return: the current timestamp
     """
-    return datetime.fromtimestamp(time.time()).strftime(time_format)
+    return datetime.now(
+        tz=(LOCAL_TIMEZONE if local_timezone else timezone.utc)
+    ).strftime(time_format)
 
 
-def datetime_to_timestamp(date_time_str: str, date_time_format: str) -> float:
+def datetime_to_timestamp(
+    date_time_str: str, date_time_format: str, local_timezone: bool = True
+) -> float:
     """
     Convert a datetime to timestamp
     :param date_time_str: the datetime string
     :param date_time_format: the datetime format
     :return: the timestamp
     """
-    return time.mktime(
-        create_datetime_from_string(date_time_str, date_time_format).timetuple()
-    )
+    return create_datetime_from_string(
+        date_time_str, date_time_format, local_timezone=local_timezone
+    ).timestamp()
 
 
-def create_datetime_from_string(date_time_str: str, date_time_format: str) -> datetime:
+def create_datetime_from_string(
+    date_time_str: str, date_time_format: str, local_timezone: bool = True
+) -> datetime:
     """
     Convert a string to datetime
     :param date_time_str: the datetime string
     :param date_time_format: the datetime format
     :return: the converted datetime
     """
-    return datetime.strptime(date_time_str, date_time_format)
+    # force local timezone or parsing might fail
+    return datetime.strptime(date_time_str, date_time_format).replace(
+        tzinfo=LOCAL_TIMEZONE if local_timezone else timezone.utc
+    )

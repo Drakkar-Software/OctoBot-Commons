@@ -89,7 +89,7 @@ def trade_pretty_printer(exchange_name, trade, markdown=False) -> str:
 
         trade_executed_time_str = (
             timestamp_util.convert_timestamp_to_datetime(
-                trade.executed_time, time_format=ORDER_TIME_FORMAT
+                trade.executed_time, time_format=ORDER_TIME_FORMAT, local_timezone=True
             )
             if trade.executed_time
             else ""
