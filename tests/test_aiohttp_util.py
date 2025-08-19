@@ -92,3 +92,18 @@ async def test_certify_aiohttp_client_session():
         async with aiohttp_util.certify_aiohttp_client_session() as session:
             assert isinstance(session, aiohttp.ClientSession)
             where_mock.assert_called_once()
+
+
+async def test_counter_client_session():
+    async with aiohttp_util.CounterClientSession("test") as session:
+        assert isinstance(session, aiohttp.ClientSession)
+        assert session.per_min.name == "test"
+        assert session.per_hour.name == "test"
+        assert session.per_day.name == "test"
+
+        # ensure counters work
+        async with session.get("https://ifconfig.me/", headers={"Content-Type": "application/json"}) as resp:
+            assert resp.status == 200
+            assert session.per_min.paths == {"[GET] /": 1}
+            assert session.per_hour.paths == {"[GET] /": 1}
+            assert session.per_day.paths == {"[GET] /": 1}
