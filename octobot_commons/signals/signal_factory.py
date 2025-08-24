@@ -16,6 +16,7 @@
 #  License along with this library.
 import octobot_commons.signals.signal as signal
 import octobot_commons.signals.signal_bundle as signal_bundle
+import octobot_commons.signals.signal_dependencies as signal_dependencies
 import octobot_commons.enums as commons_enums
 
 
@@ -39,4 +40,11 @@ def create_signal(signal_dict: dict) -> signal.Signal:
     return signal.Signal(
         signal_dict.get(commons_enums.SignalsAttrs.TOPIC.value),
         signal_dict.get(commons_enums.SignalsAttrs.CONTENT.value),
+        signal_dependencies.SignalDependencies(
+            signal_dict.get(commons_enums.SignalsAttrs.DEPENDENCIES.value).get(
+                commons_enums.SignalDependenciesAttrs.DEPENDENCY.value
+            )
+        )
+        if signal_dict.get(commons_enums.SignalsAttrs.DEPENDENCIES.value)
+        else None,
     )

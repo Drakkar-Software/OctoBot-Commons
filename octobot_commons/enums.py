@@ -398,6 +398,11 @@ class SignalBundlesAttrs(enum.Enum):
 class SignalsAttrs(enum.Enum):
     TOPIC = "topic"
     CONTENT = "content"
+    DEPENDENCIES = "dependencies"
+
+
+class SignalDependenciesAttrs(enum.Enum):
+    DEPENDENCY = "dependency"
 
 
 class InitializationEventExchangeTopics(enum.Enum):

@@ -13,8 +13,11 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import typing
+
 import octobot_commons.signals.signal_bundle as signal_bundle
 import octobot_commons.signals.signal as signal
+import octobot_commons.signals.signal_dependencies as signal_dependencies
 import octobot_commons.logging as logging
 
 
@@ -29,17 +32,31 @@ class SignalBundleBuilder:
         self.logger = logging.get_logger(self.__class__.__name__)
         self.reset()
 
-    def register_signal(self, topic: str, content: dict, **kwargs):
+    def register_signal(
+        self,
+        topic: str,
+        content: dict,
+        dependencies: typing.Optional[signal_dependencies.SignalDependencies] = None,
+        **kwargs
+    ):
         """
         Store a signal to be packed on build call
         """
-        self.signals.append(self.create_signal(topic, content, **kwargs))
+        self.signals.append(
+            self.create_signal(topic, content, dependencies=dependencies, **kwargs)
+        )
 
-    def create_signal(self, topic: str, content: dict, **kwargs):
+    def create_signal(
+        self,
+        topic: str,
+        content: dict,
+        dependencies: typing.Optional[signal_dependencies.SignalDependencies] = None,
+        **kwargs
+    ):
         """
         Create a signal from self.signal_class
         """
-        return self.signal_class(topic, content, **kwargs)
+        return self.signal_class(topic, content, dependencies=dependencies, **kwargs)
 
     def is_empty(self) -> bool:
         """
