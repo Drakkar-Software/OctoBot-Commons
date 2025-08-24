@@ -22,6 +22,13 @@ from octobot_commons.signals.signal import (
     Signal,
 )
 
+
+from octobot_commons.signals import signal_dependencies
+
+from octobot_commons.signals.signal_dependencies import (
+    SignalDependencies,
+)
+
 from octobot_commons.signals import signal_bundle
 
 from octobot_commons.signals.signal_bundle import (
@@ -68,4 +75,5 @@ __all__ = [
     "emit_signal_bundle",
     "SignalBuilderWrapper",
     "SignalPublisher",
+    "SignalDependencies",
 ]

@@ -48,6 +48,21 @@ def signal_dict():
     return {
         enums.SignalsAttrs.TOPIC.value:  "dict topic",
         enums.SignalsAttrs.CONTENT.value: {"dict": "content", "hi": 1},
+        enums.SignalsAttrs.DEPENDENCIES.value: None,
+    }
+
+
+@pytest.fixture
+def signal_with_dependencies_dict():
+    return {
+        enums.SignalsAttrs.TOPIC.value:  "dict topic",
+        enums.SignalsAttrs.CONTENT.value: {"dict": "content", "hi": 1},
+        enums.SignalsAttrs.DEPENDENCIES.value: {
+            enums.SignalDependenciesAttrs.DEPENDENCY.value: [
+                {"plop": "123"},
+                {"PLIP": "456"}
+            ]
+        },
     }
 
 

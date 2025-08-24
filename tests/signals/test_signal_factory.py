@@ -15,7 +15,7 @@
 #  License along with this library.
 import octobot_commons.signals as signals
 
-from tests.signals import signal_dict, signal_bundle_dict
+from tests.signals import signal_dict, signal_bundle_dict, signal_with_dependencies_dict
 
 
 def test_create_signal_bundle(signal_bundle_dict):
@@ -31,3 +31,13 @@ def test_create_signal(signal_dict):
     created_signal = signals.create_signal(signal_dict)
     assert created_signal.topic == "dict topic"
     assert created_signal.content == {"dict": "content", "hi": 1}
+
+
+def test_create_signal_with_dependencies(signal_with_dependencies_dict):
+    created_signal = signals.create_signal(signal_with_dependencies_dict)
+    assert created_signal.topic == "dict topic"
+    assert created_signal.content == {"dict": "content", "hi": 1}
+    assert created_signal.dependencies == signals.SignalDependencies([
+        {"plop": "123"},
+        {"PLIP": "456"}
+    ])

@@ -14,6 +14,8 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import octobot_commons.enums
+import octobot_commons.signals as signals
+
 
 from tests.signals import signal
 
@@ -22,6 +24,21 @@ def test_to_dict(signal):
     assert signal.to_dict() == {
         octobot_commons.enums.SignalsAttrs.TOPIC.value: "hello topic",
         octobot_commons.enums.SignalsAttrs.CONTENT.value: {"hi": "plop"},
+        octobot_commons.enums.SignalsAttrs.DEPENDENCIES.value: None,
+    }
+    signal.dependencies = signals.SignalDependencies([
+        {"plop": "123"},
+        {"PLIP": "123"}
+    ])
+    assert signal.to_dict() == {
+        octobot_commons.enums.SignalsAttrs.TOPIC.value: "hello topic",
+        octobot_commons.enums.SignalsAttrs.CONTENT.value: {"hi": "plop"},
+        octobot_commons.enums.SignalsAttrs.DEPENDENCIES.value: {
+            octobot_commons.enums.SignalDependenciesAttrs.DEPENDENCY.value: [
+                {"plop": "123"},
+                {"PLIP": "123"}
+            ]
+        },
     }
 
 
