@@ -18,10 +18,11 @@ import functools
 
 import octobot_commons
 
+_FULL_SYMBOL_GROUPS_REGEX = r"([^//]*)\/([^:]*):?([^-]*)-?([^-]*)-?([^-]*)-?([^-]*)"
+
 
 # pylint: disable=R0902
 class Symbol:
-    FULL_SYMBOL_GROUPS_REGEX = r"([^//]*)\/([^:]*):?([^-]*)-?([^-]*)-?([^-]*)-?([^-]*)"
     #                             base   /  quote : settlement-identifier-strike price-type
     # Inspired from CCXT https://docs.ccxt.com/en/latest/manual.html#option:
     # //
@@ -76,7 +77,7 @@ class Symbol:
                 self.identifier,
                 self.strike_price,
                 self.option_type,
-            ) = _parse_symbol_full(self.FULL_SYMBOL_GROUPS_REGEX, symbol_str)
+            ) = _parse_symbol_full(_FULL_SYMBOL_GROUPS_REGEX, symbol_str)
         else:
             # simple (probably spot) pair, use str.split as it is much faster
             self.base, self.quote = _parse_spot_symbol(
