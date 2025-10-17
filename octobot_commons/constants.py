@@ -256,6 +256,7 @@ USD_LIKE_COINS = [
     "BOB",
     "MIMATIC",
 ]
+DEFAULT_REFERENCE_MARKET = "USDT"
 
 # from coinbase and binance fiat pairs
 FIAT_NON_USD_LIKE_COINS = [
