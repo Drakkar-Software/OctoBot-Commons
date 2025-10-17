@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.83] - 2024-10-17
+### Added 
+[Constants] add DEFAULT_REFERENCE_MARKET
+
 ## [1.9.82] - 2024-08-24
 ### Added 
 [Signals] add dependencies
