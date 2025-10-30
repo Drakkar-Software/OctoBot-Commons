@@ -24,6 +24,8 @@ class BaseTreeNode:
         "node_value",
         "node_value_time",
         "node_type",
+        "node_description",
+        "node_metadata",
         "children",
     ]
 
@@ -31,6 +33,8 @@ class BaseTreeNode:
         self.node_value = node_value
         self.node_value_time = None
         self.node_type = node_type
+        self.node_description = None
+        self.node_metadata = {}
         self.children = {}
 
     def set_child(self, key, child):
