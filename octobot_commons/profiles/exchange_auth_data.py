@@ -24,6 +24,7 @@ import octobot_commons.constants
 class ExchangeAuthData(octobot_commons.dataclasses.FlexibleDataclass):
     internal_name: str
     exchange_credential_id: str = ""
+    encrypted: str = ""
     api_key: str = ""
     api_secret: str = ""
     api_password: str = ""
