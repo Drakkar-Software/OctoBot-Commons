@@ -190,7 +190,7 @@ def _get_tentacles_setup_config(
         classes = [
             octobot_tentacles_manager.api.get_tentacle_class_from_string(
                 tentacle_data.name
-            ).get_name()
+            ).__name__
             for tentacle_data in profile_data.tentacles
         ]
         config_path = os.path.join(output_path, constants.CONFIG_TENTACLES_FILE)
