@@ -109,16 +109,17 @@ def get_class_from_string(
     :param error_when_not_found: if errors should be raised
     :return: the class if found else None
     """
-    if any(
-        m[0] == class_string
+    if tentacle_class_by_name := {
+        m[0]: m[1]
+        for m in inspect.getmembers(module)
+        if (m[0] == class_string)
         and hasattr(m[1], "__bases__")
         and parent_inspection(m[1], parent)
-        for m in inspect.getmembers(module)
-    ):
-        return getattr(module, class_string)
+    }:
+        return tentacle_class_by_name[class_string]
     if error_when_not_found:
         raise ModuleNotFoundError(f"Cant find {class_string} module")
-    return None
+    return None  # no class found
 
 
 def is_abstract_using_inspection_and_class_naming(clazz):
