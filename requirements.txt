@@ -1,5 +1,5 @@
 # Setup requirements
-numpy==1.26.3
+numpy==2.3.5
 
 # Commons requirements
 jsonschema==4.20.0
