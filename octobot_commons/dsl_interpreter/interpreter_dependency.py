@@ -1,4 +1,4 @@
-# pylint: disable=R0801,R0401
+# pylint: disable=too-many-branches,too-many-return-statements
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -14,16 +14,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import dataclasses
 
 
-from octobot_commons.databases.relational_databases.sqlite import sqlite_database
-from octobot_commons.databases.relational_databases.sqlite.sqlite_database import (
-    SQLiteDatabase,
-    new_sqlite_database,
-)
-
-
-__all__ = [
-    "SQLiteDatabase",
-    "new_sqlite_database",
-]
+@dataclasses.dataclass
+class InterpreterDependency:
+    pass

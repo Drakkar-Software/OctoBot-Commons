@@ -1,4 +1,3 @@
-# pylint: disable=R0801,R0401
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -14,16 +13,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import octobot_commons.dsl_interpreter.operator as dsl_interpreter_operator
 
 
-from octobot_commons.databases.relational_databases.sqlite import sqlite_database
-from octobot_commons.databases.relational_databases.sqlite.sqlite_database import (
-    SQLiteDatabase,
-    new_sqlite_database,
-)
-
-
-__all__ = [
-    "SQLiteDatabase",
-    "new_sqlite_database",
-]
+class NaryOperator(
+    dsl_interpreter_operator.Operator
+):  # pylint: disable=abstract-method
+    """
+    Base class for n-ary operators.
+    N-ary operators have one or more operands.
+    """
