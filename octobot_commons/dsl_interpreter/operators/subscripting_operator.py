@@ -1,4 +1,3 @@
-# pylint: disable=R0801,R0401
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -14,16 +13,14 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
+import octobot_commons.dsl_interpreter.operator as dsl_interpreter_operator
 
 
-from octobot_commons.databases.relational_databases.sqlite import sqlite_database
-from octobot_commons.databases.relational_databases.sqlite.sqlite_database import (
-    SQLiteDatabase,
-    new_sqlite_database,
-)
-
-
-__all__ = [
-    "SQLiteDatabase",
-    "new_sqlite_database",
-]
+class SubscriptingOperator(
+    dsl_interpreter_operator.Operator
+):  # pylint: disable=abstract-method
+    """
+    Base class for subscripting operators (array/list subscripting).
+    Subscripting operators have 3 parameters: the array/list, the index or slice and the context.
+    # https://docs.python.org/3/library/ast.html#subscripting
+    """

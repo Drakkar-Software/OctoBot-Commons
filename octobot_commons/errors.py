@@ -133,3 +133,21 @@ class MissingSignalBuilder(Exception):
     """
     Raised when a signal builder is not found
     """
+
+
+class DSLInterpreterError(Exception):
+    """
+    Raised when a DSL interpreter error occurs
+    """
+
+
+class UnsupportedOperatorError(DSLInterpreterError):
+    """
+    Raised when an unknown operator is encountered
+    """
+
+
+class InvalidParametersError(DSLInterpreterError):
+    """
+    Raised when the parameters of an operator are invalid
+    """

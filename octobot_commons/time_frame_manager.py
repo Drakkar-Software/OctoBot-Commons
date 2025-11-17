@@ -48,7 +48,7 @@ def get_config_time_frame(config) -> list:
 
 def sort_time_frames(time_frames, reverse=False) -> list:
     """
-    Sort a time frame list
+    Sort a time frame list, shorted to longest
     :param time_frames: the time frames to sort
     :param reverse: if the sort should be reversed
     :return: the time frame list sorted
