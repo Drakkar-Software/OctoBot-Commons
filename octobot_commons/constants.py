@@ -248,20 +248,17 @@ USD_LIKE_COINS = [
     "BUSD",
     "DAI",
     "USD",
-    "FRAX",
     "USDD",
     "USDP",
     "GUSD",
     "LUSD",
     "FDUSD",
-    "ALUSD",
-    "USDTC",
-    "MIM",
-    "DOLA",
-    "BOB",
-    "MIMATIC",
 ]
 DEFAULT_REFERENCE_MARKET = "USDT"
+USUAL_REFERENCE_MARKET_USD_LIKE_COINS = [
+    DEFAULT_REFERENCE_MARKET,
+    "USDC",
+]
 
 # from coinbase and binance fiat pairs
 FIAT_NON_USD_LIKE_COINS = [
