@@ -22,7 +22,6 @@ import pathlib
 import uuid
 import time
 import requests
-import jsonschema
 import octobot_commons.constants as constants
 import octobot_commons.enums as enums
 import octobot_commons.logging as bot_logging
@@ -30,6 +29,19 @@ import octobot_commons.errors as errors
 import octobot_commons.json_util as json_util
 import octobot_commons.authentication as authentication
 
+try:
+    import jsonschema
+except ImportError:
+    if constants.USE_MINIMAL_LIBS:
+        # mock jsonschema imports
+        class JsonschemaImportMock:
+            class exceptions:
+                class ValidationError(Exception):
+                    def __init__(self, *args):
+                        raise ImportError("jsonschema not installed")
+        jsonschema = JsonschemaImportMock()
+    else:
+        raise
 # avoid cyclic import
 from octobot_commons.profiles.profile import Profile
 import octobot_commons.profiles.profile_data as profile_data_import

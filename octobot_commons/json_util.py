@@ -17,9 +17,19 @@
 import json
 import os.path
 import shutil
-import jsonschema
 import octobot_commons.logging
 import octobot_commons.constants
+try:
+    import jsonschema
+except ImportError:
+    if octobot_commons.constants.USE_MINIMAL_LIBS:
+        # mock jsonschema imports
+        class JsonschemaImportMock:
+            def validate(self, instance, schema):
+                raise ImportError("jsonschema not installed")
+        jsonschema = JsonschemaImportMock()
+    else:
+        raise
 
 
 LOGGER_NAME = "json_util"
