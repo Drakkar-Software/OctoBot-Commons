@@ -19,10 +19,37 @@ import sys
 import os
 import platform
 import ctypes
-import psutil
 
 import octobot_commons.constants as constants
 import octobot_commons.enums as enums
+
+try:
+    import psutil
+except ImportError:
+    if constants.USE_MINIMAL_LIBS:
+        # mock psutil imports
+        class PsutilImportMock:
+            class virtual_memory:
+                def __init__(self, *args):
+                    raise ImportError("psutil not installed")
+                def __getitem__(self, key):
+                    return self[key]
+            class Process:
+                def __init__(self, *args):
+                    raise ImportError("psutil not installed")
+                def memory_info(self):
+                    class MemoryInfo:
+                        def __init__(self, *args):
+                            pass
+                        def rss(self):
+                            return 0
+                    return MemoryInfo()
+            class cpu_percent:
+                def __init__(self, *args):
+                    raise ImportError("psutil not installed")
+        psutil = PsutilImportMock()
+    else:
+        raise
 
 
 def get_current_platform():
@@ -114,12 +141,7 @@ def _is_on_docker():
 
 
 def parse_boolean_environment_var(env_key: str, default_value: str) -> bool:
-    """
-    :param env_key: the environment var key
-    :param default_value: the default value
-    :return: True when the var value is "True" or "true" else false
-    """
-    return bool(os.getenv(env_key, default_value).lower() == "true")
+    return constants.parse_boolean_environment_var(env_key, default_value)
 
 
 def get_cpu_and_ram_usage(cpu_watching_seconds):

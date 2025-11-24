@@ -22,10 +22,19 @@ import dataclasses
 import contextlib
 import aiohttp
 import aiohttp.typedefs
-import certifi
 
 import octobot_commons.logging
 import octobot_commons.constants
+
+try:
+    import certifi
+except ImportError:
+    if octobot_commons.constants.USE_MINIMAL_LIBS:
+        # mock certifi imports
+        class CertifiImportMock:
+            def where(self):
+                raise ImportError("certifi not installed")
+    certifi = CertifiImportMock()
 
 
 async def download_stream_file(

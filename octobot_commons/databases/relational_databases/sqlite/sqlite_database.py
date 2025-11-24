@@ -16,12 +16,22 @@
 #  License along with this library.
 import contextlib
 import sqlite3
-import aiosqlite
 
 import octobot_commons.logging as logging
 import octobot_commons.enums as enums
 import octobot_commons.errors as errors
 import octobot_commons.databases.relational_databases.sqlite.cursor_pool as cursor_pool
+import octobot_commons.constants as constants
+
+try:
+    import aiosqlite
+except ImportError:
+    if constants.USE_MINIMAL_LIBS:
+        # mock aiosqlite imports
+            class AiosqliteImportMock:
+                def connect(self, *args):
+                    raise ImportError("aiosqlite not installed")
+    aiosqlite = AiosqliteImportMock()
 
 
 class SQLiteDatabase:

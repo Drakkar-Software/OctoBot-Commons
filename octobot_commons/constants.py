@@ -16,6 +16,15 @@
 import os
 import octobot_commons.enums as enums
 
+
+def parse_boolean_environment_var(env_key: str, default_value: str) -> bool:
+    """
+    :param env_key: the environment var key
+    :param default_value: the default value
+    :return: True when the var value is "True" or "true" else false
+    """
+    return bool(os.getenv(env_key, default_value).lower() == "true")
+
 # time
 MSECONDS_TO_SECONDS = 1000
 MINUTE_TO_SECONDS = 60
@@ -271,10 +280,9 @@ FIAT_NON_USD_LIKE_COINS = [
 
 USD_LIKE_AND_FIAT_COINS = USD_LIKE_COINS + FIAT_NON_USD_LIKE_COINS
 
-ENABLE_CERTIFI_SSL_CERTIFICATES = bool(
-    os.getenv("ENABLE_CERTIFI_SSL_CERTIFICATES", "true").lower() == "true"
-)
+ENABLE_CERTIFI_SSL_CERTIFICATES = parse_boolean_environment_var("ENABLE_CERTIFI_SSL_CERTIFICATES", "true")
 KNOWN_POTENTIALLY_SSL_FAILED_REQUIRED_URL = (
     "https://tentacles.octobot.online/officials/packages/full/base/1.0.9/metadata.yaml"
 )
-IS_DEV_MODE_ENABLED = bool(os.getenv(CONFIG_DEBUG_OPTION, "False").lower() == "true")
+IS_DEV_MODE_ENABLED = parse_boolean_environment_var(CONFIG_DEBUG_OPTION, "False")
+USE_MINIMAL_LIBS = parse_boolean_environment_var("USE_MINIMAL_LIBS", "false")
