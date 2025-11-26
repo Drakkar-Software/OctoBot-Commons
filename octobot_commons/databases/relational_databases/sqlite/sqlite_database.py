@@ -28,10 +28,13 @@ try:
 except ImportError:
     if constants.USE_MINIMAL_LIBS:
         # mock aiosqlite imports
-            class AiosqliteImportMock:
-                def connect(self, *args):
-                    raise ImportError("aiosqlite not installed")
-    aiosqlite = AiosqliteImportMock()
+        class AiosqliteImportMock:
+            def connect(self, *args):
+                raise ImportError("aiosqlite not installed")
+
+        aiosqlite = AiosqliteImportMock()
+    else:
+        raise
 
 
 class SQLiteDatabase:

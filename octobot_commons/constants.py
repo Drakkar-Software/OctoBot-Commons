@@ -25,6 +25,7 @@ def parse_boolean_environment_var(env_key: str, default_value: str) -> bool:
     """
     return bool(os.getenv(env_key, default_value).lower() == "true")
 
+
 # time
 MSECONDS_TO_SECONDS = 1000
 MINUTE_TO_SECONDS = 60
@@ -280,7 +281,9 @@ FIAT_NON_USD_LIKE_COINS = [
 
 USD_LIKE_AND_FIAT_COINS = USD_LIKE_COINS + FIAT_NON_USD_LIKE_COINS
 
-ENABLE_CERTIFI_SSL_CERTIFICATES = parse_boolean_environment_var("ENABLE_CERTIFI_SSL_CERTIFICATES", "true")
+ENABLE_CERTIFI_SSL_CERTIFICATES = parse_boolean_environment_var(
+    "ENABLE_CERTIFI_SSL_CERTIFICATES", "true"
+)
 KNOWN_POTENTIALLY_SSL_FAILED_REQUIRED_URL = (
     "https://tentacles.octobot.online/officials/packages/full/base/1.0.9/metadata.yaml"
 )

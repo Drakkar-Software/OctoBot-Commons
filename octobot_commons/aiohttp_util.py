@@ -32,9 +32,12 @@ except ImportError:
     if octobot_commons.constants.USE_MINIMAL_LIBS:
         # mock certifi imports
         class CertifiImportMock:
-            def where(self):
+            def where(self):  # pylint: disable=missing-function-docstring
                 raise ImportError("certifi not installed")
-    certifi = CertifiImportMock()
+
+        certifi = CertifiImportMock()
+    else:
+        raise
 
 
 async def download_stream_file(
