@@ -1,6 +1,3 @@
-# Setup requirements
-numpy==1.26.3
-
 # Commons requirements
 jsonschema==4.20.0
 psutil==5.9.7
