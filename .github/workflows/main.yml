@@ -13,10 +13,13 @@ jobs:
     with:
       project_main_package: octobot_commons
       use_black: true
+      use_full_requirements: true
 
   tests:
     needs: lint
     uses: Drakkar-Software/.github/.github/workflows/python3_tests_workflow.yml@master
+    with:
+      use_full_requirements: true
     secrets:
       COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
@@ -24,6 +27,8 @@ jobs:
     needs: tests
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     uses: Drakkar-Software/.github/.github/workflows/python3_sdist_workflow.yml@master
+    with:
+      use_full_requirements: true
     secrets:
       PYPI_OFFICIAL_UPLOAD_URL: ${{ secrets.PYPI_OFFICIAL_UPLOAD_URL }}
       PYPI_USERNAME: __token__
