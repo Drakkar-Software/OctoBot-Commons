@@ -19,14 +19,18 @@ import os.path
 import shutil
 import octobot_commons.logging
 import octobot_commons.constants
+
 try:
     import jsonschema
 except ImportError:
     if octobot_commons.constants.USE_MINIMAL_LIBS:
         # mock jsonschema imports
         class JsonschemaImportMock:
-            def validate(self, instance, schema):
+            def validate(
+                self, instance, schema
+            ):  # pylint: disable=missing-function-docstring
                 raise ImportError("jsonschema not installed")
+
         jsonschema = JsonschemaImportMock()
     else:
         raise

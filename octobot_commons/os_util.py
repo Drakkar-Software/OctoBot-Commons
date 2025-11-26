@@ -29,24 +29,31 @@ except ImportError:
     if constants.USE_MINIMAL_LIBS:
         # mock psutil imports
         class PsutilImportMock:
-            class virtual_memory:
+            class virtual_memory:  # pylint: disable=invalid-name
                 def __init__(self, *args):
                     raise ImportError("psutil not installed")
+
                 def __getitem__(self, key):
                     return self[key]
+
             class Process:
                 def __init__(self, *args):
                     raise ImportError("psutil not installed")
-                def memory_info(self):
+
+                def memory_info(self):  # pylint: disable=missing-function-docstring
                     class MemoryInfo:
                         def __init__(self, *args):
                             pass
-                        def rss(self):
+
+                        def rss(self):  # pylint: disable=missing-function-docstring
                             return 0
+
                     return MemoryInfo()
-            class cpu_percent:
+
+            class cpu_percent:  # pylint: disable=invalid-name
                 def __init__(self, *args):
                     raise ImportError("psutil not installed")
+
         psutil = PsutilImportMock()
     else:
         raise
@@ -141,6 +148,12 @@ def _is_on_docker():
 
 
 def parse_boolean_environment_var(env_key: str, default_value: str) -> bool:
+    """
+    Parse a boolean environment variable
+    :param env_key: the environment variable key
+    :param default_value: the default value
+    :return: the boolean value
+    """
     return constants.parse_boolean_environment_var(env_key, default_value)
 
 

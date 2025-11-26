@@ -35,10 +35,11 @@ except ImportError:
     if constants.USE_MINIMAL_LIBS:
         # mock jsonschema imports
         class JsonschemaImportMock:
-            class exceptions:
+            class exceptions:  # pylint: disable=invalid-name
                 class ValidationError(Exception):
                     def __init__(self, *args):
                         raise ImportError("jsonschema not installed")
+
         jsonschema = JsonschemaImportMock()
     else:
         raise
