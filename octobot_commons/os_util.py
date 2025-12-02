@@ -132,6 +132,30 @@ def is_arm_machine() -> bool:
     return platform.machine() in ["armv7l", "aarch64"]
 
 
+def is_raspberry_pi_machine() -> bool:
+    """
+    Check if the machine is a Raspberry Pi
+    Works on bare metal and in Docker containers
+    :return: True if the machine is a Raspberry Pi
+    """
+    # Try device-tree method (works on bare metal Raspberry Pi)
+    try:
+        with open("/proc/device-tree/model", "r") as f:
+            if "Raspberry Pi" in f.read():
+                return True
+    except (FileNotFoundError, IOError):
+        pass
+
+    # Fallback to cpuinfo (works in Docker containers)
+    try:
+        with open("/proc/cpuinfo", "r") as f:
+            cpuinfo = f.read()
+            return "Raspberry Pi" in cpuinfo or "BCM" in cpuinfo
+    except (FileNotFoundError, IOError):
+        pass
+    return False
+
+
 def _is_on_docker():
     """
     Check if the current platform is docker
