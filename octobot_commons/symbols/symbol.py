@@ -14,7 +14,6 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import re
-import functools
 
 import octobot_commons
 
@@ -181,12 +180,10 @@ class Symbol:
         return self.symbol_str
 
 
-@functools.lru_cache(maxsize=None)
 def _parse_symbol_full(full_symbol_regex, symbol_str):
     return re.search(full_symbol_regex, symbol_str).groups()
 
 
-@functools.lru_cache(maxsize=None)
 def _parse_spot_symbol(separator, symbol_str):
     split_result = symbol_str.split(separator)
     if len(split_result) < 2:
