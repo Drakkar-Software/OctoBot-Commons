@@ -22,7 +22,10 @@ import octobot_commons.constants as constants
 import octobot_commons.symbols.symbol
 
 
-@functools.lru_cache(maxsize=2048)
+_MAX_PARSED_SYMBOLS_CACHE_SIZE = 2048
+
+
+@functools.lru_cache(maxsize=_MAX_PARSED_SYMBOLS_CACHE_SIZE)
 def parse_symbol(symbol):
     """
     Parse the specified symbol into a Symbol object
