@@ -101,6 +101,22 @@ async def wait_asyncio_next_cycle():
     await asyncio.create_task(do_nothing())
 
 
+async def gather_waiting_for_all_before_raising(*coros):
+    """
+    Gather coros waiting for all futures to be done before raising an exception if any.
+    Note: given coros should never return an exception, otherwise it will be raised immediately.
+    :param coros: the coros to gather
+    :return: same as asyncio.gather with return_exceptions=False
+    """
+    maybe_exceptions = await asyncio.gather(*coros, return_exceptions=True)
+    for maybe_exception in maybe_exceptions:
+        if isinstance(maybe_exception, Exception):
+            # an exception was returned (raised by a future): raise it immediately
+            raise maybe_exception
+    # no exception returned: all futures completed successfully: return their values
+    return maybe_exceptions
+
+
 class RLock(asyncio.Lock):
     """
     Async Lock implementing reentrancy
