@@ -25,7 +25,7 @@ from octobot_commons.dsl_interpreter.dictionnaries import (
     clear_get_all_operators_cache,
 )
 from octobot_commons.dsl_interpreter.operator_parameter import OperatorParameter
-
+from octobot_commons.dsl_interpreter.operator_docs import OperatorDocs
 from octobot_commons.dsl_interpreter.operators import (
     BinaryOperator,
     UnaryOperator,
@@ -43,6 +43,7 @@ __all__ = [
     "Interpreter",
     "Operator",
     "OperatorParameter",
+    "OperatorDocs",
     "BinaryOperator",
     "UnaryOperator",
     "CompareOperator",

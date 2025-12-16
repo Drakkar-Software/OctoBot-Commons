@@ -20,6 +20,7 @@ import octobot_commons.errors
 import octobot_commons.constants
 import octobot_commons.dsl_interpreter.interpreter_dependency as dsl_interpreter_dependency
 import octobot_commons.dsl_interpreter.operator_parameter as dsl_interpreter_operator_parameter
+import octobot_commons.dsl_interpreter.operator_docs as dsl_interpreter_operator_docs
 
 OperatorParameterType = typing.Union[
     str, int, float, bool, None, list, np.ndarray, "Operator"
@@ -41,6 +42,9 @@ class Operator:
     MAX_PARAMS: typing.Optional[
         int
     ] = None  # max number of parameters when not defined in get_parameters()
+    NAME: str = ""  # name of the operator as written in the DSL expression, if not provided, get_name() will be used
+    DESCRIPTION: str = ""  # description of the operator
+    EXAMPLE: str = ""  # example of the operator in the DSL
 
     def __init__(self, *parameters: OperatorParameterType, **kwargs: typing.Any):
         self._validate_parameters(parameters)
@@ -50,7 +54,7 @@ class Operator:
     @staticmethod
     def get_name() -> str:
         """
-        Get the name of the operator, as seen in the DSL expression.
+        Get the name of the operator, as seen in the AST parsed expression.
         """
         raise NotImplementedError("get_name is not implemented")
 
@@ -96,6 +100,19 @@ class Operator:
         """
         return ", ".join(
             (f"{i+1}: {param}" for i, param in enumerate(cls.get_parameters()))
+        )
+
+    @classmethod
+    def get_docs(cls) -> dsl_interpreter_operator_docs.OperatorDocs:
+        """
+        Get the documentation of the operator.
+        """
+        return dsl_interpreter_operator_docs.OperatorDocs(
+            name=cls.NAME or cls.get_name(),
+            description=cls.DESCRIPTION,
+            type=cls.get_library(),
+            example=cls.EXAMPLE,
+            parameters=cls.get_parameters(),
         )
 
     @staticmethod
