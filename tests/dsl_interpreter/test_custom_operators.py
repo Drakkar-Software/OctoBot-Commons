@@ -152,3 +152,187 @@ async def test_interpreter_invalid_parameters(interpreter):
         interpreter.prepare("time_frame_to_seconds(1, 2, 3)")
     with pytest.raises(commons_errors.InvalidParametersError, match="time_frame_to_seconds supports up to 1 parameters"):
         await interpreter.interprete("time_frame_to_seconds(1, 2, 3)")
+
+
+class OperatorWithName(dsl_interpreter.Operator):
+    NAME = "custom_name"
+    DESCRIPTION = "A custom operator with NAME set"
+    EXAMPLE = "custom_name(1, 2)"
+    
+    @staticmethod
+    def get_name() -> str:
+        return "fallback_name"
+    
+    def compute(self) -> dsl_interpreter.ComputedOperatorParameterType:
+        return sum(self.get_computed_parameters())
+
+
+class OperatorWithoutName(dsl_interpreter.Operator):
+    DESCRIPTION = "An operator without NAME, uses get_name()"
+    EXAMPLE = "fallback_name(5)"
+    
+    @staticmethod
+    def get_name() -> str:
+        return "fallback_name"
+    
+    def compute(self) -> dsl_interpreter.ComputedOperatorParameterType:
+        return sum(self.get_computed_parameters())
+
+
+class OperatorWithParameters(dsl_interpreter.Operator):
+    NAME = "param_op"
+    DESCRIPTION = "Operator with parameters"
+    EXAMPLE = "param_op(1, 2)"
+    
+    @staticmethod
+    def get_name() -> str:
+        return "param_op"
+    
+    @staticmethod
+    def get_parameters() -> list[dsl_interpreter.OperatorParameter]:
+        return [
+            dsl_interpreter.OperatorParameter(name="x", description="first parameter", required=True, type=int),
+            dsl_interpreter.OperatorParameter(name="y", description="second parameter", required=False, type=int),
+        ]
+    
+    def compute(self) -> dsl_interpreter.ComputedOperatorParameterType:
+        return sum(self.get_computed_parameters())
+
+
+class OperatorWithoutParameters(dsl_interpreter.Operator):
+    NAME = "no_param_op"
+    DESCRIPTION = "Operator without parameters"
+    EXAMPLE = "no_param_op()"
+    
+    @staticmethod
+    def get_name() -> str:
+        return "no_param_op"
+    
+    def compute(self) -> dsl_interpreter.ComputedOperatorParameterType:
+        return 42
+
+
+class OperatorWithCustomLibrary(dsl_interpreter.Operator):
+    NAME = "custom_lib_op"
+    DESCRIPTION = "Operator with custom library"
+    EXAMPLE = "custom_lib_op()"
+    
+    @staticmethod
+    def get_name() -> str:
+        return "custom_lib_op"
+    
+    @staticmethod
+    def get_library() -> str:
+        return "custom_library"
+    
+    def compute(self) -> dsl_interpreter.ComputedOperatorParameterType:
+        return 42
+
+
+class OperatorWithEmptyFields(dsl_interpreter.Operator):
+    # NAME, DESCRIPTION, EXAMPLE all empty/default
+    @staticmethod
+    def get_name() -> str:
+        return "empty_fields_op"
+    
+    def compute(self) -> dsl_interpreter.ComputedOperatorParameterType:
+        return 42
+
+
+def test_get_docs_with_name_set():
+    """Test get_docs() when NAME class attribute is set"""
+    docs = OperatorWithName.get_docs()
+    assert isinstance(docs, dsl_interpreter.OperatorDocs)
+    assert docs.name == "custom_name"  # Should use NAME, not get_name()
+    assert docs.description == "A custom operator with NAME set"
+    assert docs.type == commons_constants.BASE_OPERATORS_LIBRARY
+    assert docs.example == "custom_name(1, 2)"
+    assert docs.parameters == []
+
+
+def test_get_docs_without_name_uses_get_name():
+    """Test get_docs() when NAME is not set, should use get_name()"""
+    docs = OperatorWithoutName.get_docs()
+    assert isinstance(docs, dsl_interpreter.OperatorDocs)
+    assert docs.name == "fallback_name"  # Should use get_name() when NAME is empty
+    assert docs.description == "An operator without NAME, uses get_name()"
+    assert docs.type == commons_constants.BASE_OPERATORS_LIBRARY
+    assert docs.example == "fallback_name(5)"
+    assert docs.parameters == []
+
+
+def test_get_docs_with_parameters():
+    """Test get_docs() when operator has parameters"""
+    docs = OperatorWithParameters.get_docs()
+    assert isinstance(docs, dsl_interpreter.OperatorDocs)
+    assert docs.name == "param_op"
+    assert docs.description == "Operator with parameters"
+    assert docs.type == commons_constants.BASE_OPERATORS_LIBRARY
+    assert docs.example == "param_op(1, 2)"
+    assert len(docs.parameters) == 2
+    assert isinstance(docs.parameters[0], dsl_interpreter.OperatorParameter)
+    assert docs.parameters[0].name == "x"
+    assert docs.parameters[0].description == "first parameter"
+    assert docs.parameters[0].required
+    assert docs.parameters[0].type == int
+    assert isinstance(docs.parameters[1], dsl_interpreter.OperatorParameter)
+    assert docs.parameters[1].name == "y"
+    assert docs.parameters[1].description == "second parameter"
+    assert not docs.parameters[1].required
+    assert docs.parameters[1].type == int
+
+
+def test_get_docs_without_parameters():
+    """Test get_docs() when operator has no parameters"""
+    docs = OperatorWithoutParameters.get_docs()
+    assert docs.name == "no_param_op"
+    assert docs.description == "Operator without parameters"
+    assert docs.type == commons_constants.BASE_OPERATORS_LIBRARY
+    assert docs.example == "no_param_op()"
+    assert docs.parameters == []
+
+
+def test_get_docs_with_custom_library():
+    """Test get_docs() when operator has custom library"""
+    docs = OperatorWithCustomLibrary.get_docs()
+    assert docs.name == "custom_lib_op"
+    assert docs.description == "Operator with custom library"
+    assert docs.type == "custom_library"  # Should use custom library, not default
+    assert docs.example == "custom_lib_op()"
+    assert docs.parameters == []
+
+
+def test_get_docs_with_empty_fields():
+    """Test get_docs() when NAME, DESCRIPTION, EXAMPLE are empty"""
+    docs = OperatorWithEmptyFields.get_docs()
+    assert docs.name == "empty_fields_op"  # Should use get_name()
+    assert docs.description == ""  # Empty DESCRIPTION
+    assert docs.type == commons_constants.BASE_OPERATORS_LIBRARY
+    assert docs.example == ""  # Empty EXAMPLE
+    assert docs.parameters == []
+
+
+def test_get_docs_returns_operator_docs_instance():
+    """Test that get_docs() returns an OperatorDocs instance"""
+    docs = OperatorWithName.get_docs()
+    assert isinstance(docs, dsl_interpreter.OperatorDocs)
+
+
+def test_get_docs_to_json():
+    """Test that the OperatorDocs returned by get_docs() can be serialized to JSON"""
+    docs = OperatorWithParameters.get_docs()
+    json_data = docs.to_json()
+    assert isinstance(json_data, dict)
+    assert json_data["name"] == "param_op"
+    assert json_data["description"] == "Operator with parameters"
+    assert json_data["type"] == commons_constants.BASE_OPERATORS_LIBRARY
+    assert json_data["example"] == "param_op(1, 2)"
+    assert len(json_data["parameters"]) == 2
+    assert json_data["parameters"][0]["name"] == "x"
+    assert json_data["parameters"][0]["description"] == "first parameter"
+    assert json_data["parameters"][0]["required"] is True
+    assert json_data["parameters"][0]["type"] == "int"
+    assert json_data["parameters"][1]["name"] == "y"
+    assert json_data["parameters"][1]["description"] == "second parameter"
+    assert json_data["parameters"][1]["required"] is False
+    assert json_data["parameters"][1]["type"] == "int"

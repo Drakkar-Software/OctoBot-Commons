@@ -1,4 +1,3 @@
-# pylint: disable=too-many-branches,too-many-return-statements
 #  Drakkar-Software OctoBot-Commons
 #  Copyright (c) Drakkar-Software, All rights reserved.
 #
@@ -15,26 +14,32 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import dataclasses
-import typing
+
+
+import octobot_commons.dsl_interpreter.operator_parameter as dsl_interpreter_operator_parameter
 
 
 @dataclasses.dataclass
-class OperatorParameter:
+class OperatorDocs:
+    """
+    Operator documentation class, used to store operators metadata to
+    generate an operator documentation.
+    """
+
     name: str
     description: str
-    required: bool
-    type: typing.Type[typing.Any]
-
-    def __repr__(self) -> str:
-        return f"{self.name}{' (required)' if self.required else ''}[{self.type.__name__}] - {self.description}"
+    type: str
+    example: str
+    parameters: list[dsl_interpreter_operator_parameter.OperatorParameter]
 
     def to_json(self) -> dict:
         """
-        Convert the operator parameter to a JSON serializable dict.
+        Convert the operator documentation to a JSON serializable dict.
         """
         return {
             "name": self.name,
             "description": self.description,
-            "required": self.required,
-            "type": self.type.__name__,
+            "type": self.type,
+            "example": self.example,
+            "parameters": [parameter.to_json() for parameter in self.parameters],
         }
