@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import re
+import typing
 
 import octobot_commons
 
@@ -48,22 +49,24 @@ class Symbol:
 
     def __init__(
         self,
-        symbol_str,
-        market_separator=octobot_commons.MARKET_SEPARATOR,
-        settlement_separator=octobot_commons.SETTLEMENT_ASSET_SEPARATOR,
+        symbol_str: str,
+        market_separator: str = octobot_commons.MARKET_SEPARATOR,
+        settlement_separator: str = octobot_commons.SETTLEMENT_ASSET_SEPARATOR,
+        option_separator: str = octobot_commons.OPTION_SEPARATOR,
     ):
-        self.symbol_str = symbol_str
-        self.base = None
-        self.quote = None
-        self.settlement_asset = None
-        self.identifier = None
-        self.strike_price = None
-        self.option_type = None
-        self.market_separator = market_separator
-        self.settlement_separator = settlement_separator
+        self.symbol_str: str = symbol_str
+        self.base: typing.Optional[str] = None
+        self.quote: typing.Optional[str] = None
+        self.settlement_asset: typing.Optional[str] = None
+        self.identifier: typing.Optional[str] = None
+        self.strike_price: typing.Optional[str] = None
+        self.option_type: typing.Optional[octobot_commons.enums.OptionTypes] = None
+        self.market_separator: str = market_separator
+        self.settlement_separator: str = settlement_separator
+        self.option_separator: str = option_separator
         self.parse_symbol(self.symbol_str)
 
-    def parse_symbol(self, symbol_str):
+    def parse_symbol(self, symbol_str: str):
         """
         Parse the specified symbol
         :param symbol_str: the symbol to parse
@@ -75,18 +78,19 @@ class Symbol:
                 self.settlement_asset,
                 self.identifier,
                 self.strike_price,
-                self.option_type,
+                option_type_str,
             ) = _parse_symbol_full(_FULL_SYMBOL_GROUPS_REGEX, symbol_str)
+            if option_type_str:
+                self.option_type = octobot_commons.enums.OptionTypes(option_type_str)
         else:
             # simple (probably spot) pair, use str.split as it is much faster
             self.base, self.quote = _parse_spot_symbol(
                 self.market_separator, symbol_str
             )
-            self.settlement_asset = (
-                self.identifier
-            ) = self.strike_price = self.option_type = ""
+            self.settlement_asset = self.identifier = self.strike_price = ""
+            self.option_type = None
 
-    def base_and_quote(self):
+    def base_and_quote(self) -> typing.Tuple[str, str]:
         """
         return a tuple made of this symbol's base and quote assets
         """
@@ -94,19 +98,31 @@ class Symbol:
 
     def merged_str_symbol(
         self,
-        market_separator=octobot_commons.MARKET_SEPARATOR,
-        settlement_separator=octobot_commons.SETTLEMENT_ASSET_SEPARATOR,
-    ):
+        market_separator: str = octobot_commons.MARKET_SEPARATOR,
+        settlement_separator: str = octobot_commons.SETTLEMENT_ASSET_SEPARATOR,
+        option_separator: str = octobot_commons.OPTION_SEPARATOR,
+    ) -> str:
         """
         return the base/quote representation of this symbol. includes settlement asset if set
         """
+        merged_symbol = f"{self.base}{market_separator}{self.quote}"
         if self.settlement_asset:
-            return f"{self.base}{market_separator}{self.quote}{settlement_separator}{self.settlement_asset}"
-        return f"{self.base}{market_separator}{self.quote}"
+            merged_symbol = (
+                f"{merged_symbol}{settlement_separator}{self.settlement_asset}"
+            )
+            if self.strike_price and self.identifier and self.option_type:
+                details = [
+                    "",
+                    self.identifier,
+                    str(self.strike_price),
+                    self.option_type.value,
+                ]
+                merged_symbol = f"{merged_symbol}{option_separator.join(details)}"
+        return merged_symbol
 
     def merged_str_base_and_quote_only_symbol(
         self,
-        market_separator=octobot_commons.MARKET_SEPARATOR,
+        market_separator: str = octobot_commons.MARKET_SEPARATOR,
     ):
         """
         return the base/quote representation of this symbol. includes settlement asset if set
@@ -134,6 +150,24 @@ class Symbol:
         return bool(
             self.settlement_asset and not (self.strike_price or self.option_type)
         )
+
+    def does_expire(self):
+        """
+        return True when this symbol is related to a contract that expires
+        """
+        return bool(self.settlement_asset and self.identifier)
+
+    def is_put_option(self):
+        """
+        return True when this symbol is related to a put option contract
+        """
+        return self.option_type == octobot_commons.enums.OptionTypes.PUT
+
+    def is_call_option(self):
+        """
+        return True when this symbol is related to a call option contract
+        """
+        return self.option_type == octobot_commons.enums.OptionTypes.CALL
 
     def is_option(self):
         """

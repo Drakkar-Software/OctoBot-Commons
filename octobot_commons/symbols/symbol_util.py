@@ -15,10 +15,12 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library.
 import functools
+import typing
 import collections
 
 import octobot_commons
 import octobot_commons.constants as constants
+import octobot_commons.enums as enums
 import octobot_commons.symbols.symbol
 
 
@@ -26,7 +28,7 @@ _MAX_PARSED_SYMBOLS_CACHE_SIZE = 2048
 
 
 @functools.lru_cache(maxsize=_MAX_PARSED_SYMBOLS_CACHE_SIZE)
-def parse_symbol(symbol):
+def parse_symbol(symbol: str):
     """
     Parse the specified symbol into a Symbol object
     :param symbol: the symbol to parse
@@ -35,7 +37,7 @@ def parse_symbol(symbol):
     return octobot_commons.symbols.symbol.Symbol(symbol)
 
 
-def merge_symbol(symbol):
+def merge_symbol(symbol: str) -> str:
     """
     Return merged currency and market without /
     :param symbol: the specified symbol
@@ -47,19 +49,25 @@ def merge_symbol(symbol):
 
 
 def merge_currencies(
-    currency,
-    market,
-    settlement_asset=None,
-    market_separator=octobot_commons.MARKET_SEPARATOR,
-    settlement_separator=octobot_commons.SETTLEMENT_ASSET_SEPARATOR,
-):
+    currency: str,
+    market: str,
+    settlement_asset: typing.Optional[str] = None,
+    identifier: typing.Optional[str] = None,
+    strike_price: typing.Optional[str] = None,
+    option_type: typing.Optional[enums.OptionTypes] = None,
+    market_separator: str = octobot_commons.MARKET_SEPARATOR,
+    settlement_separator: str = octobot_commons.SETTLEMENT_ASSET_SEPARATOR,
+    option_separator: str = octobot_commons.OPTION_SEPARATOR,
+) -> str:
     """
     Merge currency and market
     :param currency: the base currency
     :param market: the quote currency
     :param settlement_asset: the settlement asset currency (unused for spot trading)
+    :param strike_price: the strike price or time (used for options)
     :param market_separator: the separator between currency and market
     :param settlement_separator: the separator between the pair and reference market
+    :param option_separator: the separator between the option details
     :return: currency and market merged
     """
     symbol = octobot_commons.symbols.symbol.Symbol(
@@ -67,20 +75,27 @@ def merge_currencies(
     )
     if settlement_asset is not None:
         symbol.settlement_asset = settlement_asset
+    if strike_price:
+        symbol.strike_price = strike_price
+    if identifier:
+        symbol.identifier = identifier
+    if option_type:
+        symbol.option_type = option_type
     return symbol.merged_str_symbol(
         market_separator=market_separator,
         settlement_separator=settlement_separator,
+        option_separator=option_separator,
     )
 
 
 def convert_symbol(
-    symbol,
-    symbol_separator,
-    new_symbol_separator=octobot_commons.MARKET_SEPARATOR,
-    should_uppercase=False,
-    should_lowercase=False,
-    base_and_quote_only=False,
-):
+    symbol: str,
+    symbol_separator: str,
+    new_symbol_separator: str = octobot_commons.MARKET_SEPARATOR,
+    should_uppercase: bool = False,
+    should_lowercase: bool = False,
+    base_and_quote_only: bool = False,
+) -> str:
     """
     Convert symbol according to parameter
     :param symbol: the symbol to convert
@@ -107,7 +122,7 @@ def is_usd_like_coin(coin: str) -> bool:
     return coin in constants.USD_LIKE_COINS
 
 
-def get_most_common_usd_like_symbol(pairs: list[str]):
+def get_most_common_usd_like_symbol(pairs: list[str]) -> str:
     """
     :return: The most common USD like symbol from the given pairs
     """

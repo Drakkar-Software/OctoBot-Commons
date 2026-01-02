@@ -54,15 +54,15 @@ class ExchangeAuthData(octobot_commons.dataclasses.FlexibleDataclass):
 
     def _apply_config(self, exchange_config: dict):
         exchange_config[octobot_commons.constants.CONFIG_EXCHANGE_KEY] = self.api_key
-        exchange_config[
-            octobot_commons.constants.CONFIG_EXCHANGE_SECRET
-        ] = self.api_secret
-        exchange_config[
-            octobot_commons.constants.CONFIG_EXCHANGE_PASSWORD
-        ] = self.api_password
-        exchange_config[
-            octobot_commons.constants.CONFIG_EXCHANGE_SANDBOXED
-        ] = self.sandboxed
-        exchange_config[
-            octobot_commons.constants.CONFIG_EXCHANGE_TYPE
-        ] = self.exchange_type
+        exchange_config[octobot_commons.constants.CONFIG_EXCHANGE_SECRET] = (
+            self.api_secret
+        )
+        exchange_config[octobot_commons.constants.CONFIG_EXCHANGE_PASSWORD] = (
+            self.api_password
+        )
+        exchange_config[octobot_commons.constants.CONFIG_EXCHANGE_SANDBOXED] = (
+            self.sandboxed
+        )
+        exchange_config[octobot_commons.constants.CONFIG_EXCHANGE_TYPE] = (
+            self.exchange_type
+        )

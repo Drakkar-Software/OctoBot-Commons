@@ -299,9 +299,11 @@ class DisplayTranslator:
     ):
         # nested object in array, insert array first
         properties["items"] = {
-            "type": "object"
-            if input_type == enums.UserInputTypes.OBJECT_ARRAY.value
-            else "string",
+            "type": (
+                "object"
+                if input_type == enums.UserInputTypes.OBJECT_ARRAY.value
+                else "string"
+            ),
             "properties": {},
         }
         if item_title := user_input_element.get("item_title"):

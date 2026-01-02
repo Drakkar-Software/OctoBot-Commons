@@ -75,9 +75,11 @@ class UserInput:
         """
         return {
             "name": self.name,
-            "input_type": self.input_type
-            if isinstance(self.input_type, str)
-            else self.input_type.value,
+            "input_type": (
+                self.input_type
+                if isinstance(self.input_type, str)
+                else self.input_type.value
+            ),
             "value": self.value,
             "def_val": self.def_val,
             "min_val": self.min_val,
@@ -269,9 +271,11 @@ def get_user_input_tentacle_type(tentacle) -> str:
     return (
         enums.UserInputTentacleTypes.TRADING_MODE.value
         if hasattr(tentacle, "trading_config")
-        else enums.UserInputTentacleTypes.EVALUATOR.value
-        if hasattr(tentacle, "specific_config")
-        else enums.UserInputTentacleTypes.EXCHANGE.value
+        else (
+            enums.UserInputTentacleTypes.EVALUATOR.value
+            if hasattr(tentacle, "specific_config")
+            else enums.UserInputTentacleTypes.EXCHANGE.value
+        )
     )
 
 

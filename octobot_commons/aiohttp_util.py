@@ -199,9 +199,7 @@ class RequestCounter:
         identifier = (
             f"{days} days"
             if days > 1
-            else f"{hours} hours"
-            if hours > 1
-            else f"{self.period} seconds"
+            else f"{hours} hours" if hours > 1 else f"{self.period} seconds"
         )
         octobot_commons.logging.get_logger(self.__class__.__name__).info(
             f"[{self.name}]: {total_req} requests over {identifier}: {self.paths}"

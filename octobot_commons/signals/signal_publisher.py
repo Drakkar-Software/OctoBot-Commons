@@ -99,10 +99,10 @@ class SignalPublisher(singleton.Singleton):
     ) -> signal_builder_wrapper.SignalBuilderWrapper:
         if wrapper_key in self._signal_builder_wrappers:
             return self._signal_builder_wrappers[wrapper_key]
-        self._signal_builder_wrappers[
-            wrapper_key
-        ] = signal_builder_wrapper.SignalBuilderWrapper(
-            identifier, signal_builder_class, timeout, builder_args
+        self._signal_builder_wrappers[wrapper_key] = (
+            signal_builder_wrapper.SignalBuilderWrapper(
+                identifier, signal_builder_class, timeout, builder_args
+            )
         )
         return self._signal_builder_wrappers[wrapper_key]
 

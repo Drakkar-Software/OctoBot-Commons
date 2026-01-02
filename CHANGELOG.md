@@ -4,92 +4,96 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.9.92] - 2024-12-16
+## [1.10.0] - 2026-01-02
+### Added 
+- Option symbols supports in Symbol operations (Warning: `market_separator` is not the fourth param of `merge_currencies` anymore, it shouldn't be a breaking change as it should be called with kwargs)
+
+## [1.9.92] - 2025-12-16
 ### Added 
 [DSL] add operator docs
 
-## [1.9.91] - 2024-12-05
+## [1.9.91] - 2025-12-05
 ### Added 
 [AsyncTools] add gather_waiting_for_all_before_raising
 
-## [1.9.90] - 2024-12-03
+## [1.9.90] - 2025-12-03
 ### Updated 
 [Cache] reduce symbol util cache to free RAM
 
-## [1.9.89] - 2024-12-02
+## [1.9.89] - 2025-12-02
 ### Added 
 [OS] Add is_raspberry_pi_machine()
 
-## [1.9.88] - 2024-11-26
+## [1.9.88] - 2025-11-26
 ### Added 
 [Requirements] fix full requirements installation
 
-## [1.9.87] - 2024-11-26
+## [1.9.87] - 2025-11-26
 ### Added 
 [Requirements] [full] requirements
 
-## [1.9.86] - 2024-11-18
+## [1.9.86] - 2025-11-18
 ### Fixed 
 [Constants] usd-like coins list
 
-## [1.9.85] - 2024-11-18
+## [1.9.85] - 2025-11-18
 ### Added 
 [DSL] add DSL interpreter
 
-## [1.9.84] - 2024-11-07
+## [1.9.84] - 2025-11-07
 ### Added 
 [Constants] add CONFIG_FORCE_AUTHENTICATION
 
-## [1.9.83] - 2024-10-17
+## [1.9.83] - 2025-10-17
 ### Added 
 [Constants] add DEFAULT_REFERENCE_MARKET
 
-## [1.9.82] - 2024-08-24
+## [1.9.82] - 2025-08-24
 ### Added 
 [Signals] add dependencies
 
-## [1.9.81] - 2024-08-16
+## [1.9.81] - 2025-08-16
 ### Added 
 [ProfileData] add exchange_account_id
 
-## [1.9.80] - 2024-07-17
+## [1.9.80] - 2025-07-17
 ### Updated 
 [Time] fix timezone deprecation
 
-## [1.9.79] - 2024-07-12
+## [1.9.79] - 2025-07-12
 ### Added 
 [HistoricalConfig] add checker and multi config selector
 
-## [1.9.78] - 2024-06-16
+## [1.9.78] - 2025-06-16
 ### Added 
 [Authentication] add kwargs to update_portfolio
 
-## [1.9.77] - 2024-05-31
+## [1.9.77] - 2025-05-31
 ### Added 
 [DisplayTranslator] temporary fix field dependency issue
 
-## [1.9.76] - 2024-05-23
+## [1.9.76] - 2025-05-23
 ### Added 
 [ProfileData] add nested_strategy_config_id
 [ListUtil] deduplicate
 
-## [1.9.75] - 2024-05-21
+## [1.9.75] - 2025-05-21
 ### Added 
 [Constants] add distribution
 
-## [1.9.74] - 2024-03-18
+## [1.9.74] - 2025-03-18
 ### Updated 
 [ProfileData] add sub portfolio requirements
 
-## [1.9.73] - 2024-02-23
+## [1.9.73] - 2025-02-23
 ### Updated 
 [DictUtil] add ignore_lists
 
-## [1.9.72] - 2024-02-16
+## [1.9.72] - 2025-02-16
 ### Fixed
 [ProfileData] fix future_exchange_data default value
 
-## [1.9.71] - 2024-02-10
+## [1.9.71] - 2025-02-10
 ### Added
 [Constants] add TRADING_SYMBOL_REGEX
 

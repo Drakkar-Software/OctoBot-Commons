@@ -129,9 +129,7 @@ class Interpreter:
             return self._operator_tree_or_constant.compute()
         return self._operator_tree_or_constant
 
-    def _visit_node(
-        self, node: typing.Optional[ast.AST]
-    ) -> typing.Union[
+    def _visit_node(self, node: typing.Optional[ast.AST]) -> typing.Union[
         dsl_interpreter_operator.Operator,
         dsl_interpreter_operator.ComputedOperatorParameterType,
     ]:
@@ -154,9 +152,11 @@ class Interpreter:
                 operator_class = self.operators_by_name[func_name]
                 # Convert arguments to Operator instances or values
                 args = [
-                    self._get_value_from_constant_node(arg)
-                    if isinstance(arg, ast.Constant)
-                    else self._visit_node(arg)
+                    (
+                        self._get_value_from_constant_node(arg)
+                        if isinstance(arg, ast.Constant)
+                        else self._visit_node(arg)
+                    )
                     for arg in node.args
                 ]
                 return operator_class(*args)
