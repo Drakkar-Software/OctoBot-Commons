@@ -40,11 +40,13 @@ def create_signal(signal_dict: dict) -> signal.Signal:
     return signal.Signal(
         signal_dict.get(commons_enums.SignalsAttrs.TOPIC.value),
         signal_dict.get(commons_enums.SignalsAttrs.CONTENT.value),
-        signal_dependencies.SignalDependencies(
-            signal_dict.get(commons_enums.SignalsAttrs.DEPENDENCIES.value).get(
-                commons_enums.SignalDependenciesAttrs.DEPENDENCY.value
+        (
+            signal_dependencies.SignalDependencies(
+                signal_dict.get(commons_enums.SignalsAttrs.DEPENDENCIES.value).get(
+                    commons_enums.SignalDependenciesAttrs.DEPENDENCY.value
+                )
             )
-        )
-        if signal_dict.get(commons_enums.SignalsAttrs.DEPENDENCIES.value)
-        else None,
+            if signal_dict.get(commons_enums.SignalsAttrs.DEPENDENCIES.value)
+            else None
+        ),
     )

@@ -28,7 +28,18 @@ def test_merge_symbol():
 def test_merge_currencies():
     assert octobot_commons.symbols.merge_currencies("BTC", "USDT") == "BTC/USDT"
     assert octobot_commons.symbols.merge_currencies("BTC", "USDT", "BTC") == "BTC/USDT:BTC"
-    assert octobot_commons.symbols.merge_currencies("BTC", "USDT", "XXX", "g", "d") == "BTCgUSDTdXXX"
+    assert octobot_commons.symbols.merge_currencies("BTC", "USDT", settlement_asset="XXX", market_separator="g", settlement_separator="d") == "BTCgUSDTdXXX"
+    assert (
+        octobot_commons.symbols.merge_currencies(
+            "will-bitcoin-replace-sha-256-before-2027",
+            "USDC",
+            "USDC",
+            "261231",
+            "0",
+            octobot_commons.enums.OptionTypes.PUT
+        )
+        == "will-bitcoin-replace-sha-256-before-2027/USDC:USDC-261231-0-P"
+    )
 
 
 def test_convert_symbol():

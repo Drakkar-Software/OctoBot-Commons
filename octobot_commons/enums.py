@@ -88,6 +88,15 @@ class PriceStrings(enum.Enum):
     STR_PRICE_VOL = "vol"
 
 
+class OptionTypes(enum.Enum):
+    """
+    Default option type
+    """
+
+    PUT = "P"
+    CALL = "C"
+
+
 class PlatformsName(enum.Enum):
     """
     OctoBot supported platforms name

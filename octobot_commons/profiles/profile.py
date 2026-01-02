@@ -259,13 +259,13 @@ class Profile:
                 constants.CONFIG_AUTO_UPDATE: self.auto_update,
                 constants.CONFIG_READ_ONLY: self.read_only,
                 constants.CONFIG_IMPORTED: self.imported,
-                constants.CONFIG_COMPLEXITY: self.complexity.value
-                if self.complexity
-                else None,
+                constants.CONFIG_COMPLEXITY: (
+                    self.complexity.value if self.complexity else None
+                ),
                 constants.CONFIG_RISK: self.risk.value if self.risk else None,
-                constants.CONFIG_TYPE: self.profile_type.value
-                if self.profile_type
-                else None,
+                constants.CONFIG_TYPE: (
+                    self.profile_type.value if self.profile_type else None
+                ),
                 constants.CONFIG_EXTRA_BACKTESTING_TIME_FRAMES: self.extra_backtesting_time_frames,
             },
             constants.PROFILE_CONFIG: self.config,
@@ -339,13 +339,11 @@ class Profile:
                         ):
                             # item not in profile, it will be added to profile upon save
                             # use forced default profile value for forced default keys
-                            config[element][config_key][
-                                config_sub_element
-                            ] = Profile.PARTIALLY_MANAGED_ELEMENTS_FORCED_DEFAULT_KEYS[
-                                element
-                            ][
-                                config_sub_element
-                            ]
+                            config[element][config_key][config_sub_element] = (
+                                Profile.PARTIALLY_MANAGED_ELEMENTS_FORCED_DEFAULT_KEYS[
+                                    element
+                                ][config_sub_element]
+                            )
 
     @staticmethod
     def _get_element_from_template(template: dict, profile_values: dict) -> dict:

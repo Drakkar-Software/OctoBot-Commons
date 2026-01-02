@@ -28,10 +28,12 @@ class MinimizableDataclass(flexible_dataclass.FlexibleDataclass):
         factory = _asdict_without_default_factory(
             (self.__class__,)
             + tuple(
-                getattr(self, attr.name)[0].__class__
-                if isinstance(getattr(self, attr.name), list)
-                and getattr(self, attr.name)
-                else getattr(self, attr.name).__class__
+                (
+                    getattr(self, attr.name)[0].__class__
+                    if isinstance(getattr(self, attr.name), list)
+                    and getattr(self, attr.name)
+                    else getattr(self, attr.name).__class__
+                )
                 for attr in dataclasses.fields(self)
             )
         )

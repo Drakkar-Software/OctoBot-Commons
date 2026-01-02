@@ -30,17 +30,17 @@ class Signal:
     ):
         self.topic: str = topic
         self.content: dict = content
-        self.dependencies: typing.Optional[
-            signal_dependencies.SignalDependencies
-        ] = dependencies
+        self.dependencies: typing.Optional[signal_dependencies.SignalDependencies] = (
+            dependencies
+        )
 
     def to_dict(self) -> dict:
         return {
             octobot_commons.enums.SignalsAttrs.TOPIC.value: self.topic,
             octobot_commons.enums.SignalsAttrs.CONTENT.value: self.content,
-            octobot_commons.enums.SignalsAttrs.DEPENDENCIES.value: self.dependencies.to_dict()
-            if self.dependencies
-            else None,
+            octobot_commons.enums.SignalsAttrs.DEPENDENCIES.value: (
+                self.dependencies.to_dict() if self.dependencies else None
+            ),
         }
 
     def __str__(self):

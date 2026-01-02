@@ -17,4 +17,4 @@ wheel
 pur
 
 pylint
-black==23.3.0
+black==25.12.0

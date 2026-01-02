@@ -36,13 +36,15 @@ class Operator:
     It can have one or more parameters which are used to compute the result of the operator.
     """
 
-    MIN_PARAMS: typing.Optional[
-        int
-    ] = None  # min number of parameters when not defined in get_parameters()
-    MAX_PARAMS: typing.Optional[
-        int
-    ] = None  # max number of parameters when not defined in get_parameters()
-    NAME: str = ""  # name of the operator as written in the DSL expression, if not provided, get_name() will be used
+    MIN_PARAMS: typing.Optional[int] = (
+        None  # min number of parameters when not defined in get_parameters()
+    )
+    MAX_PARAMS: typing.Optional[int] = (
+        None  # max number of parameters when not defined in get_parameters()
+    )
+    NAME: str = (
+        ""  # name of the operator as written in the DSL expression, if not provided, get_name() will be used
+    )
     DESCRIPTION: str = ""  # description of the operator
     EXAMPLE: str = ""  # example of the operator in the DSL
 
