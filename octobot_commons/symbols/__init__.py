@@ -21,6 +21,7 @@ from octobot_commons.symbols.symbol_util import (
     merge_symbol,
     merge_currencies,
     convert_symbol,
+    is_symbol,
     is_usd_like_coin,
     get_most_common_usd_like_symbol,
 )
@@ -37,6 +38,7 @@ __all__ = [
     "merge_symbol",
     "merge_currencies",
     "convert_symbol",
+    "is_symbol",
     "is_usd_like_coin",
     "get_most_common_usd_like_symbol",
     "Symbol",

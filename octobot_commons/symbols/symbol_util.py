@@ -20,7 +20,6 @@ import collections
 
 import octobot_commons
 import octobot_commons.constants as constants
-import octobot_commons.enums as enums
 import octobot_commons.symbols.symbol
 
 
@@ -48,13 +47,23 @@ def merge_symbol(symbol: str) -> str:
     )
 
 
+def is_symbol(value: str, separator: str = octobot_commons.MARKET_SEPARATOR) -> bool:
+    """
+    Check if the given string is a symbol or a coin based on the separator
+    :param value: the string to check
+    :param separator: the separator to use for checking (e.g., "/" for "BTC/USDT")
+    :return: True if the string is a symbol (contains the separator), False if it's a coin (single currency)
+    """
+    return separator in value
+
+
 def merge_currencies(
     currency: str,
     market: str,
     settlement_asset: typing.Optional[str] = None,
     identifier: typing.Optional[str] = None,
     strike_price: typing.Optional[str] = None,
-    option_type: typing.Optional[enums.OptionTypes] = None,
+    option_type: typing.Optional[str] = None,
     market_separator: str = octobot_commons.MARKET_SEPARATOR,
     settlement_separator: str = octobot_commons.SETTLEMENT_ASSET_SEPARATOR,
     option_separator: str = octobot_commons.OPTION_SEPARATOR,

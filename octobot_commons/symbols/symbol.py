@@ -60,7 +60,7 @@ class Symbol:
         self.settlement_asset: typing.Optional[str] = None
         self.identifier: typing.Optional[str] = None
         self.strike_price: typing.Optional[str] = None
-        self.option_type: typing.Optional[octobot_commons.enums.OptionTypes] = None
+        self.option_type: typing.Optional[str] = None
         self.market_separator: str = market_separator
         self.settlement_separator: str = settlement_separator
         self.option_separator: str = option_separator
@@ -78,10 +78,9 @@ class Symbol:
                 self.settlement_asset,
                 self.identifier,
                 self.strike_price,
-                option_type_str,
+                self.option_type,
             ) = _parse_symbol_full(_FULL_SYMBOL_GROUPS_REGEX, symbol_str)
-            if option_type_str:
-                self.option_type = octobot_commons.enums.OptionTypes(option_type_str)
+            self.option_type = _parse_option_type(self.option_type)
         else:
             # simple (probably spot) pair, use str.split as it is much faster
             self.base, self.quote = _parse_spot_symbol(
@@ -115,7 +114,7 @@ class Symbol:
                     "",
                     self.identifier,
                     str(self.strike_price),
-                    self.option_type.value,
+                    _parse_option_type(self.option_type),
                 ]
                 merged_symbol = f"{merged_symbol}{option_separator.join(details)}"
         return merged_symbol
@@ -161,13 +160,13 @@ class Symbol:
         """
         return True when this symbol is related to a put option contract
         """
-        return self.option_type == octobot_commons.enums.OptionTypes.PUT
+        return self.option_type == octobot_commons.enums.OptionTypes.PUT.value
 
     def is_call_option(self):
         """
         return True when this symbol is related to a call option contract
         """
-        return self.option_type == octobot_commons.enums.OptionTypes.CALL
+        return self.option_type == octobot_commons.enums.OptionTypes.CALL.value
 
     def is_option(self):
         """
@@ -223,3 +222,7 @@ def _parse_spot_symbol(separator, symbol_str):
     if len(split_result) < 2:
         return symbol_str, None
     return split_result[0], split_result[1]
+
+
+def _parse_option_type(option_type_str: typing.Optional[str]) -> typing.Optional[str]:
+    return option_type_str.upper() if option_type_str else None
