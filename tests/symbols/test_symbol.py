@@ -74,12 +74,7 @@ def test_parse_option_symbol(option_symbol):
     assert option_symbol.settlement_asset == "USDT"
     assert option_symbol.identifier == "211225"
     assert option_symbol.strike_price == "40000"
-    assert option_symbol.option_type == octobot_commons.enums.OptionTypes.CALL
-
-
-def test_parse_option_symbol_with_invalid_option_type():
-    with pytest.raises(ValueError):
-        octobot_commons.symbols.Symbol("BTC/USDT:BTC-211225-60000-X")
+    assert option_symbol.option_type == octobot_commons.enums.OptionTypes.CALL.value
 
 
 def test_base_and_quote(spot_symbol, option_symbol):
@@ -101,16 +96,22 @@ def test_is_inverse(spot_symbol, perpetual_future_symbol, option_symbol):
 
 def test_merged_str_symbol_with_full_option(option_symbol, put_option_symbol):
     call_symbol = octobot_commons.symbols.Symbol("ETH/USDT:USDT-211225-40000-C")
-    call_symbol.option_type = octobot_commons.enums.OptionTypes.CALL
+    call_symbol.option_type = octobot_commons.enums.OptionTypes.CALL.value
     call_symbol.strike_price = 40000
     call_symbol.identifier = "211225"
     assert call_symbol.merged_str_symbol() == "ETH/USDT:USDT-211225-40000-C"
     
     put_symbol = octobot_commons.symbols.Symbol("BTC/USDT:BTC-211225-60000-P")
-    put_symbol.option_type = octobot_commons.enums.OptionTypes.PUT
+    put_symbol.option_type = octobot_commons.enums.OptionTypes.PUT.value
     put_symbol.strike_price = 60000
     put_symbol.identifier = "211225"
     assert put_symbol.merged_str_symbol() == "BTC/USDT:BTC-211225-60000-P"
+
+    custom_symbol = octobot_commons.symbols.Symbol("BTC/USDT:BTC-211225-60000-yES")
+    custom_symbol.option_type = "YES"
+    custom_symbol.strike_price = 60000
+    custom_symbol.identifier = "211225"
+    assert custom_symbol.merged_str_symbol() == "BTC/USDT:BTC-211225-60000-YES"
 
 
 def test_is_put_option():

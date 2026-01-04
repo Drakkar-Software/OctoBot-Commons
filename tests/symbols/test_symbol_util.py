@@ -36,11 +36,63 @@ def test_merge_currencies():
             "USDC",
             "261231",
             "0",
-            octobot_commons.enums.OptionTypes.PUT
+            octobot_commons.enums.OptionTypes.PUT.value
         )
         == "will-bitcoin-replace-sha-256-before-2027/USDC:USDC-261231-0-P"
+    )
+    assert (
+        octobot_commons.symbols.merge_currencies(
+            "will-bitcoin-replace-sha-256-before-2027",
+            "USDC",
+            "USDC",
+            "261231",
+            "0",
+            "test"
+        )
+        == "will-bitcoin-replace-sha-256-before-2027/USDC:USDC-261231-0-TEST"
+    )
+    assert (
+        octobot_commons.symbols.merge_currencies(
+            "will-bitcoin-replace-sha-256-before-2027",
+            "USDC",
+            "USDC",
+            "261231",
+            "0",
+            None
+        )
+        == "will-bitcoin-replace-sha-256-before-2027/USDC:USDC"
     )
 
 
 def test_convert_symbol():
     assert octobot_commons.symbols.convert_symbol("BTC-USDT", symbol_separator="-") == "BTC/USDT"
+
+
+def test_is_symbol():
+    # Test with default separator (/)
+    assert octobot_commons.symbols.is_symbol("BTC/USDT") is True
+    assert octobot_commons.symbols.is_symbol("ETH/USDT") is True
+    assert octobot_commons.symbols.is_symbol("BTC/USDT:USDT") is True
+    assert octobot_commons.symbols.is_symbol("BTC") is False
+    assert octobot_commons.symbols.is_symbol("USDT") is False
+    assert octobot_commons.symbols.is_symbol("ETH") is False
+    
+    # Test with custom separator (-)
+    assert octobot_commons.symbols.is_symbol("BTC-USDT", separator="-") is True
+    assert octobot_commons.symbols.is_symbol("ETH-USDT", separator="-") is True
+    assert octobot_commons.symbols.is_symbol("BTC", separator="-") is False
+    assert octobot_commons.symbols.is_symbol("USDT", separator="-") is False
+    
+    # Test with custom separator (:)
+    assert octobot_commons.symbols.is_symbol("BTC/USDT:USDT", separator=":") is True
+    assert octobot_commons.symbols.is_symbol("BTC/USDT", separator=":") is False
+    assert octobot_commons.symbols.is_symbol("BTC", separator=":") is False
+    
+    # Test with custom separator (|)
+    assert octobot_commons.symbols.is_symbol("BTC|USDT", separator="|") is True
+    assert octobot_commons.symbols.is_symbol("BTC", separator="|") is False
+    
+    # Test edge cases
+    assert octobot_commons.symbols.is_symbol("", separator="/") is False
+    assert octobot_commons.symbols.is_symbol("/", separator="/") is True
+    assert octobot_commons.symbols.is_symbol("BTC/USDT/ETH", separator="/") is True
