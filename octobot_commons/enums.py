@@ -431,6 +431,7 @@ class UserInputTentacleTypes(enum.Enum):
     TRADING_MODE = "trading_mode"
     EVALUATOR = "evaluator"
     EXCHANGE = "exchange"
+    BLOCKCHAIN_WALLET = "blockchain_wallet"
     WEB_PLUGIN = "web_plugin"
     AUTOMATION = "automation"
     UNDEFINED = "undefined"

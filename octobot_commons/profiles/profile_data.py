@@ -24,7 +24,10 @@ import octobot_commons.constants as constants
 
 
 @dataclasses.dataclass
-class ProfileDetailsData(octobot_commons.dataclasses.FlexibleDataclass):
+class ProfileDetailsData(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
     name: str = ""
     id: typing.Union[str, None] = None
     bot_id: typing.Union[str, None] = None
@@ -34,14 +37,20 @@ class ProfileDetailsData(octobot_commons.dataclasses.FlexibleDataclass):
 
 
 @dataclasses.dataclass
-class CryptoCurrencyData(octobot_commons.dataclasses.FlexibleDataclass):
-    trading_pairs: list[str]
+class CryptoCurrencyData(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
+    trading_pairs: list[str] = dataclasses.field(default_factory=list)
     name: typing.Union[str, None] = None
     enabled: bool = True
 
 
 @dataclasses.dataclass
-class ExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
+class ExchangeData(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
     exchange_credential_id: typing.Union[str, None] = (
         None  # deprecated, use exchange_account_id instead, exchange_credential_id is updated in exchange_data.auth_details
     )
@@ -53,13 +62,19 @@ class ExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
 
 
 @dataclasses.dataclass
-class FutureSymbolData(octobot_commons.dataclasses.FlexibleDataclass):
-    symbol: str
+class FutureSymbolData(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
+    symbol: typing.Optional[str] = None
     leverage: typing.Union[float, None] = None
 
 
 @dataclasses.dataclass
-class FutureExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
+class FutureExchangeData(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
     default_leverage: typing.Union[float, None] = None
     symbol_data: list[FutureSymbolData] = dataclasses.field(default_factory=list)
 
@@ -73,12 +88,18 @@ class FutureExchangeData(octobot_commons.dataclasses.FlexibleDataclass):
 
 
 @dataclasses.dataclass
-class TraderData(octobot_commons.dataclasses.FlexibleDataclass):
+class TraderData(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
     enabled: bool = True
 
 
 @dataclasses.dataclass
-class TraderSimulatorData(octobot_commons.dataclasses.FlexibleDataclass):
+class TraderSimulatorData(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
     enabled: bool = False
     starting_portfolio: dict[str, float] = dataclasses.field(default_factory=dict)
     maker_fees: float = 0.1
@@ -86,10 +107,13 @@ class TraderSimulatorData(octobot_commons.dataclasses.FlexibleDataclass):
 
 
 @dataclasses.dataclass
-class MinimalFund(octobot_commons.dataclasses.FlexibleDataclass):
-    asset: str
-    available: float
-    total: float
+class MinimalFund(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
+    asset: typing.Optional[str] = None
+    available: typing.Optional[float] = None
+    total: typing.Optional[float] = None
 
     @classmethod
     def from_dict(cls, dict_value: dict):
@@ -103,8 +127,11 @@ class MinimalFund(octobot_commons.dataclasses.FlexibleDataclass):
 
 
 @dataclasses.dataclass
-class TradingData(octobot_commons.dataclasses.FlexibleDataclass):
-    reference_market: str
+class TradingData(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
+    reference_market: str = ""
     minimal_funds: list[MinimalFund] = dataclasses.field(default_factory=list)
     risk: float = 1.0
     sub_portfolio: dict[str, float] = dataclasses.field(default_factory=dict)
@@ -120,13 +147,19 @@ class TradingData(octobot_commons.dataclasses.FlexibleDataclass):
 
 
 @dataclasses.dataclass
-class TentaclesData(octobot_commons.dataclasses.FlexibleDataclass):
-    name: str
+class TentaclesData(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
+    name: typing.Optional[str] = None
     config: dict = dataclasses.field(default_factory=dict)
 
 
 @dataclasses.dataclass
-class BacktestingContext(octobot_commons.dataclasses.FlexibleDataclass):
+class BacktestingContext(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
     start_time_delta: float = 0
     update_interval: float = 7 * constants.DAYS_TO_SECONDS
     starting_portfolio: dict = dataclasses.field(default_factory=dict)
@@ -134,15 +167,25 @@ class BacktestingContext(octobot_commons.dataclasses.FlexibleDataclass):
 
 
 @dataclasses.dataclass
-class OptionsData(octobot_commons.dataclasses.FlexibleDataclass):
+class OptionsData(
+    octobot_commons.dataclasses.FlexibleDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
     values: dict = dataclasses.field(default_factory=dict)
 
 
 @dataclasses.dataclass
-class ProfileData(octobot_commons.dataclasses.MinimizableDataclass):
-    profile_details: ProfileDetailsData
-    crypto_currencies: list[CryptoCurrencyData]
-    trading: TradingData
+class ProfileData(
+    octobot_commons.dataclasses.MinimizableDataclass,
+    octobot_commons.dataclasses.UpdatableDataclass,
+):
+    profile_details: ProfileDetailsData = dataclasses.field(
+        default_factory=ProfileDetailsData
+    )
+    crypto_currencies: list[CryptoCurrencyData] = dataclasses.field(
+        default_factory=list
+    )
+    trading: TradingData = dataclasses.field(default_factory=TradingData)
     exchanges: list[ExchangeData] = dataclasses.field(default_factory=list)
     future_exchange_data: FutureExchangeData = dataclasses.field(
         default_factory=FutureExchangeData

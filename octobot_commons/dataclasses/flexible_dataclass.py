@@ -37,7 +37,12 @@ class FlexibleDataclass:
                 for k, v in dict_value.items()
                 if k in cls.get_field_names()
             }
-            return cls(**fields_values)
+            try:
+                return cls(**fields_values)
+            except TypeError as e:
+                raise TypeError(
+                    f"Invalid {cls.__name__} input in from_dict(): {e}"
+                ) from e
         return dict_value
 
     @classmethod
