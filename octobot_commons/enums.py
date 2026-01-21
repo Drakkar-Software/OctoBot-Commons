@@ -425,6 +425,7 @@ class InitializationEventExchangeTopics(enum.Enum):
     PRICE = "price"
     ORDER_BOOK = "order_book"
     FUNDING = "funding"
+    MARKETS = "markets"
 
 
 class UserInputTentacleTypes(enum.Enum):
