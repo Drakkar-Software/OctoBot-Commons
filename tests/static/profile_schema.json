@@ -144,6 +144,9 @@
           "type": "object",
           "additionalProperties":false,
           "properties": {
+            "paused": {
+              "type": "boolean"
+            },
             "reference-market": {
               "type": "string"
             },
