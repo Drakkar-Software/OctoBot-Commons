@@ -80,6 +80,7 @@ def profile_data_dict():
             'taker_fees': 0.1
         }, 'trading': {
             'reference_market': 'BTC',
+            'paused': False,
             'minimal_funds': [
                 {
                     "asset": "BTC",
@@ -292,6 +293,7 @@ def test_from_dict_objects(profile_data_dict):
     assert profile_data.trader_simulator.enabled is False
     assert profile_data.trader_simulator.starting_portfolio == {'BTC': 10, 'USDT': 1000}
     assert profile_data.trading.risk == 0.5
+    assert profile_data.trading.paused is False
     assert profile_data.tentacles[0].name == "plopEvaluator"
     assert profile_data.tentacles[1].config["other"]["l"] == [1, 2]
     assert profile_data.options.values['plop_key'] == 'hola senior'
