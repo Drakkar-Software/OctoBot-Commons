@@ -136,6 +136,7 @@ class TradingData(
     risk: float = 1.0
     sub_portfolio: dict[str, float] = dataclasses.field(default_factory=dict)
     sellable_assets: typing.Optional[list[str]] = None
+    paused: bool = False
 
     # pylint: disable=E1134
     def __post_init__(self):
@@ -328,6 +329,7 @@ class ProfileData(
                 constants.CONFIG_TRADING: {
                     constants.CONFIG_TRADER_REFERENCE_MARKET: self.trading.reference_market,
                     constants.CONFIG_TRADER_RISK: self.trading.risk,
+                    constants.CONFIG_TRADER_PAUSED: self.trading.paused,
                 },
             },
             constants.CONFIG_PROFILE: dataclasses.asdict(self.profile_details),

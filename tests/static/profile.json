@@ -20,6 +20,7 @@
       }
     },
     "trading": {
+      "paused": false,
       "reference-market": "BTC",
       "risk": 0.5
     },
