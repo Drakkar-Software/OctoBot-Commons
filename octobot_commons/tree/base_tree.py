@@ -81,7 +81,10 @@ class BaseTree:
         """
         self._set_node(node, value, node_type, timestamp=timestamp)
 
-    def set_node_at_path(self, value, node_type, path, timestamp=0):
+    # pylint: disable=too-many-arguments
+    def set_node_at_path(
+        self, value, node_type, path, timestamp=0, description=None, metadata=None
+    ):
         """
         Set the node attributes
         Creates the node if it doesn't exists
@@ -89,13 +92,20 @@ class BaseTree:
         :param node_type: the node 'node_type' attribute to set
         :param path: the node path (as a list of string)
         :param timestamp: the value modification timestamp.
+        :param description: the node 'node_description' attribute to set
+        :param metadata: the node 'node_metadata' attribute to set
         For example:
         - If you created a first node with the path ["my-parent-node"]
         - You can create a child node of my-parent-node by using ["my-parent-node", "my-new-child-node"] as `path`
         :return: void
         """
         self._set_node(
-            self.get_or_create_node(path), value, node_type, timestamp=timestamp
+            self.get_or_create_node(path),
+            value,
+            node_type,
+            timestamp=timestamp,
+            description=description,
+            metadata=metadata,
         )
 
     def get_node(self, path, starting_node=None):
@@ -234,13 +244,24 @@ class BaseTree:
         node.set_child(key, self.TREE_NODE_CLASS(None, None, **kwargs))
         return node.children[key]
 
-    def _set_node(self, node, value=None, node_type=None, timestamp=0):
+    # pylint: disable=too-many-arguments
+    def _set_node(
+        self,
+        node,
+        value=None,
+        node_type=None,
+        timestamp=0,
+        description=None,
+        metadata=None,
+    ):
         """
         Sets the node attributes
         :param node: the node instance to update
         :param value: the node instance 'node_value' attribute to set (is ignored if None)
         :param node_type: the node instance 'node_type' attribute to set (is ignored if None)
         :param timestamp: the value modification timestamp.
+        :param description: the node instance 'node_description' attribute to set (is ignored if None)
+        :param metadata: the node instance 'node_metadata' attribute to set (is ignored if None)
         """
         if value is not None:
             node.node_value = value
@@ -250,3 +271,9 @@ class BaseTree:
 
         # set the node value modification timestamp
         node.node_value_time = timestamp
+
+        if description is not None:
+            node.node_description = description
+
+        if metadata is not None:
+            node.node_metadata = metadata

@@ -78,3 +78,4 @@ class OctoBotTradingChannelsName(enum.Enum):
     MODE_CHANNEL = "Mode"
     MARK_PRICE_CHANNEL = "MarkPrice"
     FUNDING_CHANNEL = "Funding"
+    MARKETS_CHANNEL = "Markets"
